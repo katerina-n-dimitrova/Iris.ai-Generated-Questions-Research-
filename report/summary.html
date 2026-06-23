@@ -188,6 +188,50 @@
     </div>
   </div>
 
+  <!-- ============ TABLE 3: DOC TYPE RANKING ============ -->
+  <div class="card">
+    <h2>Table 3 &mdash; Which document type works best in the RAG system?</h2>
+    <p class="sub">Ranked by a composite score = average of five comparable 0&ndash;1 metrics
+       (nDCG@10, MRR, Hit@5, faithfulness, answer relevance), using the
+       <b>baseline</b> setup as each type's native RAG performance. Higher = better.</p>
+    <table>
+      <thead>
+        <tr><th>Rank</th><th class="l">Document type</th>
+          <th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th>
+          <th>Composite</th><th class="l">Verdict</th></tr>
+      </thead>
+      <tbody>
+        <tr class="base"><td><b>1</b></td><td class="l ds">Structured text <span class="legend">(SciFact)</span></td>
+          <td>0.851</td><td>0.831</td><td>0.890</td><td>0.470</td><td>0.450</td>
+          <td class="win">0.698</td><td class="l"><span class="tag up">best</span> strongest all-round</td></tr>
+        <tr class="enr"><td><b>2</b></td><td class="l ds">Tables <span class="legend">(WikiTableQ)</span></td>
+          <td>0.704</td><td>0.677</td><td>0.777</td><td>0.452</td><td>0.600</td>
+          <td>0.642</td><td class="l">good retrieval, highest answer relevance</td></tr>
+        <tr class="base"><td><b>3</b></td><td class="l ds">Unstructured text <span class="legend">(NFCorpus)</span></td>
+          <td>0.506</td><td>0.813</td><td>0.900</td><td>0.467</td><td>0.467</td>
+          <td>0.630</td><td class="l">great ranking, many relevant docs per query</td></tr>
+        <tr class="enr"><td><b>4</b></td><td class="l ds">Charts <span class="legend">(ChartQA)</span></td>
+          <td>0.045</td><td>0.034</td><td>0.063</td><td>0.160</td><td>0.233</td>
+          <td class="lose">0.107</td><td class="l"><span class="tag down">worst</span> no usable text without OCR</td></tr>
+      </tbody>
+    </table>
+    <div class="key">
+      <h3>Best vs. worst document type</h3>
+      <ul>
+        <li><span class="tag up">BEST</span> <b>Structured scientific text (SciFact)</b> &mdash; composite
+            <b>0.698</b>. Clean, self-contained sentences with clear topics are the easiest for the RAG
+            system to embed, retrieve, and answer from.</li>
+        <li><span class="tag down">WORST</span> <b>Charts (ChartQA)</b> &mdash; composite <b>0.107</b>,
+            essentially failing. The chart data lives <i>in the image</i>; with no OCR/vision step there is
+            almost no text to embed, so retrieval is near-random.</li>
+        <li><b>Fairness note:</b> among the three text-bearing types, the order is
+            structured &gt; tables &gt; unstructured &mdash; all are usable. Charts are last largely because
+            of a <i>dataset/modality limitation</i>, not because charts are inherently impossible: adding a
+            vision/OCR step would give them real text to work with.</li>
+      </ul>
+    </div>
+  </div>
+
   <!-- ============ FINDINGS ============ -->
   <div class="card">
     <h2>Summary findings — in plain English</h2>
