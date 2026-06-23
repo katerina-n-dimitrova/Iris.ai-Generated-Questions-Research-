@@ -80,6 +80,71 @@
        (no LLM).</p>
   </div>
 
+  <!-- ============ AT-A-GLANCE ============ -->
+  <div class="card">
+    <h2>At-a-glance summary <span class="legend">(baseline &rarr; enriched)</span></h2>
+    <p class="sub">Condensed view: each row shows the change from baseline to enriched.
+       <span class="win">Green</span> = enriched improved, <span class="lose">red</span> = enriched got worse.</p>
+
+    <h3>Retrieval quality</h3>
+    <table>
+      <thead><tr><th class="l">Document type</th><th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th class="l">Effect</th></tr></thead>
+      <tbody>
+        <tr class="base"><td class="l ds">Structured text</td>
+          <td>0.851&rarr;<span class="win">0.877</span></td><td>0.831&rarr;<span class="win">0.867</span></td><td>0.890&rarr;<span class="win">0.910</span></td>
+          <td class="l"><span class="tag up">helps</span></td></tr>
+        <tr class="enr"><td class="l ds">Unstructured text</td>
+          <td>0.506&rarr;<span class="win">0.514</span></td><td>0.813&rarr;<span class="win">0.889</span></td><td>0.900&rarr;<span class="win">0.933</span></td>
+          <td class="l"><span class="tag up">helps</span></td></tr>
+        <tr class="base"><td class="l ds">Tables</td>
+          <td>0.704&rarr;<span class="lose">0.671</span></td><td>0.677&rarr;<span class="lose">0.646</span></td><td>0.777&rarr;<span class="lose">0.733</span></td>
+          <td class="l"><span class="tag down">hurts</span></td></tr>
+        <tr class="enr"><td class="l ds">Charts</td>
+          <td>0.045&rarr;0.053</td><td>0.034&rarr;0.037</td><td>0.063&rarr;0.063</td>
+          <td class="l"><span class="tag flat">no signal</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Answer quality</h3>
+    <table>
+      <thead><tr><th class="l">Document type</th><th>Faithfulness</th><th>Citation acc.</th><th>Answer rel.</th><th class="l">Effect</th></tr></thead>
+      <tbody>
+        <tr class="base"><td class="l ds">Structured text</td>
+          <td>0.470&rarr;<span class="lose">0.285</span></td><td>0.440&rarr;<span class="lose">0.275</span></td><td>0.450&rarr;<span class="lose">0.270</span></td>
+          <td class="l"><span class="tag down">hurts</span></td></tr>
+        <tr class="enr"><td class="l ds">Unstructured text</td>
+          <td>0.467&rarr;<span class="lose">0.327</span></td><td>0.467&rarr;<span class="lose">0.320</span></td><td>0.467&rarr;<span class="lose">0.367</span></td>
+          <td class="l"><span class="tag down">hurts</span></td></tr>
+        <tr class="base"><td class="l ds">Tables</td>
+          <td>0.452&rarr;<span class="lose">0.395</span></td><td>0.455&rarr;<span class="lose">0.377</span></td><td>0.600&rarr;<span class="lose">0.507</span></td>
+          <td class="l"><span class="tag down">hurts</span></td></tr>
+        <tr class="enr"><td class="l ds">Charts</td>
+          <td>0.160&rarr;<span class="lose">0.097</span></td><td>0.103&rarr;<span class="lose">0.088</span></td><td>0.233&rarr;0.250</td>
+          <td class="l"><span class="tag down">hurts</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Latency &amp; cost</h3>
+    <table>
+      <thead><tr><th class="l">Document type</th><th>Index build (s)</th><th>Embed ms/chunk</th><th>Query total (ms)</th><th class="l">Effect</th></tr></thead>
+      <tbody>
+        <tr class="base"><td class="l ds">Structured text</td>
+          <td>76.8&rarr;<span class="lose">143.4</span></td><td>18.0&rarr;<span class="lose">37.5</span></td><td>231&rarr;237</td>
+          <td class="l"><span class="tag down">slower offline</span></td></tr>
+        <tr class="enr"><td class="l ds">Unstructured text</td>
+          <td>166.8&rarr;<span class="lose">249.2</span></td><td>89.2&rarr;<span class="lose">133.5</span></td><td>216&rarr;230</td>
+          <td class="l"><span class="tag down">slower offline</span></td></tr>
+        <tr class="base"><td class="l ds">Tables</td>
+          <td>139.0&rarr;<span class="lose">425.8</span></td><td>21.9&rarr;<span class="lose">71.7</span></td><td>236&rarr;229</td>
+          <td class="l"><span class="tag down">3&times; slower offline</span></td></tr>
+        <tr class="enr"><td class="l ds">Charts</td>
+          <td>3.8&rarr;4.3</td><td>7.0&rarr;9.5</td><td>216&rarr;218</td>
+          <td class="l"><span class="tag flat">negligible</span></td></tr>
+      </tbody>
+    </table>
+    <p class="legend">Online query latency is essentially unchanged by enrichment &mdash; the cost is paid offline at index time.</p>
+  </div>
+
   <!-- ============ TABLE 1: CHROMADB ============ -->
   <div class="card">
     <h2>Table 1 &mdash; ChromaDB results (retrieval quality &amp; latency)</h2>
