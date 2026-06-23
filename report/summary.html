@@ -232,6 +232,85 @@
     </div>
   </div>
 
+  <!-- ============ TABLE 4: LATENCY ============ -->
+  <div class="card">
+    <h2>Table 4 &mdash; Latency analysis (offline indexing &amp; online queries)</h2>
+    <p class="sub">Lower is better everywhere. Red = enrichment was slower than its baseline.
+       Offline = one-time cost to build the index; online = per-query cost at search time.</p>
+
+    <h3>4a. Offline &mdash; encoding &amp; indexing (one-time cost)</h3>
+    <table>
+      <thead>
+        <tr><th class="l">Dataset</th><th class="l">Condition</th><th>Chunks</th>
+          <th>Avg tokens/chunk</th><th>Embed ms/chunk</th><th>Total embed (s)</th>
+          <th>Chroma add (s)</th><th>Total index (s)</th></tr>
+      </thead>
+      <tbody>
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">Structured text<br><span class="legend">SciFact</span></td>
+          <td class="l">baseline</td><td>3,500</td><td>40.5</td><td>18.0</td><td>63.1</td><td>13.7</td><td>76.8</td></tr>
+        <tr class="enr"><td class="l">enriched</td><td>3,500</td>
+          <td class="lose">120.0</td><td class="lose">37.5</td><td class="lose">131.2</td><td>12.2</td><td class="lose">143.4</td></tr>
+
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">Unstructured text<br><span class="legend">NFCorpus</span></td>
+          <td class="l">baseline</td><td>1,810</td><td>222.7</td><td>89.2</td><td>161.5</td><td>5.2</td><td>166.8</td></tr>
+        <tr class="enr"><td class="l">enriched</td><td>1,810</td>
+          <td class="lose">339.2</td><td class="lose">133.5</td><td class="lose">241.7</td><td class="lose">7.5</td><td class="lose">249.2</td></tr>
+
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">Tables<br><span class="legend">WikiTableQ</span></td>
+          <td class="l">baseline</td><td>5,671</td><td>37.9</td><td>21.9</td><td>124.4</td><td>14.6</td><td>139.0</td></tr>
+        <tr class="enr"><td class="l">enriched</td><td>5,671</td>
+          <td class="lose">140.0</td><td class="lose">71.7</td><td class="lose">406.5</td><td class="lose">19.3</td><td class="lose">425.8</td></tr>
+
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">Charts<br><span class="legend">ChartQA</span></td>
+          <td class="l">baseline</td><td>300</td><td>2.2</td><td>7.0</td><td>2.1</td><td>1.7</td><td>3.8</td></tr>
+        <tr class="enr"><td class="l">enriched</td><td>300</td>
+          <td class="lose">28.3</td><td class="lose">9.5</td><td class="lose">2.9</td><td>1.5</td><td class="lose">4.3</td></tr>
+      </tbody>
+    </table>
+    <p class="legend">Index size (MB) not measurable in Chroma Cloud mode (remote store) &mdash; shows as &minus;1 in the raw CSV.</p>
+
+    <h3>4b. Online &mdash; per-query retrieval latency (live cost)</h3>
+    <table>
+      <thead>
+        <tr><th class="l">Dataset</th><th class="l">Condition</th>
+          <th>Query embed (ms)</th><th>Chroma search (ms)</th>
+          <th>Total retrieval (ms)</th><th>p95 (ms)</th></tr>
+      </thead>
+      <tbody>
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">Structured text<br><span class="legend">SciFact</span></td>
+          <td class="l">baseline</td><td>52.0</td><td>179.0</td><td>231.0</td><td>372.5</td></tr>
+        <tr class="enr"><td class="l">enriched</td><td>45.5</td><td class="lose">191.9</td><td class="lose">237.4</td><td class="lose">411.8</td></tr>
+
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">Unstructured text<br><span class="legend">NFCorpus</span></td>
+          <td class="l">baseline</td><td>39.8</td><td>175.7</td><td>215.5</td><td>435.4</td></tr>
+        <tr class="enr"><td class="l">enriched</td><td>36.1</td><td class="lose">193.9</td><td class="lose">230.1</td><td class="lose">652.5</td></tr>
+
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">Tables<br><span class="legend">WikiTableQ</span></td>
+          <td class="l">baseline</td><td>43.5</td><td>192.7</td><td>236.3</td><td>439.2</td></tr>
+        <tr class="enr"><td class="l">enriched</td><td>43.8</td><td>185.0</td><td>228.8</td><td>345.5</td></tr>
+
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">Charts<br><span class="legend">ChartQA</span></td>
+          <td class="l">baseline</td><td>41.3</td><td>175.1</td><td>216.3</td><td>345.9</td></tr>
+        <tr class="enr"><td class="l">enriched</td><td>43.0</td><td>174.6</td><td>217.6</td><td>330.3</td></tr>
+      </tbody>
+    </table>
+
+    <div class="key">
+      <h3>Latency takeaways</h3>
+      <ul>
+        <li><b>Enrichment's cost is almost entirely OFFLINE.</b> Larger chunks slowed encoding by
+            <b>1.5&ndash;3.3&times;</b> per chunk; the worst case was Tables, where total index build time jumped
+            <b>3&times; (139s &rarr; 426s)</b>.</li>
+        <li><b>Online query latency barely moved</b> (~215&ndash;237 ms either way). The query itself is the same
+            length in both conditions, so embedding the query takes the same time.</li>
+        <li><b>The dominant online cost is the Chroma Cloud round-trip</b> (~175&ndash;195 ms of search), not the
+            local embedding (~40&ndash;52 ms). A self-hosted/local Chroma would cut most of this.</li>
+        <li><b>Embedding speed scales with content length.</b> NFCorpus is slowest per chunk (long passages,
+            ~89&ndash;134 ms); ChartQA is fastest (almost no text).</li>
+      </ul>
+    </div>
+  </div>
+
   <!-- ============ FINDINGS ============ -->
   <div class="card">
     <h2>Summary findings — in plain English</h2>
@@ -286,6 +365,26 @@
       <li>ChartQA needs a multimodal OCR step to be a fair test.</li>
       <li>Answer grades come from an LLM judge (gpt-4o-mini), which is useful but noisy.</li>
     </ul>
+  </div>
+
+  <div class="card">
+    <h2>Related work</h2>
+    <p class="sub">One closely related study with a finding that frames our results.</p>
+    <div class="key">
+      <h3>Anthropic — "Contextual Retrieval" (2024)</h3>
+      <p style="margin:0 0 8px">Same core idea as this project: add context to each chunk before
+        embedding. The key difference is they used an <b>LLM to generate</b> coherent, document-aware context
+        for every chunk (not keyword lists).</p>
+      <ul>
+        <li>Contextual embeddings <b>cut the top-20 retrieval failure rate by 35%</b> (5.7% &rarr; 3.7%).</li>
+        <li>Combined with contextual BM25: <b>49%</b> reduction; adding reranking: <b>67%</b>.</li>
+      </ul>
+      <p style="margin:8px 0 0"><b>Why it matters here:</b> their high-quality LLM context strongly improved
+        retrieval, while our cheap heuristic context only helped text retrieval modestly and hurt answer
+        quality. Both point to the same lesson &mdash; <b>the quality of the added context is decisive</b> &mdash;
+        and motivate our recommended next step: re-run enrichment with LLM-generated summaries.
+        <span class="legend">(Source: anthropic.com/news/contextual-retrieval &mdash; engineering/research writeup.)</span></p>
+    </div>
   </div>
 
 </main>
