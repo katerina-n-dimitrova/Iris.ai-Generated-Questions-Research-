@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Context-Enriched RAG — Results Summary</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#ffffff; --ink:#1e293b; --muted:#64748b;
+    --line:#e2e8f0; --good:#16a34a; --bad:#dc2626; --warn:#d97706;
+    --accent:#2563eb; --accentbg:#eff6ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       color:var(--ink);background:#f1f5f9;line-height:1.55}
+  header{background:linear-gradient(135deg,#1e293b,#2563eb);color:#fff;padding:40px 24px}
+  header .wrap{max-width:1080px;margin:0 auto}
+  header h1{margin:0 0 8px;font-size:28px}
+  header p{margin:0;opacity:.9;font-size:15px}
+  main{max-width:1080px;margin:0 auto;padding:24px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+        padding:22px 24px;margin:20px 0;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+  h2{font-size:21px;margin:4px 0 4px;border-left:4px solid var(--accent);padding-left:10px}
+  h3{font-size:16px;color:var(--muted);margin:18px 0 8px;font-weight:600}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 14px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:6px 0 4px}
+  th,td{padding:8px 10px;text-align:center;border-bottom:1px solid var(--line)}
+  th{background:#f8fafc;color:var(--muted);font-weight:600;font-size:12px;
+     text-transform:uppercase;letter-spacing:.03em}
+  td.l,th.l{text-align:left}
+  tr.base td{background:#fff}
+  tr.enr td{background:#fcfcfd}
+  tr.ds-sep td{border-top:2px solid var(--line)}
+  .ds{font-weight:700}
+  .win{color:var(--good);font-weight:700}
+  .lose{color:var(--bad)}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
+  .tag.up{background:#dcfce7;color:#166534}
+  .tag.down{background:#fee2e2;color:#991b1b}
+  .tag.flat{background:#f1f5f9;color:#475569}
+  .key{background:var(--accentbg);border:1px solid #bfdbfe;border-radius:10px;padding:16px 18px;margin:16px 0}
+  .key h3{color:var(--accent);margin-top:0}
+  ul{margin:8px 0 8px 2px;padding-left:20px}
+  li{margin:6px 0}
+  .legend{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .pill{font-weight:700}
+  footer{max-width:1080px;margin:0 auto;padding:16px 24px 48px;color:var(--muted);font-size:12.5px}
+  code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:12.5px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Context-Enriched RAG — Results Summary</h1>
+    <p>Does adding context before embedding improve Retrieval-Augmented Generation?
+       Baseline vs. context-enriched, across four document types.</p>
+  </div>
+</header>
+
+<main>
+
+  <div class="card">
+    <h2>What this experiment tested</h2>
+    <p class="sub">We compared two ways of preparing documents for a RAG system, on four kinds of data.</p>
+    <ul>
+      <li><b>Baseline:</b> embed the raw text only (a sentence, a passage, a table row, or chart text).</li>
+      <li><b>Enriched:</b> embed the raw text <i>plus</i> added context — titles, position, column headers,
+          keywords, and short generated summaries.</li>
+    </ul>
+    <h3>The four datasets</h3>
+    <ul>
+      <li><b>SciFact</b> — structured scientific text (abstracts)</li>
+      <li><b>NFCorpus</b> — unstructured biomedical text</li>
+      <li><b>WikiTableQuestions</b> — tables</li>
+      <li><b>ChartQA</b> — charts / graphs</li>
+    </ul>
+    <p class="sub">Embeddings: <code>Octen/Octen-Embedding-0.6B</code> (local). Vector store:
+       <b>Chroma Cloud</b>. Answer model &amp; grader: <code>gpt-4o-mini</code> via LangChain
+       (traced to LangSmith). Enrichment here used cheap heuristic summaries/keywords
+       (no LLM).</p>
+  </div>
+
+  <!-- ============ TABLE 1: CHROMADB ============ -->
+  <div class="card">
+    <h2>Table 1 &mdash; ChromaDB results (retrieval quality &amp; latency)</h2>
+    <p class="sub">Higher is better for quality metrics. Lower is better for latency.
+       Green = enrichment won vs. its baseline.</p>
+    <table>
+      <thead>
+        <tr>
+          <th class="l">Dataset</th><th class="l">Condition</th>
+          <th>Recall@5</th><th>MRR</th><th>nDCG@10</th><th>Hit@5</th>
+          <th>Encode ms/chunk</th><th>Index time (s)</th><th>Query latency (ms)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">SciFact<br><span class="legend">structured text</span></td>
+          <td class="l">baseline</td><td>0.888</td><td>0.831</td><td>0.851</td><td>0.890</td>
+          <td>18.0</td><td>76.8</td><td>231</td></tr>
+        <tr class="enr"><td class="l">enriched</td>
+          <td class="win">0.905</td><td class="win">0.867</td><td class="win">0.877</td><td class="win">0.910</td>
+          <td class="lose">37.5</td><td class="lose">143.4</td><td>237</td></tr>
+
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">NFCorpus<br><span class="legend">unstructured text</span></td>
+          <td class="l">baseline</td><td>0.121</td><td>0.813</td><td>0.506</td><td>0.900</td>
+          <td>89.2</td><td>166.8</td><td>216</td></tr>
+        <tr class="enr"><td class="l">enriched</td>
+          <td>0.119</td><td class="win">0.889</td><td class="win">0.514</td><td class="win">0.933</td>
+          <td class="lose">133.5</td><td class="lose">249.2</td><td>230</td></tr>
+
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">WikiTableQ<br><span class="legend">tables</span></td>
+          <td class="l">baseline</td><td>0.777</td><td>0.677</td><td>0.704</td><td>0.777</td>
+          <td>21.9</td><td>139.0</td><td>236</td></tr>
+        <tr class="enr"><td class="l">enriched</td>
+          <td class="lose">0.733</td><td class="lose">0.646</td><td class="lose">0.671</td><td class="lose">0.733</td>
+          <td class="lose">71.7</td><td class="lose">425.8</td><td>229</td></tr>
+
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">ChartQA<br><span class="legend">charts</span></td>
+          <td class="l">baseline</td><td>0.063</td><td>0.034</td><td>0.045</td><td>0.063</td>
+          <td>7.0</td><td>3.8</td><td>216</td></tr>
+        <tr class="enr"><td class="l">enriched</td>
+          <td>0.063</td><td>0.037</td><td>0.053</td><td>0.063</td>
+          <td>9.5</td><td>4.3</td><td>218</td></tr>
+      </tbody>
+    </table>
+    <p class="legend">Index size not shown: Chroma Cloud mode can't measure on-disk size.
+       NFCorpus Recall is low by design (~42 relevant docs/query, only 10 retrieved) — read MRR/Hit/nDCG instead.</p>
+    <div class="key">
+      <h3>ChromaDB takeaways</h3>
+      <ul>
+        <li><span class="tag up">helps</span> <b>Text (SciFact, NFCorpus):</b> enrichment improved ranking —
+            SciFact better on every metric; NFCorpus MRR +0.08, Hit@5 +0.03.</li>
+        <li><span class="tag down">hurts</span> <b>Tables (WikiTableQ):</b> enrichment lowered every metric —
+            the boilerplate diluted the distinctive cell values.</li>
+        <li><span class="tag flat">no signal</span> <b>Charts (ChartQA):</b> near-random both ways —
+            ChartQA has no usable text without an image/OCR step.</li>
+        <li><b>Cost:</b> enrichment made chunks 1.5&ndash;3.7&times; bigger and indexing up to
+            <b>3&times; slower</b> (WikiTableQ 426s vs 139s), but <b>online query latency barely changed</b>
+            (~175&ndash;195 ms, dominated by the Chroma Cloud round-trip).</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ TABLE 2: LANGCHAIN ============ -->
+  <div class="card">
+    <h2>Table 2 &mdash; LangChain results (answer quality)</h2>
+    <p class="sub">LLM-graded with <code>gpt-4o-mini</code> (0&ndash;1 scale), traced to LangSmith.
+       EM / F1 / Answer-correctness only apply where a gold answer exists (WikiTableQ, ChartQA).</p>
+    <table>
+      <thead>
+        <tr>
+          <th class="l">Dataset</th><th class="l">Condition</th>
+          <th>Faithfulness</th><th>Citation acc.</th><th>Answer rel.</th>
+          <th>Exact match</th><th>Token F1</th><th>Answer corr.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">SciFact</td>
+          <td class="l">baseline</td><td>0.470</td><td>0.440</td><td>0.450</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td></tr>
+        <tr class="enr"><td class="l">enriched</td>
+          <td class="lose">0.285</td><td class="lose">0.275</td><td class="lose">0.270</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td></tr>
+
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">NFCorpus</td>
+          <td class="l">baseline</td><td>0.467</td><td>0.467</td><td>0.467</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td></tr>
+        <tr class="enr"><td class="l">enriched</td>
+          <td class="lose">0.327</td><td class="lose">0.320</td><td class="lose">0.367</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td></tr>
+
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">WikiTableQ</td>
+          <td class="l">baseline</td><td>0.452</td><td>0.455</td><td>0.600</td><td>0.080</td><td>0.137</td><td>0.282</td></tr>
+        <tr class="enr"><td class="l">enriched</td>
+          <td class="lose">0.395</td><td class="lose">0.377</td><td class="lose">0.507</td><td class="lose">0.070</td><td class="lose">0.123</td><td class="lose">0.237</td></tr>
+
+        <tr class="base ds-sep"><td class="l ds" rowspan="2">ChartQA</td>
+          <td class="l">baseline</td><td>0.160</td><td>0.103</td><td>0.233</td><td>0.023</td><td>0.023</td><td>0.023</td></tr>
+        <tr class="enr"><td class="l">enriched</td>
+          <td class="lose">0.097</td><td class="lose">0.088</td><td>0.250</td><td class="lose">0.007</td><td class="lose">0.011</td><td class="lose">0.010</td></tr>
+      </tbody>
+    </table>
+    <div class="key">
+      <h3>LangChain takeaways</h3>
+      <ul>
+        <li><span class="tag down">hurts</span> <b>Enrichment lowered answer quality on every dataset</b> —
+            faithfulness, citation accuracy, and relevance all dropped.</li>
+        <li>Most likely cause: the <b>cheap keyword/summary enrichment adds noise</b> to the context the
+            answer model reads, producing vaguer, less grounded answers.</li>
+        <li>This is the opposite of the retrieval result &mdash; see the key finding below.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ FINDINGS ============ -->
+  <div class="card">
+    <h2>Summary findings — in plain English</h2>
+
+    <div class="key">
+      <h3>The big finding</h3>
+      <p style="margin:0">Adding context before embedding <b>helped the system <i>find</i> the right documents</b>
+      (for text), but <b>made the final <i>answers</i> worse</b> everywhere. In other words,
+      <b>better retrieval did not lead to better answers</b> &mdash; the extra context that helped search
+      became noise that confused the answer-writing step.</p>
+    </div>
+
+    <h3>1. It depends a lot on the type of document</h3>
+    <ul>
+      <li><b>Plain text (science &amp; biomedical):</b> enrichment helped retrieval. Adding the title,
+          keywords, and a short summary made the right documents rank higher.</li>
+      <li><b>Tables:</b> enrichment <i>hurt</i> retrieval. Turning a clean row into a wordy sentence buried
+          the exact values a table question needs to match.</li>
+      <li><b>Charts:</b> we couldn't test it fairly &mdash; ChartQA gives images with no text, so there was
+          almost nothing to embed without an image-reading (OCR) step.</li>
+    </ul>
+
+    <h3>2. Enrichment is not free</h3>
+    <ul>
+      <li>Enriched chunks were <b>1.5&ndash;3.7&times; larger</b>, so building the index took
+          <b>up to 3&times; longer</b>.</li>
+      <li>But it <b>barely affected live query speed</b> &mdash; most of the ~0.2s per query is just the
+          network trip to Chroma Cloud, which is the same either way.</li>
+    </ul>
+
+    <h3>3. The answers got worse with enrichment</h3>
+    <ul>
+      <li>On every dataset, the enriched setup produced <b>less faithful and less relevant answers</b>.</li>
+      <li>The likely reason: our enrichment used <b>simple keyword lists and extractive summaries</b> (no AI).
+          Those fragments cluttered the context, and the answer model picked up the clutter.</li>
+    </ul>
+
+    <h3>What this means</h3>
+    <ul>
+      <li><b>Context enrichment is a trade-off, not a free win.</b> It can improve search for text, costs more
+          to build, and &mdash; with low-quality enrichment &mdash; can damage answer quality.</li>
+      <li><b>Match the technique to the data type.</b> Helpful for prose, harmful for tables, untestable for
+          charts without OCR.</li>
+      <li><b>The quality of the added context matters most.</b> The natural next experiment is to repeat this
+          with <i>LLM-generated</i> summaries instead of keyword dumps, which may reverse the answer-quality drop.</li>
+    </ul>
+
+    <h3>Honest caveats</h3>
+    <ul>
+      <li>Small samples (100 SciFact / 30 NFCorpus / 300 WTQ / 300 ChartQA queries).</li>
+      <li>Enrichment was heuristic (no LLM) &mdash; results may differ with AI-generated context.</li>
+      <li>ChartQA needs a multimodal OCR step to be a fair test.</li>
+      <li>Answer grades come from an LLM judge (gpt-4o-mini), which is useful but noisy.</li>
+    </ul>
+  </div>
+
+</main>
+
+<footer>
+  Generated from <code>results/retrieval_metrics/retrieval_scores.csv</code>,
+  <code>results/latency_logs/latency_summary.csv</code>, and
+  <code>results/answer_metrics/answer_scores.csv</code>.
+  Embeddings: Octen-Embedding-0.6B &middot; Vector store: Chroma Cloud &middot;
+  Answer model/grader: gpt-4o-mini (LangChain &rarr; LangSmith).
+</footer>
+</body>
+</html>

@@ -1,0 +1,9 @@
+dataset,condition,num_chunks,avg_tokens_per_chunk,total_embedding_time_s,avg_embed_ms_per_chunk,total_indexing_time_s,index_size_mb,num_queries,query_embed_ms_mean,chroma_search_ms_mean,retrieval_ms_mean,retrieval_ms_p95
+chartqa,baseline,300,2.2,2.0923,6.9743,3.8062,-1.0,300,41.274,175.058,216.334,345.869
+chartqa,enriched,300,28.29,2.8511,9.5035,4.3474,-1.0,300,43.021,174.587,217.612,330.252
+nfcorpus,baseline,1810,222.7,161.5132,89.2338,166.7644,-1.0,30,39.817,175.682,215.5,435.419
+nfcorpus,enriched,1810,339.15,241.6617,133.5148,249.1965,-1.0,30,36.112,193.948,230.064,652.456
+scifact,baseline,3500,40.45,63.0729,18.0208,76.8094,-1.0,100,52.025,178.998,231.024,372.491
+scifact,enriched,3500,120.03,131.2136,37.4896,143.4249,-1.0,100,45.49,191.861,237.353,411.761
+wikitablequestions,baseline,5671,37.85,124.3664,21.9302,139.0234,-1.0,300,43.513,192.736,236.252,439.18
+wikitablequestions,enriched,5671,139.99,406.4839,71.6776,425.796,-1.0,300,43.755,185.042,228.8,345.498

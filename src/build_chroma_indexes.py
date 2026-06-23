@@ -156,10 +156,9 @@ def main() -> None:
                 rows.append(r)
 
     if rows:
-        with OFFLINE_LOG.open("w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=OFFLINE_FIELDS)
-            w.writeheader()
-            w.writerows(rows)
+        groups = {(r["dataset"], r["condition"]) for r in rows}
+        common.upsert_csv(OFFLINE_LOG, OFFLINE_FIELDS, rows,
+                          ("dataset", "condition"), groups)
         print(f"\nOffline indexing log -> {OFFLINE_LOG.relative_to(config.PROJECT_ROOT)}")
 
 

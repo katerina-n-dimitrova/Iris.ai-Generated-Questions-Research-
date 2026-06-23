@@ -23,10 +23,13 @@ from __future__ import annotations
 import argparse
 import csv
 import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List
 
 import common
 import config
+
+DEFAULT_CONCURRENCY = 8
 
 SYSTEM_PROMPT = (
     "You are a precise question-answering assistant. Answer the user's question "
@@ -65,7 +68,8 @@ def _generate(client, question: str, context: str) -> str:
 
 
 def run_one(dataset: str, condition: str, dry_run: bool, max_samples: int,
-            retr_latency: Dict[str, float]) -> int:
+            retr_latency: Dict[str, float], concurrency: int = DEFAULT_CONCURRENCY
+            ) -> int:
     in_path = config.RETRIEVAL_METRICS_DIR / f"retrieved_{dataset}_{condition}.jsonl"
     if not in_path.exists():
         print(f"  {in_path.name} not found; run retrieval first")
@@ -73,12 +77,10 @@ def run_one(dataset: str, condition: str, dry_run: bool, max_samples: int,
 
     client = None if dry_run else config.get_openai_client()
     rows = list(common.read_jsonl(in_path))[:max_samples]
-    out_rows: List[Dict] = []
 
-    for r in rows:
+    def worker(r: Dict) -> Dict:
         question = r["query_text"]
         context = r.get("context", "")
-
         if dry_run:
             answer, gen_ms = "(dry-run: no answer generated)", 0.0
         else:
@@ -88,9 +90,8 @@ def run_one(dataset: str, condition: str, dry_run: bool, max_samples: int,
             except Exception as e:  # noqa: BLE001
                 answer = f"(generation error: {e})"
             gen_ms = (time.perf_counter() - t0) * 1000
-
         retr_ms = retr_latency.get(r["query_id"], 0.0)
-        out_rows.append({
+        return {
             "query_id": r["query_id"],
             "dataset": dataset,
             "condition": condition,
@@ -100,7 +101,12 @@ def run_one(dataset: str, condition: str, dry_run: bool, max_samples: int,
             "gold_answer": r.get("gold_answer", ""),
             "llm_generation_latency_ms": round(gen_ms, 4),
             "total_rag_latency_ms": round(retr_ms + gen_ms, 4),
-        })
+        }
+
+    # Latency-bound API calls -> thread pool. map() preserves input order.
+    workers = 1 if dry_run else max(1, concurrency)
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        out_rows = list(ex.map(worker, rows))
 
     out_path = config.ANSWER_METRICS_DIR / f"answers_{dataset}_{condition}.jsonl"
     common.write_jsonl(out_path, out_rows)
@@ -117,12 +123,15 @@ def main() -> None:
     ap.add_argument("--max-samples", type=int, default=config.MAX_DATASET_SAMPLES)
     ap.add_argument("--dry-run", action="store_true",
                     help="Skip API calls; write empty answers (pipeline test).")
+    ap.add_argument("--concurrency", type=int, default=DEFAULT_CONCURRENCY,
+                    help="Parallel API calls (latency-bound; default 8).")
     args = ap.parse_args()
 
     retr_latency = _retrieval_latency_lookup()
     for dataset in args.datasets:
         for condition in args.conditions:
-            run_one(dataset, condition, args.dry_run, args.max_samples, retr_latency)
+            run_one(dataset, condition, args.dry_run, args.max_samples,
+                    retr_latency, args.concurrency)
 
 
 if __name__ == "__main__":

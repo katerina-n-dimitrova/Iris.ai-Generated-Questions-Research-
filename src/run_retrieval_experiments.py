@@ -155,10 +155,9 @@ def main() -> None:
                                    args.top_k, retrieve_k, args.max_samples)
 
     if all_latency:
-        with ONLINE_LOG.open("w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=ONLINE_FIELDS)
-            w.writeheader()
-            w.writerows(all_latency)
+        groups = {(r["dataset"], r["condition"]) for r in all_latency}
+        common.upsert_csv(ONLINE_LOG, ONLINE_FIELDS, all_latency,
+                          ("dataset", "condition"), groups)
         print(f"\nOnline latency log -> {ONLINE_LOG.relative_to(config.PROJECT_ROOT)}")
 
 

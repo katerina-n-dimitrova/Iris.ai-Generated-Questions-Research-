@@ -25,6 +25,21 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 # Load .env from the project root (no-op if the file is missing).
 load_dotenv(PROJECT_ROOT / ".env")
 
+# Mirror LangChain/LangSmith env var names both ways so tracing works no matter
+# which convention the installed langsmith version prefers (older langsmith reads
+# LANGCHAIN_*, newer reads LANGSMITH_*).
+_LC_ALIASES = {
+    "LANGSMITH_TRACING": "LANGCHAIN_TRACING_V2",
+    "LANGSMITH_API_KEY": "LANGCHAIN_API_KEY",
+    "LANGSMITH_PROJECT": "LANGCHAIN_PROJECT",
+    "LANGSMITH_ENDPOINT": "LANGCHAIN_ENDPOINT",
+}
+for _new, _old in _LC_ALIASES.items():
+    if not os.getenv(_new) and os.getenv(_old):
+        os.environ[_new] = os.environ[_old]
+    elif not os.getenv(_old) and os.getenv(_new):
+        os.environ[_old] = os.environ[_new]
+
 
 def _resolve(path_str: str) -> Path:
     """Resolve a possibly-relative path against the project root."""

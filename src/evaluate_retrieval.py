@@ -34,7 +34,20 @@ SCORE_FIELDS = [
 
 
 def _ranked_source_ids(retrieved: List[Dict]) -> List[str]:
-    return [str(r.get("source_id")) for r in retrieved]
+    """
+    Collapse retrieved chunks to unique source documents, keeping the best
+    (first) rank for each. Many chunks can share a source_id (table rows,
+    abstract sentences, doc chunks), so we evaluate at the document level to
+    avoid double-counting the same gold doc.
+    """
+    seen = set()
+    ordered: List[str] = []
+    for r in retrieved:
+        sid = str(r.get("source_id"))
+        if sid not in seen:
+            seen.add(sid)
+            ordered.append(sid)
+    return ordered
 
 
 def _recall_at_k(ranked: List[str], gold: set, k: int) -> float:

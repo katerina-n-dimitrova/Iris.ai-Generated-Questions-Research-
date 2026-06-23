@@ -1,0 +1,9 @@
+dataset,condition,num_answers,exact_match,token_f1,llm_correctness,answer_correctness,faithfulness,citation_accuracy,answer_relevance
+scifact,baseline,100,0.0,0.0,,,0.47,0.44,0.45
+scifact,enriched,100,0.0,0.0,,,0.285,0.275,0.27
+nfcorpus,baseline,30,0.0,0.0,,,0.4667,0.4667,0.4667
+nfcorpus,enriched,30,0.0,0.0,,,0.3267,0.32,0.3667
+wikitablequestions,baseline,300,0.08,0.1369,,0.2817,0.4517,0.455,0.6
+wikitablequestions,enriched,300,0.07,0.1225,,0.2367,0.395,0.3767,0.5067
+chartqa,baseline,300,0.0233,0.0233,,0.0233,0.16,0.1033,0.2333
+chartqa,enriched,300,0.0067,0.0109,,0.01,0.0967,0.0883,0.25

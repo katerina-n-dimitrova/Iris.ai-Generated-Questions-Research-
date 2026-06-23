@@ -39,18 +39,40 @@ def _abstract_sentences(row: Dict[str, Any]) -> List[str]:
     return []
 
 
-def build_documents(use_llm: bool = False, max_samples: int = config.MAX_DATASET_SAMPLES
-                    ) -> Dict[str, List[Dict[str, Any]]]:
-    client = config.get_openai_client() if use_llm else None
+# Cross-document retrieval task size: how many gold-bearing queries to evaluate
+# and how many extra distractor docs to mix into the index.
+N_EVAL_QUERIES = min(config.MAX_DATASET_SAMPLES, 100)
+N_DISTRACTORS = config.MAX_DATASET_SAMPLES
+
+
+def _corpus_index() -> Dict[str, Dict[str, Any]]:
     corpus_path = SPEC.raw_dir / "corpus.jsonl"
     if not corpus_path.exists():
         raise FileNotFoundError(f"{corpus_path} missing. Run download_datasets.py first.")
+    idx = {}
+    for row in read_jsonl(corpus_path):
+        doc_id = str(row.get("doc_id") or row.get("_id") or row.get("id"))
+        idx[doc_id] = row
+    return idx
+
+
+def _select(corpus: Dict[str, Dict[str, Any]]):
+    qtext, gold = common.load_beir_queries_gold(SPEC.raw_dir)
+    return common.select_eval_subset(
+        qtext, gold, corpus.keys(), N_EVAL_QUERIES, N_DISTRACTORS)
+
+
+def build_documents(use_llm: bool = False, max_samples: int = config.MAX_DATASET_SAMPLES
+                    ) -> Dict[str, List[Dict[str, Any]]]:
+    client = config.get_openai_client() if use_llm else None
+    corpus = _corpus_index()
+    _, index_ids = _select(corpus)
 
     baseline: List[Dict[str, Any]] = []
     enriched: List[Dict[str, Any]] = []
 
-    for row in list(read_jsonl(corpus_path))[:max_samples]:
-        doc_id = str(row.get("doc_id") or row.get("_id") or row.get("id"))
+    for doc_id in sorted(index_ids):
+        row = corpus[doc_id]
         title = str(row.get("title") or "").strip()
         sentences = _abstract_sentences(row)
         n = len(sentences)
@@ -96,37 +118,17 @@ def build_documents(use_llm: bool = False, max_samples: int = config.MAX_DATASET
 
 
 def build_queries(max_samples: int = config.MAX_DATASET_SAMPLES) -> List[Dict[str, Any]]:
-    queries_path = SPEC.raw_dir / "queries.jsonl"
-    if not queries_path.exists():
-        print(f"  (no queries file for scifact at {queries_path})")
-        return []
-
-    # Gold relevance from qrels (prefer test split).
-    gold: Dict[str, List[str]] = {}
-    for split in ("test", "validation", "train"):
-        qpath = SPEC.raw_dir / f"qrels_{split}.jsonl"
-        if not qpath.exists():
-            continue
-        for r in read_jsonl(qpath):
-            qid = str(r.get("query-id") or r.get("query_id"))
-            cid = str(r.get("corpus-id") or r.get("corpus_id"))
-            if int(r.get("score", 1)) > 0:
-                gold.setdefault(qid, []).append(cid)
-        break  # use the first split that exists
-
-    queries: List[Dict[str, Any]] = []
-    for row in list(read_jsonl(queries_path))[:max_samples]:
-        qid = str(row.get("_id") or row.get("id"))
-        text = str(row.get("text") or row.get("query") or "").strip()
-        if not text:
-            continue
-        queries.append({
+    corpus = _corpus_index()
+    selected, _ = _select(corpus)
+    return [
+        {
             "query_id": qid,
             "dataset": "scifact",
             "text": text,
-            "gold_source_ids": gold.get(qid, []),
-        })
-    return queries
+            "gold_source_ids": gold_ids,
+        }
+        for qid, text, gold_ids in selected
+    ]
 
 
 def main() -> None:
