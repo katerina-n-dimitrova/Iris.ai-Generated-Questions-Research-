@@ -1,0 +1,31 @@
+# ---- Secrets ----
+.env
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# ---- Project artifacts (large / generated) ----
+data/raw/*
+data/processed/*
+chroma_indexes/*
+results/latency_logs/*
+results/retrieval_metrics/*
+results/answer_metrics/*
+results/*.log
+
+# keep the empty dirs tracked
+!**/.gitkeep
+
+# ---- OS / editor ----
+.DS_Store
+.idea/
+.vscode/
