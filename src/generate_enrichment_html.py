@@ -130,6 +130,9 @@ def main() -> None:
         if ds not in datasets:
             datasets.append(ds)
         methods.setdefault(ds, []).append(m)
+    # fixed presentation order: structured, unstructured, tables, charts, formulas
+    ORDER = ["scifact", "nfcorpus", "wikitablequestions", "chartqa", "formulareasoning"]
+    datasets.sort(key=lambda d: ORDER.index(d) if d in ORDER else 999)
     order = ["baseline", "combined_best"]
     for ds in methods:
         methods[ds].sort(key=lambda m: (m == "combined_best", m != "baseline", m))
