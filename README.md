@@ -199,6 +199,59 @@ Outputs:
 
 ---
 
+## Enrichment-method comparison (phase 2)
+
+Beyond the single baseline-vs-enriched study above, the project also compares
+**multiple enrichment methods per document type** — for each of the 5 datasets:
+`baseline`, three targeted methods, and a `combined_best`. Methods live in
+`src/enrichment_methods.py` (one function each, e.g.
+`enrich_scifact_neighboring_context`, `enrich_nfcorpus_generated_questions`,
+`enrich_wikitable_row_summary`, `enrich_chartqa_axis_metadata`,
+`enrich_formula_variable_definitions`) registered in `DATASET_METHODS`.
+
+### Run it (start small to debug, then scale)
+
+```bash
+# 1) make sure the 5 datasets are downloaded (see step 3 above; +formulareasoning)
+python src/download_datasets.py --datasets formulareasoning   # if not done
+
+# 2) debug run: ~15 queries/dataset, heuristic enrichment, all metrics
+python src/run_enrichment_experiments.py --max-samples 15 --distractors 30
+
+# 3) full LLM enrichment (generated questions, LLM chunk context, summaries):
+python src/run_enrichment_experiments.py --max-samples 50 --use-llm
+
+# retrieval/latency only (no API cost):
+python src/run_enrichment_experiments.py --max-samples 25 --no-answers
+
+# one dataset:
+python src/run_enrichment_experiments.py --datasets scifact --max-samples 25
+```
+
+Each run builds one Chroma collection per `dataset_method` condition, retrieves,
+generates an answer from the retrieved context, and grades it (LangChain →
+LangSmith). Then generate the human-readable summary:
+
+```bash
+python src/generate_summary.py
+```
+
+### Outputs (`results/enrichment_method_tests/`)
+- `retrieval_metrics_by_method.csv` — Recall@5/10, P@5, MRR, nDCG@10, Hit@5
+- `answer_quality_by_method.csv` — faithfulness, citation acc., answer rel., EM, F1, correctness
+- `latency_by_method.csv` — encode/index latency + query latency + p50/p95
+- `token_cost_by_method.csv` — prompt/completion/total tokens + estimated USD cost
+- `full_results_by_query.jsonl` — per-query detail
+- `context_enrichment_summary.md` — executive summary, method comparison table,
+  rankings, main findings, and a final recommendation table
+
+### Adding a new document type
+Add a `units_<type>()` builder + `enrich_<type>_<method>()` functions in
+`enrichment_methods.py`, register them in `DATASET_METHODS`/`UNIT_BUILDERS`, and
+add the dataset to `config.DATASETS`. The runner and summary need no changes.
+
+---
+
 ## One-shot quickstart
 
 ```bash
