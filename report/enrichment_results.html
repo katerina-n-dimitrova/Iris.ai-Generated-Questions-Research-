@@ -56,17 +56,6 @@ footer{max-width:1080px;margin:0 auto;padding:10px 24px 44px;color:#64748b;font-
 <div class='fb'><b>Feedback <span class='tag mix'>mixed</span></b><br>Table rows match queries on exact cell values; adding headers/titles/NL summaries can raise retrieval but the extra prose often dilutes the precise values an answer needs. Here, best for retrieval was <b>M2 · Table / page title</b> (nDCG@10 0.823, +0.014 vs baseline); best for answers was <b>M1 · Column headers per row</b> (faithfulness 0.533, +0.000).</div>
 </div>
 <div class='card'>
-<h2>chartqa</h2><div class='dt'>Charts / graphs</div>
-<table><thead><tr><th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th><th>Token cost ($)</th></tr></thead><tbody>
-<tr class='base'><td class='l'>Baseline (raw content)</td><td class="">0.133</td><td class="">0.166</td><td class="">0.098</td><td class="">0.133</td><td class="">0.100</td><td class="">0.167</td><td>0.000462</td></tr>
-<tr class=''><td class='l'>M2 · Axis/legend/title metadata*</td><td class="win">0.200</td><td class="win">0.248</td><td class="win">0.184</td><td class="win">0.200</td><td class="lose">0.033</td><td class="win">0.433</td><td>0.000901</td></tr>
-<tr class=''><td class='l'>M3 · Chart summary</td><td class="win">0.200</td><td class="win">0.184</td><td class="win">0.119</td><td class="win">0.200</td><td class="lose">0.067</td><td class="lose">0.100</td><td>0.001008</td></tr>
-<tr class=''><td class='l'>M1 · Chart-to-table data*</td><td class="win">0.200</td><td class="win">0.178</td><td class="win">0.130</td><td class="win">0.200</td><td class="lose">0.033</td><td class="win">0.367</td><td>0.001102</td></tr>
-<tr class=''><td class='l'>Combined best</td><td class="win">0.233</td><td class="win">0.206</td><td class="win">0.148</td><td class="win">0.233</td><td class="lose">0.000</td><td class="lose">0.133</td><td>0.001957</td></tr>
-</tbody></table>
-<div class='fb'><b>Feedback <span class='tag mix'>mixed</span></b><br>ChartQA ships images with almost no text, so the baseline is near-random; any added metadata/summary gives the retriever something to match, which is why enrichment helps most here (chart-to-table/axis are OCR placeholders). Here, best for retrieval was <b>M2 · Axis/legend/title metadata*</b> (nDCG@10 0.248, +0.082 vs baseline); best for answers was <b>M3 · Chart summary</b> (faithfulness 0.067, -0.033).</div>
-</div>
-<div class='card'>
 <h2>formulareasoning</h2><div class='dt'>Mathematical formulas</div>
 <table><thead><tr><th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th><th>Token cost ($)</th></tr></thead><tbody>
 <tr class='base'><td class='l'>Baseline (raw content)</td><td class="">0.000</td><td class="">0.019</td><td class="">0.012</td><td class="">0.000</td><td class="">0.033</td><td class="">0.233</td><td>0.00156</td></tr>
@@ -76,6 +65,18 @@ footer{max-width:1080px;margin:0 auto;padding:10px 24px 44px;color:#64748b;font-
 <tr class=''><td class='l'>Combined best</td><td class="win">0.094</td><td class="win">0.079</td><td class="win">0.057</td><td class="win">0.133</td><td class="win">0.067</td><td class="lose">0.167</td><td>0.003864</td></tr>
 </tbody></table>
 <div class='fb'><b>Feedback <span class='tag up'>beneficial</span></b><br>Terse formulas are hard to match to long word-problems; variable definitions add the quantity names a question mentions, which lifts retrieval from near-zero, though answer accuracy stays low. Here, best for retrieval was <b>Combined best</b> (nDCG@10 0.079, +0.060 vs baseline); best for answers was <b>M2 · Variable definitions</b> (faithfulness 0.100, +0.067).</div>
+</div>
+<div class='card'>
+<h2>chartqa</h2><div class='dt'>Charts / graphs</div>
+<table><thead><tr><th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th><th>Token cost ($)</th></tr></thead><tbody>
+<tr class='base'><td class='l'>Baseline (raw content)</td><td class="">0.133</td><td class="">0.166</td><td class="">0.098</td><td class="">0.133</td><td class="">0.100</td><td class="">0.200</td><td>0.000462</td></tr>
+<tr class=''><td class='l'>M2 · Axis/legend/title metadata*</td><td class="win">0.200</td><td class="win">0.248</td><td class="win">0.184</td><td class="win">0.200</td><td class="lose">0.067</td><td class="win">0.433</td><td>0.000901</td></tr>
+<tr class=''><td class='l'>M3 · Chart summary</td><td class="win">0.200</td><td class="win">0.198</td><td class="win">0.130</td><td class="win">0.200</td><td class="lose">0.067</td><td class="lose">0.100</td><td>0.001006</td></tr>
+<tr class=''><td class='l'>M1 · Chart-to-table data*</td><td class="win">0.200</td><td class="win">0.178</td><td class="win">0.130</td><td class="win">0.200</td><td class="lose">0.033</td><td class="win">0.367</td><td>0.001102</td></tr>
+<tr class=''><td class='l'>M4 · Vision chart description + analysis</td><td class="win">0.567</td><td class="win">0.457</td><td class="win">0.382</td><td class="win">0.567</td><td class="win">0.433</td><td class="win">0.500</td><td>0.004007</td></tr>
+<tr class=''><td class='l'>Combined best</td><td class="win">0.200</td><td class="win">0.198</td><td class="win">0.138</td><td class="win">0.200</td><td class="lose">0.000</td><td class="lose">0.167</td><td>0.001949</td></tr>
+</tbody></table>
+<div class='fb'><b>Feedback <span class='tag up'>beneficial</span></b><br>ChartQA ships images with almost no text, so the baseline is near-random; any added metadata/summary gives the retriever something to match, which is why enrichment helps most here (chart-to-table/axis are OCR placeholders). Here, best for retrieval was <b>M4 · Vision chart description + analysis</b> (nDCG@10 0.457, +0.291 vs baseline); best for answers was <b>M4 · Vision chart description + analysis</b> (faithfulness 0.433, +0.333).</div>
 </div>
 <div class='card note'>* chart-to-table, chart axis metadata, and formula surrounding-text are documented placeholders (require OCR/vision or are not in the source data); their effect is structural, not from real extracted values. Answer grades come from an LLM judge and are noisy on small samples.</div>
 </main><footer>Generated from results/enrichment_method_tests/ • Octen embeddings • Chroma Cloud • gpt-4o-mini (LangChain→LangSmith)</footer>

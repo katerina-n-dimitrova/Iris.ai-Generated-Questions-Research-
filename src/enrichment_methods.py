@@ -86,15 +86,28 @@ def units_scifact(n_queries: int, n_distractors: int, use_llm: bool):
                 "abstract_full": abstract_full,
                 "prev": sents[i - 1] if i > 0 else "",
                 "next": sents[i + 1] if i < n - 1 else "",
-                "pos": f"{i+1}/{n}", "llm_ctx": llm_ctx,
+                "pos": f"{i+1}/{n}", "pos_i": i + 1, "pos_n": n,
+                "llm_ctx": llm_ctx, "doc_summary": llm_ctx,
                 "chunk_key": f"scifact_{doc_id}_s{i}",
             })
+    # doc2query-style: questions each sentence-chunk answers (per-chunk, concurrent)
+    if use_llm:
+        gqs = _parallel(lambda u: _gen_questions(client, u["text"]), units)
+    else:
+        gqs = ["- (enable --use-llm to generate questions)"] * len(units)
+    for u, gq in zip(units, gqs):
+        u["gen_questions"] = gq
+
     queries = [{"query_id": q, "dataset": "scifact", "text": t,
                 "gold_source_ids": g} for q, t, g in selected]
     return units, queries
 
 
 def enrich_scifact_baseline(u): return u["text"]
+
+def enrich_scifact_generated_questions(u):
+    return _join("Likely questions this chunk answers:", u["gen_questions"],
+                 f"Original chunk: {u['text']}")
 
 def enrich_scifact_title_abstract_context(u):
     return _join(f"Paper title: {u['title']}",
@@ -108,6 +121,13 @@ def enrich_scifact_neighboring_context(u):
 
 def enrich_scifact_llm_context(u):
     return _join(f"Document-aware context: This chunk comes from {u['llm_ctx']}",
+                 f"Original chunk: {u['text']}")
+
+def enrich_scifact_doc_summary_position(u):
+    # Anthropic-style: short whole-document summary + where the chunk sits.
+    return _join(f"Document summary: This is {u['doc_summary']}.",
+                 f"Location: sentence {u['pos_i']} of {u['pos_n']} in the abstract "
+                 f"titled '{u['title']}'.",
                  f"Original chunk: {u['text']}")
 
 def enrich_scifact_combined(u):
@@ -146,12 +166,28 @@ def units_nfcorpus(n_queries: int, n_distractors: int, use_llm: bool):
         gqs = ["- (enable --use-llm to generate questions)"] * len(chunks)
         sums = [common.cheap_summary(c[2]) for c in chunks]
 
+    # per-document summary + chunk counts (for the doc_summary_position method)
+    from collections import defaultdict
+    n_per_doc = defaultdict(int)
+    for c in chunks:
+        n_per_doc[c[0]] += 1
+    doc_ids = [d for d in sorted(index_ids) if n_per_doc[d] > 0]
+    if use_llm:
+        ds_list = _parallel(lambda d: common.llm_summary(
+            client, str(corpus[d].get("text", ""))[:3000],
+            kind="whole biomedical document"), doc_ids)
+    else:
+        ds_list = [common.cheap_summary(str(corpus[d].get("text", ""))) for d in doc_ids]
+    doc_sum = dict(zip(doc_ids, ds_list))
+
     units = []
     for (doc_id, title, chunk, ci), gen_q, summ in zip(chunks, gqs, sums):
         units.append({
             "source_id": doc_id, "title": title, "text": chunk,
             "keywords": common.cheap_keywords(f"{title}. {chunk}"),
             "gen_questions": gen_q, "plain_summary": summ,
+            "doc_summary": doc_sum.get(doc_id, ""),
+            "ci": ci + 1, "n_chunks": n_per_doc[doc_id],
             "chunk_key": f"nfcorpus_{doc_id}_c{ci}",
         })
     queries = [{"query_id": q, "dataset": "nfcorpus", "text": t,
@@ -186,6 +222,12 @@ def enrich_nfcorpus_keywords_entities(u):
 
 def enrich_nfcorpus_plain_summary(u):
     return _join(f"Plain-language summary: {u['plain_summary']}",
+                 f"Original passage: {u['text']}")
+
+def enrich_nfcorpus_doc_summary_position(u):
+    # Anthropic-style: whole-document summary + chunk position within the source.
+    return _join(f"Document summary: {u['doc_summary']}",
+                 f"Location: passage {u['ci']} of {u['n_chunks']} in this document.",
                  f"Original passage: {u['text']}")
 
 def enrich_nfcorpus_combined(u):
@@ -252,6 +294,40 @@ CHART_AXIS_PLACEHOLDER = ("[axis/legend/title metadata unavailable: requires "
                           "vision parsing of the chart image]")
 
 
+VISION_PLACEHOLDER = ("[vision description unavailable: run with --use-llm to use the "
+                      "chat model as a vision model on the chart image]")
+
+
+def _vision_describe(oai, pil_image) -> str:
+    """Use the chat model as a vision model: describe the chart + analyze numbers."""
+    import base64
+    import io
+    try:
+        buf = io.BytesIO()
+        pil_image.convert("RGB").save(buf, format="PNG")
+        b64 = base64.b64encode(buf.getvalue()).decode()
+        r = oai.chat.completions.create(
+            model=config.OPENAI_CHAT_MODEL, temperature=0.0, max_tokens=220,
+            messages=[{"role": "user", "content": [
+                {"type": "text", "text":
+                 "You are a vision model reading a chart. In 2-4 factual sentences, "
+                 "describe what the chart shows (chart type, axis labels, series/legend) "
+                 "and analyze the key numbers and trends (highs, lows, comparisons). "
+                 "Use only what is visible; if unreadable, say so."},
+                {"type": "image_url",
+                 "image_url": {"url": f"data:image/png;base64,{b64}"}}]}])
+        return r.choices[0].message.content.strip()
+    except Exception as e:  # noqa: BLE001
+        return f"[vision extraction failed: {e}]"
+
+
+def _load_chartqa_images(n: int):
+    """Load the first n ChartQA test images (PIL). Index i == chart id chartqa_i."""
+    from datasets import load_dataset
+    ds = load_dataset("HuggingFaceM4/ChartQA", split=f"test[:{n}]")
+    return [ds[i]["image"] for i in range(len(ds))]
+
+
 def units_chartqa(n_queries: int, n_distractors: int, use_llm: bool):
     from common import read_jsonl
     test_path = pc.SPEC.raw_dir / "test.jsonl"
@@ -262,7 +338,7 @@ def units_chartqa(n_queries: int, n_distractors: int, use_llm: bool):
         cid = f"chartqa_{idx}"
         fields = pc.extract_chart_text(row)
         ocr = (fields.get("ocr_text") or "").strip() or "(no extractable chart text)"
-        charts.append((cid, fields.get("title"), ocr))
+        charts.append((idx, cid, fields.get("title"), ocr))
         if len(queries) < n_queries:
             q = str(row.get("query") or "").strip()
             if q:
@@ -271,14 +347,21 @@ def units_chartqa(n_queries: int, n_distractors: int, use_llm: bool):
                                 "gold_source_ids": [cid],
                                 "gold_answer": str(row.get("label") or "")})
     if use_llm:
-        summaries = _parallel(lambda c: common.llm_summary(client, c[2], kind="chart"), charts)
+        summaries = _parallel(lambda c: common.llm_summary(client, c[3], kind="chart"), charts)
+        # vision pass: read the actual chart image with the chat model
+        try:
+            images = _load_chartqa_images(len(charts))
+            visions = _parallel(lambda im: _vision_describe(client, im), images, workers=6)
+        except Exception as e:  # noqa: BLE001
+            visions = [f"[image load failed: {e}]"] * len(charts)
     else:
-        summaries = [common.cheap_summary(c[2]) for c in charts]
+        summaries = [common.cheap_summary(c[3]) for c in charts]
+        visions = [VISION_PLACEHOLDER] * len(charts)
     units = [{"source_id": cid, "title": title, "text": ocr,
               "chart_table": CHART_TABLE_PLACEHOLDER,
               "axis_meta": CHART_AXIS_PLACEHOLDER, "summary": summ,
-              "chunk_key": cid}
-             for (cid, title, ocr), summ in zip(charts, summaries)]
+              "vision_text": vis, "chunk_key": cid}
+             for (idx, cid, title, ocr), summ, vis in zip(charts, summaries, visions)]
     return units, queries
 
 
@@ -291,6 +374,11 @@ def enrich_chartqa_axis_metadata(u):
 def enrich_chartqa_summary(u):
     return _join(f"Chart summary: {u['summary']}",
                  f"Original chart text: {u['text']}")
+def enrich_chartqa_vision_description(u):
+    # chat model used as a vision model: chart description + numeric analysis
+    return _join(f"Chart (vision-read) description and analysis: {u['vision_text']}",
+                 f"Original chart text: {u['text']}")
+
 def enrich_chartqa_combined(u):
     return _join("Extracted chart data:", u["chart_table"], u["axis_meta"],
                  f"Chart summary: {u['summary']}",
@@ -362,6 +450,8 @@ DATASET_METHODS: Dict[str, Dict[str, Callable]] = {
         "title_abstract_context": enrich_scifact_title_abstract_context,
         "neighboring_context": enrich_scifact_neighboring_context,
         "llm_generated_chunk_context": enrich_scifact_llm_context,
+        "doc_summary_position": enrich_scifact_doc_summary_position,
+        "generated_questions": enrich_scifact_generated_questions,
         "combined_best": enrich_scifact_combined,
     },
     "nfcorpus": {
@@ -369,6 +459,7 @@ DATASET_METHODS: Dict[str, Dict[str, Callable]] = {
         "generated_questions": enrich_nfcorpus_generated_questions,
         "keywords_entities": enrich_nfcorpus_keywords_entities,
         "plain_summary": enrich_nfcorpus_plain_summary,
+        "doc_summary_position": enrich_nfcorpus_doc_summary_position,
         "combined_best": enrich_nfcorpus_combined,
     },
     "wikitablequestions": {
@@ -383,6 +474,7 @@ DATASET_METHODS: Dict[str, Dict[str, Callable]] = {
         "chart_to_table_data": enrich_chartqa_data_table,
         "axis_legend_title_metadata": enrich_chartqa_axis_metadata,
         "chart_summary": enrich_chartqa_summary,
+        "vision_chart_description": enrich_chartqa_vision_description,
         "combined_best": enrich_chartqa_combined,
     },
     "formulareasoning": {
@@ -404,10 +496,12 @@ UNIT_BUILDERS: Dict[str, Callable] = {
 
 # which conditions require the LLM (so the runner can warn / cost)
 LLM_CONDITIONS = {
-    ("scifact", "llm_generated_chunk_context"), ("scifact", "combined_best"),
+    ("scifact", "llm_generated_chunk_context"), ("scifact", "doc_summary_position"),
+    ("scifact", "generated_questions"), ("scifact", "combined_best"),
     ("nfcorpus", "generated_questions"), ("nfcorpus", "plain_summary"),
-    ("nfcorpus", "combined_best"),
-    ("chartqa", "chart_summary"), ("chartqa", "combined_best"),
+    ("nfcorpus", "doc_summary_position"), ("nfcorpus", "combined_best"),
+    ("chartqa", "chart_summary"), ("chartqa", "vision_chart_description"),
+    ("chartqa", "combined_best"),
 }
 
 

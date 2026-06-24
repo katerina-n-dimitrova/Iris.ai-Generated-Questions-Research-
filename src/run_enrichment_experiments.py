@@ -225,8 +225,7 @@ def main() -> None:
     print(f"Datasets:  {args.datasets} | queries/ds={args.max_samples} | "
           f"use_llm={args.use_llm} | answers={do_answers}\n")
 
-    ret_rows, ans_rows, lat_rows, cost_rows = [], [], [], []
-    per_query_fh = (OUT_DIR / "full_results_by_query.jsonl").open("w", encoding="utf-8")
+    ret_rows, ans_rows, lat_rows, cost_rows, pq_rows = [], [], [], [], []
 
     for dataset in args.datasets:
         print(f"[{dataset}] building conditions…")
@@ -249,16 +248,15 @@ def main() -> None:
             lat_rows.append({"dataset": dataset, "method": cond, **r["latency"]})
             cost_rows.append({"dataset": dataset, "method": cond, **r["cost"]})
             for q in r["per_query"]:
-                per_query_fh.write(json.dumps(
-                    {"dataset": dataset, "method": cond, **q}, ensure_ascii=False) + "\n")
-    per_query_fh.close()
+                pq_rows.append({"dataset": dataset, "method": cond, **q})
 
+    # upsert by (dataset, method) so re-running a subset of datasets keeps the rest
     def write(name, rows):
         if not rows:
             return
-        with (OUT_DIR / name).open("w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
-            w.writeheader(); w.writerows(rows)
+        groups = {(r["dataset"], r["method"]) for r in rows}
+        common.upsert_csv(OUT_DIR / name, list(rows[0].keys()), rows,
+                          ("dataset", "method"), groups)
         print(f"  wrote {name}")
 
     print("\nWriting result files:")
@@ -266,7 +264,24 @@ def main() -> None:
     write("answer_quality_by_method.csv", ans_rows)
     write("latency_by_method.csv", lat_rows)
     write("token_cost_by_method.csv", cost_rows)
-    print(f"  wrote full_results_by_query.jsonl")
+
+    # merge per-query jsonl: keep lines from datasets not re-run, append new ones
+    pq_path = OUT_DIR / "full_results_by_query.jsonl"
+    processed = set(args.datasets)
+    kept = []
+    if pq_path.exists():
+        for line in pq_path.open(encoding="utf-8"):
+            try:
+                if json.loads(line).get("dataset") not in processed:
+                    kept.append(line.rstrip("\n"))
+            except Exception:
+                pass
+    with pq_path.open("w", encoding="utf-8") as f:
+        for line in kept:
+            f.write(line + "\n")
+        for r in pq_rows:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    print("  wrote full_results_by_query.jsonl")
     print(f"\nDone -> {OUT_DIR.relative_to(config.PROJECT_ROOT)}")
     print("Next: python src/generate_summary.py")
 

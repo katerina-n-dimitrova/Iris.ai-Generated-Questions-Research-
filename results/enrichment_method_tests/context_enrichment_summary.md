@@ -11,8 +11,8 @@ We tested whether different context-enrichment methods improve RAG retrieval and
 | scifact | Structured scientific text | Raw abstract sentence | title_abstract_context, neighboring_context, llm_generated_chunk_context, combined_best | 654 | 30 |
 | nfcorpus | Unstructured biomedical text | Raw biomedical passage chunk | generated_questions, keywords_entities, plain_summary, combined_best | 1324 | 30 |
 | wikitablequestions | Tables | Linearized table row | column_headers_per_row, table_page_title, natural_language_row_summary, combined_best | 938 | 30 |
-| chartqa | Charts / graphs | Chart OCR/caption text | chart_to_table_data, axis_legend_title_metadata, chart_summary, combined_best | 40 | 30 |
 | formulareasoning | Mathematical formulas | Raw formula text | surrounding_text, variable_definitions, latex_structure, combined_best | 272 | 30 |
+| chartqa | Charts / graphs | Chart OCR/caption text | chart_to_table_data, axis_legend_title_metadata, chart_summary, vision_chart_description, combined_best | 40 | 30 |
 
 ## 3. Results by dataset
 
@@ -37,19 +37,19 @@ We tested whether different context-enrichment methods improve RAG retrieval and
 - **Best answer-quality method:** `column_headers_per_row` (faithfulness 0.533, baseline 0.533)
 - Baseline → retrieval nDCG@10 0.809, MRR 0.800; answer faithfulness 0.533, relevance 0.733.
 
-### chartqa — Charts / graphs
-
-- **Best retrieval method:** `axis_legend_title_metadata` (nDCG@10 0.248, baseline 0.166)
-- **Worst retrieval method:** `chart_to_table_data` (nDCG@10 0.178)
-- **Best answer-quality method:** `chart_summary` (faithfulness 0.067, baseline 0.100)
-- Baseline → retrieval nDCG@10 0.166, MRR 0.098; answer faithfulness 0.100, relevance 0.167.
-
 ### formulareasoning — Mathematical formulas
 
 - **Best retrieval method:** `combined_best` (nDCG@10 0.079, baseline 0.019)
 - **Worst retrieval method:** `latex_structure` (nDCG@10 0.016)
 - **Best answer-quality method:** `variable_definitions` (faithfulness 0.100, baseline 0.033)
 - Baseline → retrieval nDCG@10 0.019, MRR 0.012; answer faithfulness 0.033, relevance 0.233.
+
+### chartqa — Charts / graphs
+
+- **Best retrieval method:** `vision_chart_description` (nDCG@10 0.457, baseline 0.166)
+- **Worst retrieval method:** `chart_to_table_data` (nDCG@10 0.178)
+- **Best answer-quality method:** `vision_chart_description` (faithfulness 0.433, baseline 0.100)
+- Baseline → retrieval nDCG@10 0.166, MRR 0.098; answer faithfulness 0.100, relevance 0.200.
 
 ## 4. Method comparison table
 
@@ -70,16 +70,17 @@ We tested whether different context-enrichment methods improve RAG retrieval and
 | wikitablequestions | table_page_title | 0.867 | 0.808 | 0.823 | 0.867 | 0.367 | 0.600 | 587.842 | 1851.373 | 0.00179 | retrieval ↑ / answer ↓ |
 | wikitablequestions | natural_language_row_summary | 0.833 | 0.778 | 0.792 | 0.833 | 0.467 | 0.533 | 750.076 | 2170.918 | 0.002805 | both ↓ |
 | wikitablequestions | combined_best | 0.833 | 0.800 | 0.809 | 0.833 | 0.400 | 0.467 | 671.934 | 2015.637 | 0.003615 | both ↓ |
-| chartqa | baseline | 0.133 | 0.098 | 0.166 | 0.133 | 0.100 | 0.167 | 229.579 | 412.990 | 0.000462 | — |
-| chartqa | chart_to_table_data | 0.200 | 0.130 | 0.178 | 0.200 | 0.033 | 0.367 | 294.088 | 429.759 | 0.001102 | retrieval ↑ / answer ↓ |
-| chartqa | axis_legend_title_metadata | 0.200 | 0.184 | 0.248 | 0.200 | 0.033 | 0.433 | 262.419 | 464.347 | 0.000901 | retrieval ↑ / answer ↓ |
-| chartqa | chart_summary | 0.200 | 0.119 | 0.184 | 0.200 | 0.067 | 0.100 | 272.828 | 489.324 | 0.001008 | retrieval ↑ / answer ↓ |
-| chartqa | combined_best | 0.233 | 0.148 | 0.206 | 0.233 | 0.000 | 0.133 | 260.260 | 522.330 | 0.001957 | retrieval ↑ / answer ↓ |
 | formulareasoning | baseline | 0.000 | 0.012 | 0.019 | 0.000 | 0.033 | 0.233 | 726.696 | 1719.456 | 0.00156 | — |
 | formulareasoning | surrounding_text | 0.044 | 0.033 | 0.037 | 0.100 | 0.033 | 0.100 | 939.155 | 1663.259 | 0.001921 | retrieval ↑ / answer ↓ |
 | formulareasoning | variable_definitions | 0.128 | 0.060 | 0.078 | 0.167 | 0.100 | 0.200 | 601.644 | 1561.999 | 0.002838 | retrieval+answer ↑ |
 | formulareasoning | latex_structure | 0.000 | 0.011 | 0.016 | 0.000 | 0.033 | 0.033 | 782.844 | 1621.100 | 0.002705 | both ↓ |
 | formulareasoning | combined_best | 0.094 | 0.057 | 0.079 | 0.133 | 0.067 | 0.167 | 670.905 | 1640.364 | 0.003864 | retrieval+answer ↑ |
+| chartqa | baseline | 0.133 | 0.098 | 0.166 | 0.133 | 0.100 | 0.200 | 1488.612 | 3648.189 | 0.000462 | — |
+| chartqa | chart_to_table_data | 0.200 | 0.130 | 0.178 | 0.200 | 0.033 | 0.367 | 477.995 | 900.524 | 0.001102 | retrieval ↑ / answer ↓ |
+| chartqa | axis_legend_title_metadata | 0.200 | 0.184 | 0.248 | 0.200 | 0.067 | 0.433 | 435.311 | 872.357 | 0.000901 | retrieval ↑ / answer ↓ |
+| chartqa | chart_summary | 0.200 | 0.130 | 0.198 | 0.200 | 0.067 | 0.100 | 362.260 | 859.249 | 0.001006 | retrieval ↑ / answer ↓ |
+| chartqa | vision_chart_description | 0.567 | 0.382 | 0.457 | 0.567 | 0.433 | 0.500 | 246.721 | 432.147 | 0.004007 | retrieval+answer ↑ |
+| chartqa | combined_best | 0.200 | 0.138 | 0.198 | 0.200 | 0.000 | 0.167 | 423.664 | 798.666 | 0.001949 | retrieval ↑ / answer ↓ |
 
 ## 5. Overall ranking (best enrichment method per dataset)
 
@@ -88,15 +89,15 @@ We tested whether different context-enrichment methods improve RAG retrieval and
 | scifact | title_abstract_context (+0.025) | llm_generated_chunk_context (-0.107) | neighboring_context (-359.461) | llm_generated_chunk_context |
 | nfcorpus | combined_best (+0.024) | plain_summary (+0.093) | keywords_entities (+55.018) | plain_summary |
 | wikitablequestions | table_page_title (+0.014) | column_headers_per_row (+0.000) | table_page_title (+72.667) | column_headers_per_row |
-| chartqa | axis_legend_title_metadata (+0.082) | chart_summary (-0.033) | combined_best (+30.681) | axis_legend_title_metadata |
 | formulareasoning | combined_best (+0.060) | variable_definitions (+0.067) | variable_definitions (-125.052) | variable_definitions |
+| chartqa | vision_chart_description (+0.291) | vision_chart_description (+0.333) | vision_chart_description (-1241.891) | vision_chart_description |
 
 ## 6. Main findings
 
 - **Best method for Structured scientific text (SciFact):** `title_abstract_context`
 - **Best method for Unstructured biomedical text (NFCorpus):** `combined_best`
 - **Best method for Tables (WikiTableQuestions):** `table_page_title`
-- **Best method for Charts (ChartQA):** `axis_legend_title_metadata`
+- **Best method for Charts (ChartQA):** `vision_chart_description`
 - **Best method for Formulas (FormulaReasoning):** `combined_best`
 - **Methods that hurt retrieval (nDCG@10 below baseline):** wikitablequestions/column_headers_per_row, wikitablequestions/natural_language_row_summary, formulareasoning/latex_structure
 - **Did better retrieval always mean better answers?** No. Cases where retrieval improved but answer quality dropped: scifact/title_abstract_context, scifact/neighboring_context, scifact/llm_generated_chunk_context, scifact/combined_best, nfcorpus/generated_questions, nfcorpus/combined_best, wikitablequestions/table_page_title, chartqa/chart_to_table_data, chartqa/axis_legend_title_metadata, chartqa/chart_summary, chartqa/combined_best.
@@ -109,8 +110,8 @@ We tested whether different context-enrichment methods improve RAG retrieval and
 | Structured scientific text | llm_generated_chunk_context | no net gain over baseline in this run | adds encoding latency + token cost | Avoid (enrichment did not help here) |
 | Unstructured biomedical text | plain_summary | improves retrieval and/or answer grounding | adds encoding latency + token cost | Use |
 | Tables | column_headers_per_row | no net gain over baseline in this run | adds encoding latency + token cost | Avoid (enrichment did not help here) |
-| Charts / graphs | axis_legend_title_metadata | improves retrieval and/or answer grounding | adds encoding latency + token cost | Use |
 | Mathematical formulas | variable_definitions | improves retrieval and/or answer grounding | adds encoding latency + token cost | Use |
+| Charts / graphs | vision_chart_description | improves retrieval and/or answer grounding | adds encoding latency + token cost | Use |
 
 ## Notes & caveats
 

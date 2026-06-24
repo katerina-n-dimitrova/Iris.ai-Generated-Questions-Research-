@@ -31,6 +31,8 @@ METHOD_LABEL = {
     "title_abstract_context": "M1 · Title + abstract context",
     "neighboring_context": "M2 · Neighboring sentence summary",
     "llm_generated_chunk_context": "M3 · LLM-generated chunk context",
+    "doc_summary_position": "M4 · Doc summary + chunk position (Anthropic-style)",
+    "vision_chart_description": "M4 · Vision chart description + analysis",
     "generated_questions": "M1 · Generated questions",
     "keywords_entities": "M2 · Keywords / entities",
     "plain_summary": "M3 · Plain-language summary",
