@@ -9,12 +9,6 @@ formulareasoning,surrounding_text,30,0.0444,0.0778,0.02,0.0331,0.0371,0.1
 formulareasoning,variable_definitions,30,0.1278,0.1694,0.0333,0.0604,0.078,0.1667
 formulareasoning,latex_structure,30,0.0,0.0417,0.0,0.0112,0.0164,0.0
 formulareasoning,combined_best,30,0.0944,0.1889,0.0267,0.0566,0.0788,0.1333
-scifact,baseline,30,0.8933,0.9267,0.2133,0.8708,0.8815,0.9
-scifact,title_abstract_context,30,0.9133,0.9133,0.2067,0.9167,0.9061,0.9333
-scifact,neighboring_context,30,0.92,0.92,0.2133,0.8944,0.8924,0.9333
-scifact,llm_generated_chunk_context,30,0.9133,0.9133,0.2067,0.9167,0.9061,0.9333
-scifact,doc_summary_position,30,0.9133,0.9133,0.2067,0.9333,0.9158,0.9333
-scifact,combined_best,30,0.9133,0.9133,0.2067,0.9167,0.9061,0.9333
 nfcorpus,baseline,30,0.1238,0.1488,0.62,0.8306,0.523,0.9
 nfcorpus,generated_questions,30,0.1236,0.1512,0.6533,0.8917,0.5422,0.9667
 nfcorpus,keywords_entities,30,0.1245,0.1484,0.66,0.8833,0.5333,0.9667
@@ -27,3 +21,10 @@ chartqa,axis_legend_title_metadata,30,0.2,0.4667,0.04,0.184,0.2477,0.2
 chartqa,chart_summary,30,0.1667,0.3667,0.0333,0.1277,0.1816,0.1667
 chartqa,vision_chart_description,30,0.5333,0.7,0.1067,0.3676,0.4476,0.5333
 chartqa,combined_best,30,0.2333,0.3667,0.0467,0.1404,0.1924,0.2333
+scifact,baseline,30,0.8933,0.9267,0.2133,0.8708,0.8815,0.9
+scifact,title_abstract_context,30,0.9133,0.9133,0.2067,0.9167,0.9061,0.9333
+scifact,neighboring_context,30,0.92,0.92,0.2133,0.8944,0.8924,0.9333
+scifact,llm_generated_chunk_context,30,0.9133,0.9133,0.2067,0.9167,0.9061,0.9333
+scifact,doc_summary_position,30,0.9133,0.9133,0.2067,0.9333,0.9184,0.9333
+scifact,generated_questions,30,0.9933,0.9933,0.2333,0.9067,0.9249,1.0
+scifact,combined_best,30,0.9133,0.9133,0.2067,0.9167,0.9061,0.9333
