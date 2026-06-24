@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>Context Enrichment Results by Dataset</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1e293b;background:#f1f5f9;line-height:1.55}
+header{background:linear-gradient(135deg,#1e293b,#7c3aed);color:#fff;padding:38px 24px}
+header .wrap{max-width:1080px;margin:0 auto}header h1{margin:0 0 8px;font-size:26px}header p{margin:0;opacity:.92;font-size:14.5px}
+main{max-width:1080px;margin:0 auto;padding:24px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px 22px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+h2{font-size:20px;margin:2px 0 2px;border-left:4px solid #7c3aed;padding-left:10px}
+.dt{color:#7c3aed;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em;margin:2px 0 12px}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:4px 0}
+th,td{padding:7px 9px;text-align:center;border-bottom:1px solid #eef2f7}
+th{background:#f8fafc;color:#64748b;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+td.l,th.l{text-align:left}tr.base td{background:#faf5ff;font-weight:600}
+.win{color:#16a34a;font-weight:700}.lose{color:#dc2626}
+.fb{background:#f5f3ff;border:1px solid #ddd6fe;border-radius:9px;padding:13px 15px;margin-top:14px;font-size:14px}
+.fb b{color:#6d28d9}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;margin-left:6px}
+.tag.up{background:#dcfce7;color:#166534}.tag.down{background:#fee2e2;color:#991b1b}.tag.mix{background:#fef9c3;color:#854d0e}
+footer{max-width:1080px;margin:0 auto;padding:10px 24px 44px;color:#64748b;font-size:12px}
+.note{color:#64748b;font-size:12px;margin-top:6px}
+</style></head><body>
+<header><div class='wrap'><h1>Context Enrichment Results — by Dataset</h1><p>Three enrichment methods (+ combined) vs. baseline, for each of the five document types. Green = better than baseline, red = worse.</p></div></header><main>
+<div class='card'>
+<h2>scifact</h2><div class='dt'>Structured scientific text</div>
+<table><thead><tr><th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th><th>Token cost ($)</th></tr></thead><tbody>
+<tr class='base'><td class='l'>Baseline (raw content)</td><td class="">0.893</td><td class="">0.881</td><td class="">0.871</td><td class="">0.900</td><td class="">0.567</td><td class="">0.500</td><td>0.001319</td></tr>
+<tr class=''><td class='l'>M3 · LLM-generated chunk context</td><td class="win">0.913</td><td class="win">0.906</td><td class="win">0.917</td><td class="win">0.933</td><td class="lose">0.460</td><td class="lose">0.467</td><td>0.002491</td></tr>
+<tr class=''><td class='l'>M2 · Neighboring sentence summary</td><td class="win">0.920</td><td class="win">0.892</td><td class="win">0.894</td><td class="win">0.933</td><td class="lose">0.383</td><td class="lose">0.400</td><td>0.002868</td></tr>
+<tr class=''><td class='l'>M1 · Title + abstract context</td><td class="win">0.913</td><td class="win">0.906</td><td class="win">0.917</td><td class="win">0.933</td><td class="lose">0.417</td><td class="lose">0.433</td><td>0.004782</td></tr>
+<tr class=''><td class='l'>Combined best</td><td class="win">0.913</td><td class="win">0.906</td><td class="win">0.917</td><td class="win">0.933</td><td class="lose">0.417</td><td class="lose">0.433</td><td>0.006463</td></tr>
+</tbody></table>
+<div class='fb'><b>Feedback <span class='tag mix'>mixed</span></b><br>Scientific sentences are already self-contained, so the baseline is strong; light document context helps ranking a little, but heavier enrichment mostly adds noise that lowers answer faithfulness. Here, best for retrieval was <b>M3 · LLM-generated chunk context</b> (nDCG@10 0.906, +0.025 vs baseline); best for answers was <b>M3 · LLM-generated chunk context</b> (faithfulness 0.460, -0.107).</div>
+</div>
+<div class='card'>
+<h2>nfcorpus</h2><div class='dt'>Unstructured biomedical text</div>
+<table><thead><tr><th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th><th>Token cost ($)</th></tr></thead><tbody>
+<tr class='base'><td class='l'>Baseline (raw content)</td><td class="">0.124</td><td class="">0.523</td><td class="">0.831</td><td class="">0.900</td><td class="">0.433</td><td class="">0.400</td><td>0.00452</td></tr>
+<tr class=''><td class='l'>M1 · Generated questions</td><td class="win">0.125</td><td class="win">0.535</td><td class="win">0.908</td><td class="win">0.967</td><td class="lose">0.233</td><td class="lose">0.233</td><td>0.00573</td></tr>
+<tr class=''><td class='l'>M2 · Keywords / entities</td><td class="win">0.124</td><td class="win">0.533</td><td class="win">0.883</td><td class="win">0.967</td><td class="">0.433</td><td class="">0.400</td><td>0.005246</td></tr>
+<tr class=''><td class='l'>M3 · Plain-language summary</td><td class="lose">0.121</td><td class="win">0.534</td><td class="win">0.875</td><td class="win">0.933</td><td class="win">0.527</td><td class="win">0.533</td><td>0.005749</td></tr>
+<tr class=''><td class='l'>Combined best</td><td class="lose">0.122</td><td class="win">0.547</td><td class="win">0.887</td><td class="win">0.933</td><td class="lose">0.267</td><td class="lose">0.250</td><td>0.00742</td></tr>
+</tbody></table>
+<div class='fb'><b>Feedback <span class='tag up'>beneficial</span></b><br>Long biomedical passages are vague on their own; expansion methods (generated questions, plain summaries) tend to help answer grounding more than raw retrieval, since they restate what the passage answers. Here, best for retrieval was <b>Combined best</b> (nDCG@10 0.547, +0.024 vs baseline); best for answers was <b>M3 · Plain-language summary</b> (faithfulness 0.527, +0.093).</div>
+</div>
+<div class='card'>
+<h2>wikitablequestions</h2><div class='dt'>Tables</div>
+<table><thead><tr><th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th><th>Token cost ($)</th></tr></thead><tbody>
+<tr class='base'><td class='l'>Baseline (raw content)</td><td class="">0.833</td><td class="">0.809</td><td class="">0.800</td><td class="">0.833</td><td class="">0.533</td><td class="">0.733</td><td>0.001538</td></tr>
+<tr class=''><td class='l'>M1 · Column headers per row</td><td class="">0.833</td><td class="lose">0.801</td><td class="lose">0.790</td><td class="">0.833</td><td class="">0.533</td><td class="lose">0.700</td><td>0.001929</td></tr>
+<tr class=''><td class='l'>M3 · Natural-language row summary</td><td class="">0.833</td><td class="lose">0.792</td><td class="lose">0.778</td><td class="">0.833</td><td class="lose">0.467</td><td class="lose">0.533</td><td>0.002805</td></tr>
+<tr class=''><td class='l'>M2 · Table / page title</td><td class="win">0.867</td><td class="win">0.823</td><td class="win">0.808</td><td class="win">0.867</td><td class="lose">0.367</td><td class="lose">0.600</td><td>0.00179</td></tr>
+<tr class=''><td class='l'>Combined best</td><td class="">0.833</td><td class="">0.809</td><td class="">0.800</td><td class="">0.833</td><td class="lose">0.400</td><td class="lose">0.467</td><td>0.003615</td></tr>
+</tbody></table>
+<div class='fb'><b>Feedback <span class='tag mix'>mixed</span></b><br>Table rows match queries on exact cell values; adding headers/titles/NL summaries can raise retrieval but the extra prose often dilutes the precise values an answer needs. Here, best for retrieval was <b>M2 · Table / page title</b> (nDCG@10 0.823, +0.014 vs baseline); best for answers was <b>M1 · Column headers per row</b> (faithfulness 0.533, +0.000).</div>
+</div>
+<div class='card'>
+<h2>chartqa</h2><div class='dt'>Charts / graphs</div>
+<table><thead><tr><th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th><th>Token cost ($)</th></tr></thead><tbody>
+<tr class='base'><td class='l'>Baseline (raw content)</td><td class="">0.133</td><td class="">0.166</td><td class="">0.098</td><td class="">0.133</td><td class="">0.100</td><td class="">0.167</td><td>0.000462</td></tr>
+<tr class=''><td class='l'>M2 · Axis/legend/title metadata*</td><td class="win">0.200</td><td class="win">0.248</td><td class="win">0.184</td><td class="win">0.200</td><td class="lose">0.033</td><td class="win">0.433</td><td>0.000901</td></tr>
+<tr class=''><td class='l'>M3 · Chart summary</td><td class="win">0.200</td><td class="win">0.184</td><td class="win">0.119</td><td class="win">0.200</td><td class="lose">0.067</td><td class="lose">0.100</td><td>0.001008</td></tr>
+<tr class=''><td class='l'>M1 · Chart-to-table data*</td><td class="win">0.200</td><td class="win">0.178</td><td class="win">0.130</td><td class="win">0.200</td><td class="lose">0.033</td><td class="win">0.367</td><td>0.001102</td></tr>
+<tr class=''><td class='l'>Combined best</td><td class="win">0.233</td><td class="win">0.206</td><td class="win">0.148</td><td class="win">0.233</td><td class="lose">0.000</td><td class="lose">0.133</td><td>0.001957</td></tr>
+</tbody></table>
+<div class='fb'><b>Feedback <span class='tag mix'>mixed</span></b><br>ChartQA ships images with almost no text, so the baseline is near-random; any added metadata/summary gives the retriever something to match, which is why enrichment helps most here (chart-to-table/axis are OCR placeholders). Here, best for retrieval was <b>M2 · Axis/legend/title metadata*</b> (nDCG@10 0.248, +0.082 vs baseline); best for answers was <b>M3 · Chart summary</b> (faithfulness 0.067, -0.033).</div>
+</div>
+<div class='card'>
+<h2>formulareasoning</h2><div class='dt'>Mathematical formulas</div>
+<table><thead><tr><th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th><th>Token cost ($)</th></tr></thead><tbody>
+<tr class='base'><td class='l'>Baseline (raw content)</td><td class="">0.000</td><td class="">0.019</td><td class="">0.012</td><td class="">0.000</td><td class="">0.033</td><td class="">0.233</td><td>0.00156</td></tr>
+<tr class=''><td class='l'>M3 · LaTeX + structure</td><td class="">0.000</td><td class="lose">0.016</td><td class="lose">0.011</td><td class="">0.000</td><td class="">0.033</td><td class="lose">0.033</td><td>0.002705</td></tr>
+<tr class=''><td class='l'>M1 · Surrounding text*</td><td class="win">0.044</td><td class="win">0.037</td><td class="win">0.033</td><td class="win">0.100</td><td class="">0.033</td><td class="lose">0.100</td><td>0.001921</td></tr>
+<tr class=''><td class='l'>M2 · Variable definitions</td><td class="win">0.128</td><td class="win">0.078</td><td class="win">0.060</td><td class="win">0.167</td><td class="win">0.100</td><td class="lose">0.200</td><td>0.002838</td></tr>
+<tr class=''><td class='l'>Combined best</td><td class="win">0.094</td><td class="win">0.079</td><td class="win">0.057</td><td class="win">0.133</td><td class="win">0.067</td><td class="lose">0.167</td><td>0.003864</td></tr>
+</tbody></table>
+<div class='fb'><b>Feedback <span class='tag up'>beneficial</span></b><br>Terse formulas are hard to match to long word-problems; variable definitions add the quantity names a question mentions, which lifts retrieval from near-zero, though answer accuracy stays low. Here, best for retrieval was <b>Combined best</b> (nDCG@10 0.079, +0.060 vs baseline); best for answers was <b>M2 · Variable definitions</b> (faithfulness 0.100, +0.067).</div>
+</div>
+<div class='card note'>* chart-to-table, chart axis metadata, and formula surrounding-text are documented placeholders (require OCR/vision or are not in the source data); their effect is structural, not from real extracted values. Answer grades come from an LLM judge and are noisy on small samples.</div>
+</main><footer>Generated from results/enrichment_method_tests/ • Octen embeddings • Chroma Cloud • gpt-4o-mini (LangChain→LangSmith)</footer>
+</body></html>

@@ -44,6 +44,15 @@ def _join(*parts: str) -> str:
     return "\n".join(p for p in parts if p and p.strip())
 
 
+def _parallel(fn, items, workers: int = 8):
+    """Run fn over items concurrently (LLM enrichment is latency-bound)."""
+    from concurrent.futures import ThreadPoolExecutor
+    if not items:
+        return []
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        return list(ex.map(fn, items))
+
+
 # =========================================================================== #
 # SciFact — structured scientific text
 # =========================================================================== #
@@ -53,21 +62,23 @@ def units_scifact(n_queries: int, n_distractors: int, use_llm: bool):
     selected, index_ids = common.select_eval_subset(
         qtext, gold, corpus.keys(), n_queries, n_distractors)
     client = config.get_openai_client() if use_llm else None
-    units = []
+    # one doc-context per document, computed concurrently and reused per sentence
+    docs = []
     for doc_id in sorted(index_ids):
         row = corpus[doc_id]
         title = str(row.get("title") or "").strip()
         sents = ps._abstract_sentences(row)
-        abstract_full = " ".join(sents)
-        # one LLM doc-context per document (reused across its sentences)
-        llm_ctx = ""
-        if use_llm:
-            llm_ctx = common.llm_summary(
-                client, f"Title: {title}\nAbstract: {abstract_full}",
-                kind="scientific paper (say what it is about in one sentence)")
-        else:
-            llm_ctx = f"a scientific abstract titled '{title}'" if title else \
-                "a scientific abstract"
+        docs.append((doc_id, title, sents, " ".join(sents)))
+    if use_llm:
+        ctxs = _parallel(lambda d: common.llm_summary(
+            client, f"Title: {d[1]}\nAbstract: {d[3]}",
+            kind="scientific paper (say what it is about in one sentence)"), docs)
+    else:
+        ctxs = [f"a scientific abstract titled '{d[1]}'" if d[1]
+                else "a scientific abstract" for d in docs]
+
+    units = []
+    for (doc_id, title, sents, abstract_full), llm_ctx in zip(docs, ctxs):
         n = len(sents)
         for i, s in enumerate(sents):
             units.append({
@@ -117,7 +128,8 @@ def units_nfcorpus(n_queries: int, n_distractors: int, use_llm: bool):
     selected, index_ids = common.select_eval_subset(
         qtext, gold, corpus.keys(), n_queries, n_distractors)
     client = config.get_openai_client() if use_llm else None
-    units = []
+    # collect all chunks first, then run the two LLM enrichments concurrently
+    chunks = []
     for doc_id in sorted(index_ids):
         row = corpus[doc_id]
         title = str(row.get("title") or "").strip()
@@ -125,21 +137,23 @@ def units_nfcorpus(n_queries: int, n_distractors: int, use_llm: bool):
         if not text:
             continue
         for ci, chunk in enumerate(common.chunk_text(text)):
-            gen_q = ""
-            summ = ""
-            if use_llm:
-                gen_q = _gen_questions(client, chunk)
-                summ = common.llm_summary(client, chunk,
-                                          kind="biomedical passage in plain language")
-            else:
-                summ = common.cheap_summary(chunk)
-                gen_q = "- (enable --use-llm to generate questions)"
-            units.append({
-                "source_id": doc_id, "title": title, "text": chunk,
-                "keywords": common.cheap_keywords(f"{title}. {chunk}"),
-                "gen_questions": gen_q, "plain_summary": summ,
-                "chunk_key": f"nfcorpus_{doc_id}_c{ci}",
-            })
+            chunks.append((doc_id, title, chunk, ci))
+    if use_llm:
+        gqs = _parallel(lambda c: _gen_questions(client, c[2]), chunks)
+        sums = _parallel(lambda c: common.llm_summary(
+            client, c[2], kind="biomedical passage in plain language"), chunks)
+    else:
+        gqs = ["- (enable --use-llm to generate questions)"] * len(chunks)
+        sums = [common.cheap_summary(c[2]) for c in chunks]
+
+    units = []
+    for (doc_id, title, chunk, ci), gen_q, summ in zip(chunks, gqs, sums):
+        units.append({
+            "source_id": doc_id, "title": title, "text": chunk,
+            "keywords": common.cheap_keywords(f"{title}. {chunk}"),
+            "gen_questions": gen_q, "plain_summary": summ,
+            "chunk_key": f"nfcorpus_{doc_id}_c{ci}",
+        })
     queries = [{"query_id": q, "dataset": "nfcorpus", "text": t,
                 "gold_source_ids": g} for q, t, g in selected]
     return units, queries
@@ -243,19 +257,12 @@ def units_chartqa(n_queries: int, n_distractors: int, use_llm: bool):
     test_path = pc.SPEC.raw_dir / "test.jsonl"
     rows = list(read_jsonl(test_path))[:max(n_queries, n_distractors)]
     client = config.get_openai_client() if use_llm else None
-    units, queries = [], []
+    charts, queries = [], []
     for idx, row in enumerate(rows):
         cid = f"chartqa_{idx}"
         fields = pc.extract_chart_text(row)
         ocr = (fields.get("ocr_text") or "").strip() or "(no extractable chart text)"
-        summ = common.llm_summary(client, ocr, kind="chart") if use_llm \
-            else common.cheap_summary(ocr)
-        units.append({
-            "source_id": cid, "title": fields.get("title"), "text": ocr,
-            "chart_table": CHART_TABLE_PLACEHOLDER,
-            "axis_meta": CHART_AXIS_PLACEHOLDER, "summary": summ,
-            "chunk_key": cid,
-        })
+        charts.append((cid, fields.get("title"), ocr))
         if len(queries) < n_queries:
             q = str(row.get("query") or "").strip()
             if q:
@@ -263,6 +270,15 @@ def units_chartqa(n_queries: int, n_distractors: int, use_llm: bool):
                                 "dataset": "chartqa", "text": q,
                                 "gold_source_ids": [cid],
                                 "gold_answer": str(row.get("label") or "")})
+    if use_llm:
+        summaries = _parallel(lambda c: common.llm_summary(client, c[2], kind="chart"), charts)
+    else:
+        summaries = [common.cheap_summary(c[2]) for c in charts]
+    units = [{"source_id": cid, "title": title, "text": ocr,
+              "chart_table": CHART_TABLE_PLACEHOLDER,
+              "axis_meta": CHART_AXIS_PLACEHOLDER, "summary": summ,
+              "chunk_key": cid}
+             for (cid, title, ocr), summ in zip(charts, summaries)]
     return units, queries
 
 
