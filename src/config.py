@@ -144,6 +144,16 @@ DATASETS: Dict[str, DatasetSpec] = {
         input_type="chart",
         description="Charts / graphs (ChartQA).",
     ),
+    "formulareasoning": DatasetSpec(
+        # Hosted on GitHub (nju-websoft/FormulaReasoning), not the HF Hub —
+        # downloaded via raw URLs in download_datasets.py. Documents are the
+        # formula database; queries are physics questions with numeric answers.
+        name="formulareasoning",
+        hf_id="nju-websoft/FormulaReasoning",
+        hf_config=None,
+        input_type="formula",
+        description="Formulas (FormulaReasoning physics formula database + QA).",
+    ),
 }
 
 ALL_DATASETS = list(DATASETS.keys())

@@ -2,4 +2,5 @@ rank,document_type,dataset,nDCG@10,MRR,Hit@5,faithfulness,answer_relevance,compo
 1,Structured text,scifact,0.851,0.831,0.89,0.47,0.45,0.698
 2,Tables,wikitablequestions,0.704,0.677,0.777,0.452,0.6,0.642
 3,Unstructured text,nfcorpus,0.506,0.813,0.9,0.467,0.467,0.63
-4,Charts,chartqa,0.045,0.034,0.063,0.16,0.233,0.107
+4,Formulas,formulareasoning,0.081,0.066,0.108,0.162,0.372,0.158
+5,Charts,chartqa,0.045,0.034,0.063,0.16,0.233,0.107

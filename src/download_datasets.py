@@ -49,6 +49,20 @@ def download_one(name: str, max_samples: int) -> None:
     out_dir = spec.raw_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    # FormulaReasoning lives on GitHub (not the HF Hub): fetch the formula
+    # database + an English test split via raw URLs.
+    if name == "formulareasoning":
+        import urllib.request
+        base = "https://raw.githubusercontent.com/nju-websoft/FormulaReasoning/main"
+        for rel, dest in [
+            ("formulas.json", "formulas.json"),
+            ("data/FormulaReasoning/HeF_test.json", "HeF_test.json"),
+        ]:
+            target = out_dir / dest
+            urllib.request.urlretrieve(f"{base}/{rel}", target)
+            print(f"  fetched {rel} -> {target.relative_to(config.PROJECT_ROOT)}")
+        return
+
     # ChartQA stores images; we only need the textual fields, so we drop the
     # image column on load to keep the raw cache small and JSON-serialisable.
     if name == "chartqa":

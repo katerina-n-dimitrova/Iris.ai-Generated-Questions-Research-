@@ -222,10 +222,9 @@ def main() -> None:
         print("No answer files found. Run run_answer_generation.py first.")
         return
 
-    with ANSWER_SCORES.open("w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=SCORE_FIELDS)
-        w.writeheader()
-        w.writerows(results)
+    groups = {(r["dataset"], r["condition"]) for r in results}
+    common.upsert_csv(ANSWER_SCORES, SCORE_FIELDS, results,
+                      ("dataset", "condition"), groups)
 
     print(f"\n{'dataset':<20}{'cond':<10}{'EM':>8}{'F1':>8}{'LLM':>8}")
     print("-" * 54)

@@ -18,6 +18,7 @@ import argparse
 import common
 import config
 import preprocess_chartqa
+import preprocess_formulareasoning
 import preprocess_nfcorpus
 import preprocess_scifact
 import preprocess_wikitablequestions
@@ -27,6 +28,7 @@ MODULES = {
     "nfcorpus": preprocess_nfcorpus,
     "wikitablequestions": preprocess_wikitablequestions,
     "chartqa": preprocess_chartqa,
+    "formulareasoning": preprocess_formulareasoning,
 }
 
 

@@ -135,10 +135,9 @@ def main() -> None:
         print("No retrieval outputs found. Run run_retrieval_experiments.py first.")
         return
 
-    with RETRIEVAL_SCORES.open("w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=SCORE_FIELDS)
-        w.writeheader()
-        w.writerows(results)
+    groups = {(r["dataset"], r["condition"]) for r in results}
+    common.upsert_csv(RETRIEVAL_SCORES, SCORE_FIELDS, results,
+                      ("dataset", "condition"), groups)
 
     # pretty print
     print(f"\n{'dataset':<20}{'cond':<10}{'R@5':>8}{'R@10':>8}"
