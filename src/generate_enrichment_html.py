@@ -23,7 +23,8 @@ DATA_TYPE = {
     "nfcorpus": "Unstructured biomedical text",
     "wikitablequestions": "Tables",
     "chartqa": "Charts / graphs",
-    "formulareasoning": "Mathematical formulas",
+    "formulareasoning": "Mathematical formulas (standalone)",
+    "numinamath": "Math text with inline formulas",
 }
 # human-readable method labels
 METHOD_LABEL = {
@@ -43,9 +44,10 @@ METHOD_LABEL = {
     "chart_to_table_data": "M1 · Chart-to-table data*",
     "axis_legend_title_metadata": "M2 · Axis/legend/title metadata*",
     "chart_summary": "M3 · Chart summary",
-    "surrounding_text": "M1 · Surrounding text*",
+    "surrounding_text": "M1 · Surrounding text",
     "variable_definitions": "M2 · Variable definitions",
     "latex_structure": "M3 · LaTeX + structure",
+    "problem_context": "M2 · Problem context",
     "combined_best": "Combined best",
 }
 # why each data type's enrichment tends to help or not (domain rationale)
@@ -65,6 +67,10 @@ RATIONALE = {
     "formulareasoning": ("Terse formulas are hard to match to long word-problems; variable "
                          "definitions add the quantity names a question mentions, which lifts "
                          "retrieval from near-zero, though answer accuracy stays low."),
+    "numinamath": ("Unlike the standalone-formula DB, here formulas sit inside step-by-step "
+                   "solution text, so they already carry context; adding the surrounding "
+                   "steps or the originating problem gives the retriever the natural-language "
+                   "anchors a query uses, which is exactly the context that pure formulas lack."),
 }
 # why answer relevance/faithfulness tends to fall after enrichment, per dataset
 REL_DROP = {
@@ -89,6 +95,9 @@ REL_DROP = {
                          "formula text cannot supply; adding variable definitions, "
                          "LaTeX or structure expands the context without giving the "
                          "model the computation, so answers stay only loosely relevant."),
+    "numinamath": ("Each retrieved chunk is one step of a multi-step solution; even with "
+                   "surrounding context the model often lacks the full derivation needed "
+                   "to answer, so answer scores stay modest while retrieval improves most."),
 }
 WHY_REL_DROPS = (
     "<div class='card'><h2>Why does answer relevance (and faithfulness) often drop "
@@ -175,7 +184,8 @@ def main() -> None:
             datasets.append(ds)
         methods.setdefault(ds, []).append(m)
     # fixed presentation order: structured, unstructured, tables, charts, formulas
-    ORDER = ["scifact", "nfcorpus", "wikitablequestions", "chartqa", "formulareasoning"]
+    ORDER = ["scifact", "nfcorpus", "wikitablequestions", "chartqa",
+             "formulareasoning", "numinamath"]
     datasets.sort(key=lambda d: ORDER.index(d) if d in ORDER else 999)
     order = ["baseline", "combined_best"]
     for ds in methods:

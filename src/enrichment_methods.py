@@ -467,6 +467,71 @@ def enrich_formula_combined(u):
 
 
 # =========================================================================== #
+# NuminaMath — math text with inline formulas (formulas inside explanatory text)
+# =========================================================================== #
+_MATH_RE = re.compile(r"(\\\[.*?\\\]|\\\(.*?\\\)|\$\$.*?\$\$|\$[^$]+\$|\\[a-zA-Z]+)")
+
+
+def _split_steps(solution: str):
+    parts = re.split(r"\n+|(?<=[.!?])\s+", solution.strip())
+    return [p.strip() for p in parts if len(p.strip()) >= 20]
+
+
+def units_numinamath(n_queries: int, n_distractors: int, use_llm: bool):
+    raw = config.DATASETS["numinamath"].raw_dir / "test.jsonl"
+    if not raw.exists():
+        raise FileNotFoundError(f"{raw} missing. Run download_datasets.py first.")
+    rows = list(common.read_jsonl(raw))[:max(n_queries, n_distractors)]
+    units, queries = [], []
+    for idx, row in enumerate(rows):
+        problem = str(row.get("problem") or "").strip()
+        solution = str(row.get("solution") or "").strip()
+        if not problem or not solution:
+            continue
+        sid = f"num_{idx}"
+        steps = _split_steps(solution)
+        n = len(steps)
+        for i, step in enumerate(steps):
+            units.append({
+                "source_id": sid, "title": problem[:80], "text": step,
+                "problem": problem, "prev": steps[i - 1] if i > 0 else "",
+                "next": steps[i + 1] if i < n - 1 else "",
+                "pos_i": i + 1, "pos_n": n,
+                "latex": "; ".join(dict.fromkeys(_MATH_RE.findall(step)))[:300],
+                "chunk_key": f"numinamath_{sid}_s{i}",
+            })
+        if len(queries) < n_queries:
+            queries.append({"query_id": f"num_q{idx}", "dataset": "numinamath",
+                            "text": problem, "gold_source_ids": [sid],
+                            "gold_answer": ""})
+    return units, queries
+
+
+def enrich_numinamath_baseline(u): return u["text"]
+
+def enrich_numinamath_surrounding_text(u):
+    # the point of this dataset: real text around the formula gives it context
+    return _join(f"Previous step: {u['prev']}" if u['prev'] else "",
+                 f"Current step (with formula): {u['text']}",
+                 f"Next step: {u['next']}" if u['next'] else "")
+
+def enrich_numinamath_problem_context(u):
+    return _join(f"This step is part of solving the problem: {u['problem'][:400]}",
+                 f"Step (with formula): {u['text']}")
+
+def enrich_numinamath_latex_structure(u):
+    return _join(f"Formulas/symbols in this step (LaTeX): {u['latex']}"
+                 if u['latex'] else "", f"Step: {u['text']}")
+
+def enrich_numinamath_combined(u):
+    return _join(f"Problem: {u['problem'][:300]}",
+                 f"Previous step: {u['prev']}" if u['prev'] else "",
+                 f"Formulas/symbols (LaTeX): {u['latex']}" if u['latex'] else "",
+                 f"Current step: {u['text']}",
+                 f"Next step: {u['next']}" if u['next'] else "")
+
+
+# =========================================================================== #
 # Registry
 # =========================================================================== #
 # dataset -> { condition_name: enrich_fn }   (order: baseline, m1, m2, m3, combined)
@@ -511,6 +576,13 @@ DATASET_METHODS: Dict[str, Dict[str, Callable]] = {
         "latex_structure": enrich_formula_structure,
         "combined_best": enrich_formula_combined,
     },
+    "numinamath": {
+        "baseline": enrich_numinamath_baseline,
+        "surrounding_text": enrich_numinamath_surrounding_text,
+        "problem_context": enrich_numinamath_problem_context,
+        "latex_structure": enrich_numinamath_latex_structure,
+        "combined_best": enrich_numinamath_combined,
+    },
 }
 
 UNIT_BUILDERS: Dict[str, Callable] = {
@@ -519,6 +591,7 @@ UNIT_BUILDERS: Dict[str, Callable] = {
     "wikitablequestions": units_wikitablequestions,
     "chartqa": units_chartqa,
     "formulareasoning": units_formulareasoning,
+    "numinamath": units_numinamath,
 }
 
 # which conditions require the LLM (so the runner can warn / cost)

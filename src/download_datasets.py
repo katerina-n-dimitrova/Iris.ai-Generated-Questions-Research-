@@ -74,6 +74,12 @@ def download_one(name: str, max_samples: int) -> None:
         _save_split(rows, out_dir / "test.jsonl")
         return
 
+    if name == "numinamath":
+        # math problems + step-by-step solutions (LaTeX formulas inside text)
+        ds = load_dataset(spec.hf_id, split="test")
+        _save_split(_take(ds, max_samples), out_dir / "test.jsonl")
+        return
+
     if name == "wikitablequestions":
         ds = load_dataset(spec.hf_id, split="test")
         rows = _take(ds, max_samples)

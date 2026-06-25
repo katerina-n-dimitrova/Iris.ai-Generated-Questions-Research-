@@ -154,6 +154,16 @@ DATASETS: Dict[str, DatasetSpec] = {
         input_type="formula",
         description="Formulas (FormulaReasoning physics formula database + QA).",
     ),
+    "numinamath": DatasetSpec(
+        # Math problems with step-by-step solutions where LaTeX formulas appear
+        # inside explanatory text — lets us test context/surrounding-text
+        # enrichment on formulas (vs the standalone-formula FormulaReasoning DB).
+        name="numinamath",
+        hf_id="AI-MO/NuminaMath-CoT",
+        hf_config=None,
+        input_type="formula_text",
+        description="Math text with inline formulas (NuminaMath-CoT solutions).",
+    ),
 }
 
 ALL_DATASETS = list(DATASETS.keys())

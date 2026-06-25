@@ -77,16 +77,28 @@ footer{max-width:1080px;margin:0 auto;padding:10px 24px 44px;color:#64748b;font-
 <div class='fb' style='background:#fff7ed;border-color:#fed7aa'><b style='color:#c2410c'>Why answer relevance drops here</b><br>Most chart enrichments are metadata placeholders with little real content, so relevance stays noisy/low — the exception is the vision method, which adds genuine chart content and actually raises relevance.</div>
 </div>
 <div class='card'>
-<h2>formulareasoning</h2><div class='dt'>Mathematical formulas</div>
+<h2>formulareasoning</h2><div class='dt'>Mathematical formulas (standalone)</div>
 <table><thead><tr><th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th><th>Token cost ($)</th></tr></thead><tbody>
 <tr class='base'><td class='l'>Baseline (raw content)</td><td class="">0.000</td><td class="">0.019</td><td class="">0.012</td><td class="">0.000</td><td class="">0.033</td><td class="">0.233</td><td>0.00156</td></tr>
 <tr class=''><td class='l'>M3 · LaTeX + structure</td><td class="">0.000</td><td class="lose">0.016</td><td class="lose">0.011</td><td class="">0.000</td><td class="">0.033</td><td class="lose">0.033</td><td>0.002705</td></tr>
-<tr class=''><td class='l'>M1 · Surrounding text*</td><td class="win">0.044</td><td class="win">0.037</td><td class="win">0.033</td><td class="win">0.100</td><td class="">0.033</td><td class="lose">0.100</td><td>0.001921</td></tr>
+<tr class=''><td class='l'>M1 · Surrounding text</td><td class="win">0.044</td><td class="win">0.037</td><td class="win">0.033</td><td class="win">0.100</td><td class="">0.033</td><td class="lose">0.100</td><td>0.001921</td></tr>
 <tr class=''><td class='l'>M2 · Variable definitions</td><td class="win">0.128</td><td class="win">0.078</td><td class="win">0.060</td><td class="win">0.167</td><td class="win">0.100</td><td class="lose">0.200</td><td>0.002838</td></tr>
 <tr class=''><td class='l'>Combined best</td><td class="win">0.094</td><td class="win">0.079</td><td class="win">0.057</td><td class="win">0.133</td><td class="win">0.067</td><td class="lose">0.167</td><td>0.003864</td></tr>
 </tbody></table>
 <div class='fb'><b>Feedback <span class='tag up'>beneficial</span></b><br>Terse formulas are hard to match to long word-problems; variable definitions add the quantity names a question mentions, which lifts retrieval from near-zero, though answer accuracy stays low. Here, best for retrieval was <b>Combined best</b> (nDCG@10 0.079, +0.060 vs baseline); best for answers was <b>M2 · Variable definitions</b> (faithfulness 0.100, +0.067).</div>
 <div class='fb' style='background:#fff7ed;border-color:#fed7aa'><b style='color:#c2410c'>Why answer relevance drops here</b><br>Formula questions need numeric reasoning the retrieved formula text cannot supply; adding variable definitions, LaTeX or structure expands the context without giving the model the computation, so answers stay only loosely relevant.</div>
+</div>
+<div class='card'>
+<h2>numinamath</h2><div class='dt'>Math text with inline formulas</div>
+<table><thead><tr><th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th><th>Token cost ($)</th></tr></thead><tbody>
+<tr class='base'><td class='l'>Baseline (raw content)</td><td class="">1.000</td><td class="">0.994</td><td class="">0.992</td><td class="">1.000</td><td class="">0.792</td><td class="">0.833</td><td>0.003982</td></tr>
+<tr class=''><td class='l'>M3 · LaTeX + structure</td><td class="">1.000</td><td class="">0.994</td><td class="">0.992</td><td class="">1.000</td><td class="lose">0.783</td><td class="lose">0.817</td><td>0.004797</td></tr>
+<tr class=''><td class='l'>M2 · Problem context</td><td class="">1.000</td><td class="win">1.000</td><td class="win">1.000</td><td class="">1.000</td><td class="win">0.933</td><td class="win">0.933</td><td>0.00724</td></tr>
+<tr class=''><td class='l'>M1 · Surrounding text</td><td class="">1.000</td><td class="win">1.000</td><td class="win">1.000</td><td class="">1.000</td><td class="win">0.842</td><td class="win">0.850</td><td>0.005939</td></tr>
+<tr class=''><td class='l'>Combined best</td><td class="">1.000</td><td class="win">1.000</td><td class="win">1.000</td><td class="">1.000</td><td class="win">0.917</td><td class="win">0.900</td><td>0.00936</td></tr>
+</tbody></table>
+<div class='fb'><b>Feedback <span class='tag up'>beneficial</span></b><br>Unlike the standalone-formula DB, here formulas sit inside step-by-step solution text, so they already carry context; adding the surrounding steps or the originating problem gives the retriever the natural-language anchors a query uses, which is exactly the context that pure formulas lack. Here, best for retrieval was <b>M2 · Problem context</b> (nDCG@10 1.000, +0.006 vs baseline); best for answers was <b>M2 · Problem context</b> (faithfulness 0.933, +0.142).</div>
+<div class='fb' style='background:#fff7ed;border-color:#fed7aa'><b style='color:#c2410c'>Why answer relevance drops here</b><br>Each retrieved chunk is one step of a multi-step solution; even with surrounding context the model often lacks the full derivation needed to answer, so answer scores stay modest while retrieval improves most.</div>
 </div>
 <div class='card note'>* chart-to-table, chart axis metadata, and formula surrounding-text are documented placeholders (require OCR/vision or are not in the source data); their effect is structural, not from real extracted values. Answer grades come from an LLM judge and are noisy on small samples.</div>
 </main><footer>Generated from results/enrichment_method_tests/ • Octen embeddings • Chroma Cloud • gpt-4o-mini (LangChain→LangSmith)</footer>

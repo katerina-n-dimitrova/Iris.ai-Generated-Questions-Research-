@@ -13,6 +13,7 @@ We tested whether different context-enrichment methods improve RAG retrieval and
 | chartqa | Charts / graphs | Chart OCR/caption text | chart_to_table_data, axis_legend_title_metadata, chart_summary, vision_chart_description, combined_best | 40 | 30 |
 | scifact | Structured scientific text | Raw abstract sentence | title_abstract_context, neighboring_context, llm_generated_chunk_context, doc_summary_position, generated_questions, combined_best | 654 | 30 |
 | wikitablequestions | Tables | Linearized table row | column_headers_per_row, table_page_title, natural_language_row_summary, whole_table_summary, combined_best | 938 | 30 |
+| numinamath |  |  | surrounding_text, problem_context, latex_structure, combined_best | 876 | 60 |
 
 ## 3. Results by dataset
 
@@ -51,6 +52,13 @@ We tested whether different context-enrichment methods improve RAG retrieval and
 - **Best answer-quality method:** `column_headers_per_row` (faithfulness 0.500, baseline 0.533)
 - Baseline → retrieval nDCG@10 0.809, MRR 0.800; answer faithfulness 0.533, relevance 0.700.
 
+### numinamath — 
+
+- **Best retrieval method:** `surrounding_text` (nDCG@10 1.000, baseline 0.994)
+- **Worst retrieval method:** `latex_structure` (nDCG@10 0.994)
+- **Best answer-quality method:** `problem_context` (faithfulness 0.933, baseline 0.792)
+- Baseline → retrieval nDCG@10 0.994, MRR 0.992; answer faithfulness 0.792, relevance 0.833.
+
 ## 4. Method comparison table
 
 | Dataset | Method | Recall@5 | MRR | nDCG@10 | Hit@5 | Faithfulness | Answer rel. | Retr. latency (ms) | p95 (ms) | Token cost ($) | Verdict |
@@ -85,6 +93,11 @@ We tested whether different context-enrichment methods improve RAG retrieval and
 | wikitablequestions | natural_language_row_summary | 0.833 | 0.778 | 0.792 | 0.833 | 0.433 | 0.567 | 609.183 | 1980.540 | 0.002804 | both ↓ |
 | wikitablequestions | whole_table_summary | 0.833 | 0.833 | 0.833 | 0.833 | 0.267 | 0.400 | 594.007 | 1813.914 | 0.002792 | retrieval ↑ / answer ↓ |
 | wikitablequestions | combined_best | 0.833 | 0.800 | 0.809 | 0.833 | 0.367 | 0.467 | 663.054 | 1938.786 | 0.00361 | both ↓ |
+| numinamath | baseline | 1.000 | 0.992 | 0.994 | 1.000 | 0.792 | 0.833 | 558.758 | 2262.659 | 0.003982 | — |
+| numinamath | surrounding_text | 1.000 | 1.000 | 1.000 | 1.000 | 0.842 | 0.850 | 553.691 | 2661.643 | 0.005939 | retrieval+answer ↑ |
+| numinamath | problem_context | 1.000 | 1.000 | 1.000 | 1.000 | 0.933 | 0.933 | 545.497 | 2337.847 | 0.00724 | retrieval+answer ↑ |
+| numinamath | latex_structure | 1.000 | 0.992 | 0.994 | 1.000 | 0.783 | 0.817 | 422.411 | 1599.948 | 0.004797 | both ↓ |
+| numinamath | combined_best | 1.000 | 1.000 | 1.000 | 1.000 | 0.917 | 0.900 | 494.475 | 2252.919 | 0.00936 | retrieval+answer ↑ |
 
 ## 5. Overall ranking (best enrichment method per dataset)
 
@@ -95,6 +108,7 @@ We tested whether different context-enrichment methods improve RAG retrieval and
 | chartqa | vision_chart_description (+0.282) | vision_chart_description (+0.367) | combined_best (-64.780) | vision_chart_description |
 | scifact | generated_questions (+0.043) | title_abstract_context (-0.117) | generated_questions (-168.582) | title_abstract_context |
 | wikitablequestions | whole_table_summary (+0.025) | column_headers_per_row (-0.033) | whole_table_summary (-203.691) | column_headers_per_row |
+| numinamath | surrounding_text (+0.006) | problem_context (+0.142) | latex_structure (-136.346) | problem_context |
 
 ## 6. Main findings
 
@@ -116,6 +130,7 @@ We tested whether different context-enrichment methods improve RAG retrieval and
 | Charts / graphs | vision_chart_description | improves retrieval and/or answer grounding | adds encoding latency + token cost | Use |
 | Structured scientific text | title_abstract_context | no net gain over baseline in this run | adds encoding latency + token cost | Avoid (enrichment did not help here) |
 | Tables | column_headers_per_row | no net gain over baseline in this run | adds encoding latency + token cost | Avoid (enrichment did not help here) |
+|  | problem_context | improves retrieval and/or answer grounding | adds encoding latency + token cost | Use |
 
 ## Notes & caveats
 

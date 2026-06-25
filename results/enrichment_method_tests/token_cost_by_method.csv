@@ -29,3 +29,8 @@ wikitablequestions,table_page_title,10843,295,11138,0.001803
 wikitablequestions,natural_language_row_summary,17799,223,18022,0.002804
 wikitablequestions,whole_table_summary,17634,244,17878,0.002792
 wikitablequestions,combined_best,23071,249,23320,0.00361
+numinamath,baseline,17005,2386,19391,0.003982
+numinamath,surrounding_text,33684,1478,35162,0.005939
+numinamath,problem_context,43770,1124,44894,0.00724
+numinamath,latex_structure,24887,1773,26660,0.004797
+numinamath,combined_best,58110,1073,59183,0.00936
