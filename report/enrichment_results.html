@@ -22,6 +22,7 @@ footer{max-width:1080px;margin:0 auto;padding:10px 24px 44px;color:#64748b;font-
 .note{color:#64748b;font-size:12px;margin-top:6px}
 </style></head><body>
 <header><div class='wrap'><h1>Context Enrichment Results — by Dataset</h1><p>Three enrichment methods (+ combined) vs. baseline, for each of the five document types. Green = better than baseline, red = worse.</p></div></header><main>
+<div class='card'><h2>Why does answer relevance (and faithfulness) often drop with enrichment?</h2><p class='sub'>A central finding: enrichment is optimized for the <b>retriever</b> (the embedding), not the <b>generator</b> (the answer model). The same extra text that helps a chunk get found becomes padding in the answer prompt.</p><ul><li><b>Diluted context:</b> the original answer-bearing text is now surrounded by titles, keywords, summaries and generated questions, so the model spreads attention and produces broader, less on-target answers.</li><li><b>Derived text isn't ground truth:</b> summaries and generated questions are model-written; when the answer leans on them instead of the source, faithfulness drops.</li><li><b>Retrieval shifts the context:</b> enrichment changes which chunks land in the top-k, sometimes swapping in lexically strong but less answer-focused chunks.</li><li><b>The grader rewards concise, grounded, on-question answers</b>, so any drift is penalized — which is why relevance/faithfulness can fall even as retrieval metrics rise.</li><li><b>The exception:</b> when enrichment adds <i>real new information</i> (e.g. the vision method reading a chart), both retrieval <i>and</i> answer quality improve.</li></ul></div>
 <div class='card'>
 <h2>scifact</h2><div class='dt'>Structured scientific text</div>
 <table><thead><tr><th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th><th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th><th>Token cost ($)</th></tr></thead><tbody>
@@ -34,6 +35,7 @@ footer{max-width:1080px;margin:0 auto;padding:10px 24px 44px;color:#64748b;font-
 <tr class=''><td class='l'>Combined best</td><td class="win">0.913</td><td class="win">0.906</td><td class="win">0.917</td><td class="win">0.933</td><td class="lose">0.417</td><td class="lose">0.433</td><td>0.006492</td></tr>
 </tbody></table>
 <div class='fb'><b>Feedback <span class='tag mix'>mixed</span></b><br>Scientific sentences are already self-contained, so the baseline is strong; light document context helps ranking a little, but heavier enrichment mostly adds noise that lowers answer faithfulness. Here, best for retrieval was <b>M1 · Generated questions</b> (nDCG@10 0.925, +0.043 vs baseline); best for answers was <b>M1 · Title + abstract context</b> (faithfulness 0.450, -0.117).</div>
+<div class='fb' style='background:#fff7ed;border-color:#fed7aa'><b style='color:#c2410c'>Why answer relevance drops here</b><br>Abstract sentences already answer the claim directly, so titles, summaries and generated questions mostly pad the context with topic-level text; the model then gives broader, less targeted answers (and sometimes echoes the scaffolding), so relevance and faithfulness fall even when retrieval improves.</div>
 </div>
 <div class='card'>
 <h2>nfcorpus</h2><div class='dt'>Unstructured biomedical text</div>
@@ -46,6 +48,7 @@ footer{max-width:1080px;margin:0 auto;padding:10px 24px 44px;color:#64748b;font-
 <tr class=''><td class='l'>Combined best</td><td class="lose">0.123</td><td class="win">0.542</td><td class="win">0.872</td><td class="win">0.933</td><td class="lose">0.267</td><td class="lose">0.283</td><td>0.007412</td></tr>
 </tbody></table>
 <div class='fb'><b>Feedback <span class='tag up'>beneficial</span></b><br>Long biomedical passages are vague on their own; expansion methods (generated questions, plain summaries) tend to help answer grounding more than raw retrieval, since they restate what the passage answers. Here, best for retrieval was <b>Combined best</b> (nDCG@10 0.542, +0.019 vs baseline); best for answers was <b>M3 · Plain-language summary</b> (faithfulness 0.533, +0.100).</div>
+<div class='fb' style='background:#fff7ed;border-color:#fed7aa'><b style='color:#c2410c'>Why answer relevance drops here</b><br>Expansion methods inject model-written questions/summaries that are not in the source passage; the answer model sometimes responds from that generated scaffolding rather than the passage, lowering faithfulness, and the longer mixed context lets answers drift off the exact question.</div>
 </div>
 <div class='card'>
 <h2>wikitablequestions</h2><div class='dt'>Tables</div>
@@ -57,6 +60,7 @@ footer{max-width:1080px;margin:0 auto;padding:10px 24px 44px;color:#64748b;font-
 <tr class=''><td class='l'>Combined best</td><td class="">0.833</td><td class="">0.809</td><td class="">0.800</td><td class="">0.833</td><td class="lose">0.400</td><td class="lose">0.467</td><td>0.003615</td></tr>
 </tbody></table>
 <div class='fb'><b>Feedback <span class='tag mix'>mixed</span></b><br>Table rows match queries on exact cell values; adding headers/titles/NL summaries can raise retrieval but the extra prose often dilutes the precise values an answer needs. Here, best for retrieval was <b>M2 · Table / page title</b> (nDCG@10 0.823, +0.014 vs baseline); best for answers was <b>M1 · Column headers per row</b> (faithfulness 0.533, +0.000).</div>
+<div class='fb' style='background:#fff7ed;border-color:#fed7aa'><b style='color:#c2410c'>Why answer relevance drops here</b><br>Wrapping a row in headers, titles and a natural-language summary surrounds the precise cell value with prose; the model tends to answer from the narrative instead of the exact value, so answers become less directly relevant.</div>
 </div>
 <div class='card'>
 <h2>chartqa</h2><div class='dt'>Charts / graphs</div>
@@ -69,6 +73,7 @@ footer{max-width:1080px;margin:0 auto;padding:10px 24px 44px;color:#64748b;font-
 <tr class=''><td class='l'>Combined best</td><td class="win">0.233</td><td class="win">0.192</td><td class="win">0.140</td><td class="win">0.233</td><td class="lose">0.000</td><td class="win">0.233</td><td>0.001943</td></tr>
 </tbody></table>
 <div class='fb'><b>Feedback <span class='tag up'>beneficial</span></b><br>ChartQA ships images with almost no text, so the baseline is near-random; any added metadata/summary gives the retriever something to match, which is why enrichment helps most here (chart-to-table/axis are OCR placeholders). Here, best for retrieval was <b>M4 · Vision chart description + analysis</b> (nDCG@10 0.448, +0.282 vs baseline); best for answers was <b>M4 · Vision chart description + analysis</b> (faithfulness 0.467, +0.367).</div>
+<div class='fb' style='background:#fff7ed;border-color:#fed7aa'><b style='color:#c2410c'>Why answer relevance drops here</b><br>Most chart enrichments are metadata placeholders with little real content, so relevance stays noisy/low — the exception is the vision method, which adds genuine chart content and actually raises relevance.</div>
 </div>
 <div class='card'>
 <h2>formulareasoning</h2><div class='dt'>Mathematical formulas</div>
@@ -80,6 +85,7 @@ footer{max-width:1080px;margin:0 auto;padding:10px 24px 44px;color:#64748b;font-
 <tr class=''><td class='l'>Combined best</td><td class="win">0.094</td><td class="win">0.079</td><td class="win">0.057</td><td class="win">0.133</td><td class="win">0.067</td><td class="lose">0.167</td><td>0.003864</td></tr>
 </tbody></table>
 <div class='fb'><b>Feedback <span class='tag up'>beneficial</span></b><br>Terse formulas are hard to match to long word-problems; variable definitions add the quantity names a question mentions, which lifts retrieval from near-zero, though answer accuracy stays low. Here, best for retrieval was <b>Combined best</b> (nDCG@10 0.079, +0.060 vs baseline); best for answers was <b>M2 · Variable definitions</b> (faithfulness 0.100, +0.067).</div>
+<div class='fb' style='background:#fff7ed;border-color:#fed7aa'><b style='color:#c2410c'>Why answer relevance drops here</b><br>Formula questions need numeric reasoning the retrieved formula text cannot supply; adding variable definitions, LaTeX or structure expands the context without giving the model the computation, so answers stay only loosely relevant.</div>
 </div>
 <div class='card note'>* chart-to-table, chart axis metadata, and formula surrounding-text are documented placeholders (require OCR/vision or are not in the source data); their effect is structural, not from real extracted values. Answer grades come from an LLM judge and are noisy on small samples.</div>
 </main><footer>Generated from results/enrichment_method_tests/ • Octen embeddings • Chroma Cloud • gpt-4o-mini (LangChain→LangSmith)</footer>

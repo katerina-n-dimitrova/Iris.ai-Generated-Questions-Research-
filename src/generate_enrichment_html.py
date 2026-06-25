@@ -65,6 +65,49 @@ RATIONALE = {
                          "definitions add the quantity names a question mentions, which lifts "
                          "retrieval from near-zero, though answer accuracy stays low."),
 }
+# why answer relevance/faithfulness tends to fall after enrichment, per dataset
+REL_DROP = {
+    "scifact": ("Abstract sentences already answer the claim directly, so titles, "
+                "summaries and generated questions mostly pad the context with "
+                "topic-level text; the model then gives broader, less targeted "
+                "answers (and sometimes echoes the scaffolding), so relevance and "
+                "faithfulness fall even when retrieval improves."),
+    "nfcorpus": ("Expansion methods inject model-written questions/summaries that "
+                 "are not in the source passage; the answer model sometimes responds "
+                 "from that generated scaffolding rather than the passage, lowering "
+                 "faithfulness, and the longer mixed context lets answers drift off "
+                 "the exact question."),
+    "wikitablequestions": ("Wrapping a row in headers, titles and a natural-language "
+                           "summary surrounds the precise cell value with prose; the "
+                           "model tends to answer from the narrative instead of the "
+                           "exact value, so answers become less directly relevant."),
+    "chartqa": ("Most chart enrichments are metadata placeholders with little real "
+                "content, so relevance stays noisy/low — the exception is the vision "
+                "method, which adds genuine chart content and actually raises relevance."),
+    "formulareasoning": ("Formula questions need numeric reasoning the retrieved "
+                         "formula text cannot supply; adding variable definitions, "
+                         "LaTeX or structure expands the context without giving the "
+                         "model the computation, so answers stay only loosely relevant."),
+}
+WHY_REL_DROPS = (
+    "<div class='card'><h2>Why does answer relevance (and faithfulness) often drop "
+    "with enrichment?</h2>"
+    "<p class='sub'>A central finding: enrichment is optimized for the <b>retriever</b> "
+    "(the embedding), not the <b>generator</b> (the answer model). The same extra text "
+    "that helps a chunk get found becomes padding in the answer prompt.</p><ul>"
+    "<li><b>Diluted context:</b> the original answer-bearing text is now surrounded by "
+    "titles, keywords, summaries and generated questions, so the model spreads attention "
+    "and produces broader, less on-target answers.</li>"
+    "<li><b>Derived text isn't ground truth:</b> summaries and generated questions are "
+    "model-written; when the answer leans on them instead of the source, faithfulness drops.</li>"
+    "<li><b>Retrieval shifts the context:</b> enrichment changes which chunks land in the "
+    "top-k, sometimes swapping in lexically strong but less answer-focused chunks.</li>"
+    "<li><b>The grader rewards concise, grounded, on-question answers</b>, so any drift is "
+    "penalized — which is why relevance/faithfulness can fall even as retrieval metrics rise.</li>"
+    "<li><b>The exception:</b> when enrichment adds <i>real new information</i> (e.g. the "
+    "vision method reading a chart), both retrieval <i>and</i> answer quality improve.</li>"
+    "</ul></div>"
+)
 CSS = """
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1e293b;background:#f1f5f9;line-height:1.55}
 header{background:linear-gradient(135deg,#1e293b,#7c3aed);color:#fff;padding:38px 24px}
@@ -145,6 +188,7 @@ def main() -> None:
     H.append("<header><div class='wrap'><h1>Context Enrichment Results — by Dataset</h1>"
              "<p>Three enrichment methods (+ combined) vs. baseline, for each of the five "
              "document types. Green = better than baseline, red = worse.</p></div></header><main>")
+    H.append(WHY_REL_DROPS)
 
     for ds in datasets:
         base_r = ret.get((ds, "baseline"), {})
@@ -196,6 +240,9 @@ def main() -> None:
                          f"(faithfulness {best_ans[1]:.3f}, {d:+.3f})")
         verdict = "Here, " + "; ".join(parts) + "." if parts else ""
         H.append(f"<div class='fb'><b>Feedback {tag}</b><br>{RATIONALE.get(ds,'')} {verdict}</div>")
+        H.append(f"<div class='fb' style='background:#fff7ed;border-color:#fed7aa'>"
+                 f"<b style='color:#c2410c'>Why answer relevance drops here</b><br>"
+                 f"{REL_DROP.get(ds,'')}</div>")
         H.append("</div>")
 
     H.append("<div class='card note'>* chart-to-table, chart axis metadata, and formula "
