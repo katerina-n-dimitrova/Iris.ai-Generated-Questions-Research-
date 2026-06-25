@@ -256,6 +256,38 @@ def main() -> None:
                  f"{REL_DROP.get(ds,'')}</div>")
         H.append("</div>")
 
+    # ---- final summary table: best & worst method per dataset ----
+    H.append("<div class='card'><h2>Final summary — best &amp; worst enrichment method per dataset</h2>")
+    H.append("<p class='sub'>Best/worst chosen among the non-baseline methods. "
+             "Retrieval ranked by nDCG@10, answers by faithfulness; Δ is vs. baseline.</p>")
+    H.append("<table><thead><tr><th class='l'>Dataset</th><th class='l'>Data type</th>"
+             "<th class='l'>Best (retrieval)</th><th class='l'>Worst (retrieval)</th>"
+             "<th class='l'>Best (answers)</th></tr></thead><tbody>")
+    for ds in datasets:
+        nb = [m for m in methods[ds] if m != "baseline"]
+        b_nd = _f(ret.get((ds, "baseline"), {}).get("nDCG@10"))
+        b_fa = _f(ans.get((ds, "baseline"), {}).get("faithfulness"))
+        rc = [(m, _f(ret[(ds, m)].get("nDCG@10"))) for m in nb
+              if _f(ret[(ds, m)].get("nDCG@10")) is not None]
+        ac = [(m, _f(ans.get((ds, m), {}).get("faithfulness"))) for m in nb
+              if _f(ans.get((ds, m), {}).get("faithfulness")) is not None]
+
+        def fmt(pick, base, cls):
+            if not pick:
+                return "<td class='l'>n/a</td>"
+            m, v = pick
+            d = "" if base is None else f" ({v - base:+.3f})"
+            return (f"<td class='l'><span class='{cls}'>{METHOD_LABEL.get(m, m)}</span>"
+                    f"<br><span class='legend'>nDCG/faith {v:.3f}{d}</span></td>")
+
+        best_r = max(rc, key=lambda x: x[1]) if rc else None
+        worst_r = min(rc, key=lambda x: x[1]) if rc else None
+        best_a = max(ac, key=lambda x: x[1]) if ac else None
+        H.append(f"<tr><td class='l ds'>{ds}</td><td class='l'>{DATA_TYPE.get(ds,'')}</td>"
+                 + fmt(best_r, b_nd, "win") + fmt(worst_r, b_nd, "lose")
+                 + fmt(best_a, b_fa, "win") + "</tr>")
+    H.append("</tbody></table></div>")
+
     H.append("<div class='card note'>* chart-to-table, chart axis metadata, and formula "
              "surrounding-text are documented placeholders (require OCR/vision or are not in "
              "the source data); their effect is structural, not from real extracted values. "
