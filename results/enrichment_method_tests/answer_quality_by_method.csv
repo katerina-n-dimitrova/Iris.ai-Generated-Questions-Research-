@@ -1,9 +1,4 @@
 dataset,method,num_answers,faithfulness,citation_accuracy,answer_relevance,exact_match,token_f1,answer_correctness
-wikitablequestions,baseline,30,0.5333,0.5333,0.7333,0.0667,0.1112,0.3
-wikitablequestions,column_headers_per_row,30,0.5333,0.5333,0.7,0.0667,0.1052,0.2667
-wikitablequestions,table_page_title,30,0.3667,0.34,0.6,0.0667,0.108,0.2333
-wikitablequestions,natural_language_row_summary,30,0.4667,0.4333,0.5333,0.1,0.1271,0.2667
-wikitablequestions,combined_best,30,0.4,0.3667,0.4667,0.0667,0.0812,0.1667
 formulareasoning,baseline,30,0.0333,0.0,0.2333,0.0,0.02,0.0333
 formulareasoning,surrounding_text,30,0.0333,0.0,0.1,0.0,0.0133,0.0333
 formulareasoning,variable_definitions,30,0.1,0.0667,0.2,0.0,0.0189,0.0667
@@ -28,3 +23,9 @@ scifact,llm_generated_chunk_context,30,0.4167,0.4167,0.4667,,,
 scifact,doc_summary_position,30,0.3833,0.3833,0.4,,,
 scifact,generated_questions,30,0.3167,0.3167,0.3667,,,
 scifact,combined_best,30,0.4167,0.4167,0.4333,,,
+wikitablequestions,baseline,30,0.5333,0.5333,0.7,0.0667,0.1195,0.3
+wikitablequestions,column_headers_per_row,30,0.5,0.5,0.6667,0.0667,0.0978,0.2333
+wikitablequestions,table_page_title,30,0.4333,0.4,0.6,0.0667,0.1052,0.2667
+wikitablequestions,natural_language_row_summary,30,0.4333,0.4,0.5667,0.1,0.1276,0.2667
+wikitablequestions,whole_table_summary,30,0.2667,0.2667,0.4,0.0667,0.0903,0.2
+wikitablequestions,combined_best,30,0.3667,0.3667,0.4667,0.0667,0.0828,0.1667

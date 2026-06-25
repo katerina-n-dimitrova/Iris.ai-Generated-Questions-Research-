@@ -244,7 +244,7 @@ def units_wikitablequestions(n_queries: int, n_distractors: int, use_llm: bool):
     from common import read_jsonl
     test_path = pw.SPEC.raw_dir / "test.jsonl"
     rows = list(read_jsonl(test_path))[:max(n_queries, n_distractors)]
-    units, queries, seen = [], [], set()
+    queries, seen, tables = [], set(), []
     for idx, row in enumerate(rows):
         table = row.get("table") or {}
         tid = pw._table_id(table, fallback=f"table_{idx}")
@@ -252,17 +252,7 @@ def units_wikitablequestions(n_queries: int, n_distractors: int, use_llm: bool):
         headers = [str(h) for h in (table.get("header") or [])]
         if tid not in seen:
             seen.add(tid)
-            for ri, data_row in enumerate(table.get("rows") or []):
-                linear = pw._linearize_row(headers, data_row)
-                if not linear:
-                    continue
-                units.append({
-                    "source_id": tid, "title": title,
-                    "headers": ", ".join(headers), "text": linear,
-                    "row_summary": "In table '%s', " % title + "; ".join(
-                        f"{h} is {v}" for h, v in zip(headers, data_row) if str(v).strip()),
-                    "chunk_key": f"wtq_{tid}_r{ri}".replace("/", "_"),
-                })
+            tables.append((tid, title, headers, table.get("rows") or []))
         q = str(row.get("question") or "").strip()
         if q and len(queries) < n_queries:
             ans = row.get("answers")
@@ -270,6 +260,40 @@ def units_wikitablequestions(n_queries: int, n_distractors: int, use_llm: bool):
                             "dataset": "wikitablequestions", "text": q,
                             "gold_source_ids": [tid],
                             "gold_answer": ", ".join(map(str, ans)) if isinstance(ans, list) else str(ans or "")})
+
+    # one natural-language summary per WHOLE table (reused across its rows)
+    client = config.get_openai_client() if use_llm else None
+
+    def _table_blob(t):
+        tid, title, headers, trows = t
+        body = " | ".join(pw._linearize_row(headers, r) for r in trows[:25])
+        return (f"Table '{title}'. Columns: {', '.join(headers)}. Rows: {body}")[:3000]
+
+    def _summarize(t):
+        if use_llm:
+            return common.llm_summary(
+                client, _table_blob(t),
+                kind="data table (summarize in 2-3 sentences what the whole table "
+                     "is about, its columns, and notable contents)")
+        return common.cheap_summary(_table_blob(t))
+
+    tsums = _parallel(_summarize, tables) if use_llm else [_summarize(t) for t in tables]
+    tsum = {t[0]: s for t, s in zip(tables, tsums)}
+
+    units = []
+    for tid, title, headers, trows in tables:
+        for ri, data_row in enumerate(trows):
+            linear = pw._linearize_row(headers, data_row)
+            if not linear:
+                continue
+            units.append({
+                "source_id": tid, "title": title,
+                "headers": ", ".join(headers), "text": linear,
+                "row_summary": "In table '%s', " % title + "; ".join(
+                    f"{h} is {v}" for h, v in zip(headers, data_row) if str(v).strip()),
+                "table_summary": tsum.get(tid, ""),
+                "chunk_key": f"wtq_{tid}_r{ri}".replace("/", "_"),
+            })
     return units, queries
 
 
@@ -280,6 +304,8 @@ def enrich_wikitable_title(u):
     return _join(f"Page/table title: {u['title']}", f"Original row: {u['text']}")
 def enrich_wikitable_row_summary(u):
     return _join(f"Row summary: {u['row_summary']}", f"Original row: {u['text']}")
+def enrich_wikitable_table_summary(u):
+    return _join(f"Table summary: {u['table_summary']}", f"Original row: {u['text']}")
 def enrich_wikitable_combined(u):
     return _join(f"Page/table title: {u['title']}", f"Columns: {u['headers']}",
                  f"Row summary: {u['row_summary']}", f"Original row: {u['text']}")
@@ -467,6 +493,7 @@ DATASET_METHODS: Dict[str, Dict[str, Callable]] = {
         "column_headers_per_row": enrich_wikitable_headers,
         "table_page_title": enrich_wikitable_title,
         "natural_language_row_summary": enrich_wikitable_row_summary,
+        "whole_table_summary": enrich_wikitable_table_summary,
         "combined_best": enrich_wikitable_combined,
     },
     "chartqa": {
@@ -502,6 +529,7 @@ LLM_CONDITIONS = {
     ("nfcorpus", "doc_summary_position"), ("nfcorpus", "combined_best"),
     ("chartqa", "chart_summary"), ("chartqa", "vision_chart_description"),
     ("chartqa", "combined_best"),
+    ("wikitablequestions", "whole_table_summary"),
 }
 
 

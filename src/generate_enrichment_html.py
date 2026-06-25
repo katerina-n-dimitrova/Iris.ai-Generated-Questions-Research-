@@ -39,6 +39,7 @@ METHOD_LABEL = {
     "column_headers_per_row": "M1 · Column headers per row",
     "table_page_title": "M2 · Table / page title",
     "natural_language_row_summary": "M3 · Natural-language row summary",
+    "whole_table_summary": "M4 · Whole-table summary paragraph",
     "chart_to_table_data": "M1 · Chart-to-table data*",
     "axis_legend_title_metadata": "M2 · Axis/legend/title metadata*",
     "chart_summary": "M3 · Chart summary",
