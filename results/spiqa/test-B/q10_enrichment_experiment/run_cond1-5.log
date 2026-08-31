@@ -1,17 +1,0 @@
-=== q10 enrichment experiment | split=test-B | conditions=['baseline', 'q10_raw_append', 'q10_roundtrip_filter_append', 'q10_score_fusion', 'q10_roundtrip_filter_score_fusion'] ===
-chunks=3326 queries=228
-[embeddings] backend=huggingface model=Octen/Octen-Embedding-0.6B
-Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 26239.79it/s]
-/Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/src/embeddings.py:59: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
-  self.dim = int(self.model.get_sentence_embedding_dimension())
-embedded 3326 original chunks in 413.1s (huggingface:Octen/Octen-Embedding-0.6B:dim1024)
-/Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/src/spiqa/q10_experiment.py:251: RuntimeWarning: divide by zero encountered in matmul
-  return self.index_matrix() @ qv
-/Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/src/spiqa/q10_experiment.py:251: RuntimeWarning: overflow encountered in matmul
-  return self.index_matrix() @ qv
-/Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/src/spiqa/q10_experiment.py:251: RuntimeWarning: invalid value encountered in matmul
-  return self.index_matrix() @ qv
-  baseline                             Hit@1=0.408 Hit@5=0.684 Hit@10=0.759 MRR=0.518 nDCG@10=0.564 kept=0/0 (0.0% filt) p95=0.201ms
-/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/multiprocessing/resource_tracker.py:224: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
-  warnings.warn('resource_tracker: There appear to be %d '

@@ -1,8 +1,0 @@
-=== config current ===
-[embeddings] backend=huggingface model=Octen/Octen-Embedding-0.6B
-Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 5030.09it/s]
-/Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/src/embeddings.py:59: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
-  self.dim = int(self.model.get_sentence_embedding_dimension())
-  current_chunking_baseline        chunks=3326 avgtok=296.6 Hit@1=0.408 Hit@5=0.684 MRR=0.518 nDCG@10=0.564 idx=23.496MB p95=0.662ms
-  current_chunking_q10             chunks=3326 avgtok=296.6 Hit@1=0.417 Hit@5=0.689 MRR=0.542 nDCG@10=0.582 idx=23.488MB p95=0.21ms

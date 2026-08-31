@@ -1,5 +1,0 @@
-diagnostic,atomic,chunk_level
-top1_match_type,42,27
-gold_match_winning_type,63,18
-false_positive_winning_type,142,122
-lower_ranked_gold_winning_type,33,14

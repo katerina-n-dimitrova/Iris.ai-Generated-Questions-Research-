@@ -1,4 +1,0 @@
-stage,mean_ms,p50_ms,p95_ms,p99_ms
-query_embed_ms,43.11,45.328,58.825,68.432
-baseline_search_ms,1.241,1.207,1.417,1.739
-mixed_search_ms,4.036,4.019,4.406,4.979

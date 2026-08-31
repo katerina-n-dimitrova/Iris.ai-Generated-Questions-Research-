@@ -1,311 +1,86 @@
-# Context-Enrichment RAG — Evaluation Harness
+# Context Enrichment for RAG — Adaptive Generated Questions
 
-Evaluate how **context enrichment** affects a Retrieval-Augmented Generation
-(RAG) pipeline across four document types:
+Does indexing **LLM-generated questions** alongside (or instead of) raw chunk
+text improve RAG retrieval? This repo holds the final study: five controlled
+retrieval conditions on two corpora, plus a combined-corpus robustness check
+and a cross-model generator replication.
 
-| Input type            | Dataset             | Hugging Face id                |
-|-----------------------|---------------------|--------------------------------|
-| Structured sci. text  | SciFact             | `allenai/scifact`              |
-| Unstructured biomed.  | BEIR NFCorpus       | `BeIR/nfcorpus`                |
-| Tables                | WikiTableQuestions  | `stanfordnlp/wikitablequestions` |
-| Charts / graphs       | ChartQA             | `HuggingFaceM4/ChartQA`        |
+## The five conditions
 
-We compare two conditions per dataset:
+Every condition shares the same chunks (1024 tokens / 128 overlap), the same
+Iris dim-384 embeddings, the same BM25, and RRF k=60. Only the enrichment
+changes.
 
-- **Condition A — Baseline RAG:** embed raw content only.
-- **Condition B — Context-Enriched RAG:** embed raw content + added context
-  (titles, positions, headers, key entities, generated summaries, …).
+| # | Condition | Enrichment | Dense retrieval |
+|---|-----------|------------|-----------------|
+| 1 | Baseline | none | chunk vectors |
+| 2 | Adaptive generated questions 5–20 | `clamp(5, 20, round(facts × 0.5))` questions per chunk, from deduplicated atomic facts | 0.5/0.5 chunk / question fusion |
+| 3 | Adaptive generated questions unbounded | `round(facts × 0.5)` per chunk, no bounds | 0.5/0.5 chunk / question fusion |
+| 4 | Adaptive chunk + whole-article questions 5–20 | condition 2 + 5–20 questions per whole article | equal 1/3 chunk / chunk-question / article-question fusion |
+| 5 | Adaptive chunk + whole-article questions unbounded | condition 3 + unbounded per whole article | equal 1/3 fusion |
 
-…and measure: **(1)** retrieval quality, **(2)** answer quality,
-**(3)** offline encoding latency, **(4)** online ChromaDB query latency,
-**(5)** index size / storage cost.
+The dense ranking is always fused with the chunk BM25 ranking by RRF (k=60).
+Generator: `gpt-5.4-mini` @ temp 0.3 (except the baseline, which uses no LLM).
 
-> This is a first end-to-end version designed to run on a **small subset**
-> (`MAX_DATASET_SAMPLES`, default 300). It is modular so you can extend it to
-> scanned PDFs, slide decks, spreadsheets, and multimodal documents later.
+## The two datasets
 
----
+| Dataset | Corpus | Chunks | Eval queries | Baseline MRR@10 | Best MRR@10 |
+|---------|--------|--------|--------------|-----------------|-------------|
+| MultiHop-RAG (`yixuantt/MultiHopRAG`) | 609 English news articles | 1,830 | 2,255 | 0.644 | 0.672 (cond. 4) |
+| Yettel Bulgaria (self-built) | 340 Bulgarian telco documents | 963 | 2,255 (+301 null excluded) | 0.392 | 0.548 (cond. 5) |
 
-## Embedding model
+## Layout
 
-By default embeddings use the Hugging Face model
-**`Octen/Octen-Embedding-0.6B`** via `sentence-transformers` (runs locally — no
-embedding API cost). Switch backends in `.env`:
-
-```env
-EMBEDDING_BACKEND=huggingface          # default
-HF_EMBEDDING_MODEL=Octen/Octen-Embedding-0.6B
-# EMBEDDING_BACKEND=openai             # to use OPENAI_EMBEDDING_MODEL instead
+```
+src/ragkit/          shared infrastructure: config, embedders (Iris/OpenAI/HF),
+                     BM25 tokenizers, cosine helpers, RRF fusion, metrics, JSONL I/O
+exp/multihoprag/     experiment 1 — the five conditions on MultiHop-RAG
+exp/yettel_bg/       experiment 2 — the same five conditions on Yettel Bulgaria,
+                     plus corpus/ (crawler, question generator, validator)
+exp/combined/        experiment 3 — union-corpus interference study (949 docs)
+exp/qwen_generator/  experiment 4 — conditions 1/2/4 re-run with Iris-hosted Qwen3.5-4B
+data/raw/            source corpora (gitignored)
+data/processed/      chunking + LLM-generation caches (gitignored; expensive to rebuild)
+results/             metrics.json + rankings per experiment (vector caches gitignored)
+report/              the deliverables: one self-contained HTML per experiment
 ```
 
-The chat model (`OPENAI_CHAT_MODEL`) is still used for optional LLM enrichment,
-answer generation, and the LLM-as-judge metric.
-
-## ChromaDB — local (default) or cloud
-
-By default this project uses **ChromaDB in local persistent mode**
-(`chromadb.PersistentClient` → `./chroma_indexes/` on disk). In local mode there
-is **no API key** to configure — leave the cloud fields as placeholders.
-
-To run indexes/queries against **Chroma Cloud** instead, set `CHROMA_MODE=cloud`
-and paste your credentials in `.env`:
-
-```env
-CHROMA_MODE=cloud
-CHROMA_API_KEY=ck-...your_key...
-CHROMA_TENANT=your_tenant_id
-CHROMA_DATABASE=your_database_name
-```
-
-The same scripts then build collections and run retrieval/latency analysis
-against the hosted database — all metrics are still computed locally from the
-query results. Note: `index_size_mb` is reported as `-1` in cloud mode (on-disk
-size isn't measurable remotely); all other latency/quality metrics work
-identically. The active backend is printed at the top of each run
-(`Chroma backend: cloud:<tenant>/<database>`).
-
----
-
-## 1. Install dependencies
+## Setup
 
 ```bash
-cd context-enrichment-rag
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+./prep.sh                      # uv venv + uv sync
+cp .env.example .env           # then fill in OPENAI_API_KEY (and IRIS_* if needed)
 ```
 
-First run will also download NLTK data on demand if needed:
+All presentation runs used `EMBEDDING_BACKEND=iris` and
+`OPENAI_CHAT_MODEL=gpt-5.4-mini`.
+
+## Running
 
 ```bash
-python -c "import nltk; nltk.download('punkt')"
+python exp/multihoprag/run.py               # all five MultiHop-RAG conditions, in order
+python exp/yettel_bg/run_experiments.py     # all five Yettel conditions in one run
+python exp/combined/run_combined_experiments.py
+python exp/combined/combined_report.py      # re-render the rich combined report
 ```
 
-## 2. Create the `.env` file
+Every stage is cached and resumable: re-running never regenerates questions or
+re-embeds unless a cache is missing. With the shipped caches under
+`data/processed/` and `results/`, full re-evaluation is offline and only
+recomputes retrieval + metrics. Treat the generation caches
+(`adaptive_generations.jsonl`, `article_question_generations*.jsonl`) as costly
+artifacts — losing them means re-paying for all LLM calls.
 
-```bash
-cp .env.example .env
-```
+There is no test suite — the smoke run is the test. Each experiment README
+documents its own run order and outputs.
 
-Then edit `.env` and set `OPENAI_API_KEY` (only needed for answer generation,
-LLM enrichment, or the LLM judge — **not** required for retrieval + latency
-experiments with the default HF embedder). `.env` is gitignored so your key is
-never committed.
+## Reports
 
-## 3. Download the datasets
-
-Pulls a capped subset of each dataset into `data/raw/`:
-
-```bash
-python src/download_datasets.py                       # all four
-python src/download_datasets.py --datasets scifact    # one
-python src/download_datasets.py --max-samples 100
-```
-
-## 4. Preprocess baseline and enriched chunks
-
-Each dataset produces `processed/<dataset>_baseline.jsonl`,
-`processed/<dataset>_enriched.jsonl`, and `processed/<dataset>_queries.jsonl`.
-
-```bash
-# both conditions, per dataset:
-python src/preprocess_scifact.py
-python src/preprocess_nfcorpus.py
-python src/preprocess_wikitablequestions.py
-python src/preprocess_chartqa.py
-
-# or orchestrate across all datasets by condition:
-python src/create_baseline_chunks.py
-python src/create_enriched_chunks.py            # cheap offline enrichment
-python src/create_enriched_chunks.py --use-llm  # LLM-generated summaries
-```
-
-Each JSONL row:
-
-```json
-{
-  "id": "scifact_123_s0_baseline",
-  "dataset": "scifact",
-  "input_type": "structured_text",
-  "condition": "baseline",
-  "text_for_embedding": "...",
-  "original_text": "...",
-  "metadata": {"source_id": "123", "question_id": null, "title": "...",
-               "page": "1/8", "row_id": null, "chart_id": null}
-}
-```
-
-## 5. Build ChromaDB indexes
-
-Creates one collection per dataset×condition (`scifact_baseline`,
-`scifact_enriched`, …) and logs **offline encoding latency + index size**.
-
-```bash
-python src/build_chroma_indexes.py
-python src/build_chroma_indexes.py --datasets scifact --conditions baseline
-```
-
-→ `results/latency_logs/offline_indexing.csv`
-
-## 6. Run retrieval experiments
-
-Embeds each query, searches Chroma, assembles context, logs **online query
-latency**, and saves retrieved chunks for evaluation.
-
-```bash
-python src/run_retrieval_experiments.py
-python src/run_retrieval_experiments.py --top-k 5
-```
-
-→ `results/latency_logs/online_query_latency.csv`
-→ `results/retrieval_metrics/retrieved_<dataset>_<condition>.jsonl`
-
-### (optional) Generate + evaluate answers
-
-```bash
-python src/run_answer_generation.py            # needs OPENAI_API_KEY
-python src/run_answer_generation.py --dry-run  # pipeline test, no API calls
-python src/evaluate_answers.py                 # exact match + token F1
-python src/evaluate_answers.py --use-llm-judge # + LLM 0/1 correctness
-```
-
-→ `results/answer_metrics/answers_*.jsonl`, `answer_scores.csv`
-
-## 7. Measure offline encoding latency
-
-Logged automatically in step 5. Columns: `num_documents`, `num_chunks`,
-`avg_tokens_per_chunk`, `total_embedding_time_seconds`,
-`avg_embedding_time_per_chunk_ms`, `chroma_add_time_seconds`,
-`total_indexing_time_seconds`, `index_size_mb`.
-
-## 8. Measure online query latency
-
-Logged automatically in step 6. Columns: `query_embedding_latency_ms`,
-`chroma_search_latency_ms`, `context_assembly_latency_ms`,
-`total_retrieval_latency_ms`, `retrieved_chunk_ids`.
-
-## 9. View the final results
-
-Compute retrieval metrics and a consolidated latency/storage summary:
-
-```bash
-python src/evaluate_retrieval.py     # Recall@5/10, Precision@5, MRR, nDCG@10, Hit@5
-python src/measure_latency.py        # baseline vs enriched: encode/query latency + size
-```
-
-Outputs:
-- `results/retrieval_metrics/retrieval_scores.csv`
-- `results/answer_metrics/answer_scores.csv`
-- `results/latency_logs/latency_summary.csv`
-
----
-
-## Enrichment-method comparison (phase 2)
-
-Beyond the single baseline-vs-enriched study above, the project also compares
-**multiple enrichment methods per document type** — for each of the 5 datasets:
-`baseline`, three targeted methods, and a `combined_best`. Methods live in
-`src/enrichment_methods.py` (one function each, e.g.
-`enrich_scifact_neighboring_context`, `enrich_nfcorpus_generated_questions`,
-`enrich_wikitable_row_summary`, `enrich_chartqa_axis_metadata`,
-`enrich_formula_variable_definitions`) registered in `DATASET_METHODS`.
-
-### Run it (start small to debug, then scale)
-
-```bash
-# 1) make sure the 5 datasets are downloaded (see step 3 above; +formulareasoning)
-python src/download_datasets.py --datasets formulareasoning   # if not done
-
-# 2) debug run: ~15 queries/dataset, heuristic enrichment, all metrics
-python src/run_enrichment_experiments.py --max-samples 15 --distractors 30
-
-# 3) full LLM enrichment (generated questions, LLM chunk context, summaries):
-python src/run_enrichment_experiments.py --max-samples 50 --use-llm
-
-# retrieval/latency only (no API cost):
-python src/run_enrichment_experiments.py --max-samples 25 --no-answers
-
-# one dataset:
-python src/run_enrichment_experiments.py --datasets scifact --max-samples 25
-```
-
-Each run builds one Chroma collection per `dataset_method` condition, retrieves,
-generates an answer from the retrieved context, and grades it (LangChain →
-LangSmith). Then generate the human-readable summary:
-
-```bash
-python src/generate_summary.py
-```
-
-### Outputs (`results/enrichment_method_tests/`)
-- `retrieval_metrics_by_method.csv` — Recall@5/10, P@5, MRR, nDCG@10, Hit@5
-- `answer_quality_by_method.csv` — faithfulness, citation acc., answer rel., EM, F1, correctness
-- `latency_by_method.csv` — encode/index latency + query latency + p50/p95
-- `token_cost_by_method.csv` — prompt/completion/total tokens + estimated USD cost
-- `full_results_by_query.jsonl` — per-query detail
-- `context_enrichment_summary.md` — executive summary, method comparison table,
-  rankings, main findings, and a final recommendation table
-
-### Adding a new document type
-Add a `units_<type>()` builder + `enrich_<type>_<method>()` functions in
-`enrichment_methods.py`, register them in `DATASET_METHODS`/`UNIT_BUILDERS`, and
-add the dataset to `config.DATASETS`. The runner and summary need no changes.
-
----
-
-## One-shot quickstart
-
-```bash
-python src/download_datasets.py --max-samples 100
-python src/create_baseline_chunks.py --max-samples 100
-python src/create_enriched_chunks.py --max-samples 100
-python src/build_chroma_indexes.py
-python src/run_retrieval_experiments.py
-python src/evaluate_retrieval.py
-python src/measure_latency.py
-```
-
-## Project layout
-
-```text
-context-enrichment-rag/
-  data/{raw,processed}/          # downloaded + chunked data
-  chroma_indexes/                # persistent Chroma collections
-  results/{latency_logs,retrieval_metrics,answer_metrics}/
-  src/
-    config.py                    # paths, dataset registry, env knobs
-    embeddings.py                # HF (Octen) / OpenAI embedding backends
-    common.py                    # JSONL I/O, record schema, enrichment helpers
-    download_datasets.py
-    preprocess_*.py              # one per dataset (baseline + enriched + queries)
-    create_baseline_chunks.py    # orchestrators
-    create_enriched_chunks.py
-    build_chroma_indexes.py      # + offline latency log
-    run_retrieval_experiments.py # + online latency log
-    run_answer_generation.py
-    evaluate_retrieval.py
-    evaluate_answers.py
-    measure_latency.py
-```
-
-## Extending to new document types
-
-Add a `preprocess_<type>.py` exposing `build_documents(use_llm, max_samples)`
-(returns `{"baseline": [...], "enriched": [...]}`) and
-`build_queries(max_samples)`, register the dataset in `config.DATASETS`, and add
-it to the `MODULES` maps in the two orchestrators. For scanned PDFs / slides /
-charts, implement the text/feature extraction inside that module (e.g. the
-`extract_chart_text()` hook in `preprocess_chartqa.py`) — the indexing,
-retrieval, latency, and evaluation stages need no changes.
-
-## Notes / limitations
-
-- **ChartQA** ships images without bundled OCR/caption text. This first version
-  uses the answer label as a textual stand-in and leaves placeholder fields
-  (chart type, axes, legend) in the enriched format. Plug a vision/OCR model
-  into `extract_chart_text()` for real chart signal.
-- Relevance for retrieval metrics is judged at the **source-document** level
-  (`metadata.source_id` ∈ `gold_source_ids`).
-- Answer metrics start simple (exact match, token F1, optional LLM judge);
-  `faithfulness`, `citation_accuracy`, `answer_relevance` are stubbed with a
-  ragas hook in `evaluate_answers.compute_ragas_metrics()`.
-```
+| Report | Contents |
+|--------|----------|
+| `report/mhrag_full_no_question_baseline.html` | MultiHop-RAG condition 1 |
+| `report/mhrag_adaptive_questions_full.html` | MultiHop-RAG, all five conditions |
+| `report/yettel_bg_adaptive_questions.html` | Yettel, all five conditions |
+| `report/combined_multihop_yettel_adaptive_questions.html` | union corpus, conditions 1–4 |
+| `report/combined_multihop_yettel_four_experiments.html` | union corpus with delta / interference / leakage analysis |
+| `report/mhrag_iris_qwen_5_20_full.html` | Qwen-generator replication (conditions 1, 2, 4) |

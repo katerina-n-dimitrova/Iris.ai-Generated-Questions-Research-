@@ -18,11 +18,6 @@ env/
 # ---- Project artifacts (large / generated) ----
 data/raw/*
 data/processed/*
-chroma_indexes/*
-results/latency_logs/*
-results/retrieval_metrics/*
-results/answer_metrics/*
-results/*.log
 results/**/*vector*.json
 results/**/*.pkl
 
@@ -34,5 +29,4 @@ results/**/*.pkl
 .idea/
 .vscode/
 
-.dspy_cache/
 .ruff_cache/
