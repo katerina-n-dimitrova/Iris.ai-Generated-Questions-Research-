@@ -52,52 +52,76 @@ METHOD_LABEL = {
 }
 # why each data type's enrichment tends to help or not (domain rationale)
 RATIONALE = {
-    "scifact": ("Scientific sentences are already self-contained, so the baseline is "
-                "strong; light document context helps ranking a little, but heavier "
-                "enrichment mostly adds noise that lowers answer faithfulness."),
-    "nfcorpus": ("Long biomedical passages are vague on their own; expansion methods "
-                 "(generated questions, plain summaries) tend to help answer grounding "
-                 "more than raw retrieval, since they restate what the passage answers."),
-    "wikitablequestions": ("Table rows match queries on exact cell values; adding "
-                           "headers/titles/NL summaries can raise retrieval but the "
-                           "extra prose often dilutes the precise values an answer needs."),
-    "chartqa": ("ChartQA ships images with almost no text, so the baseline is near-random; "
-                "any added metadata/summary gives the retriever something to match, which is "
-                "why enrichment helps most here (chart-to-table/axis are OCR placeholders)."),
-    "formulareasoning": ("Terse formulas are hard to match to long word-problems; variable "
-                         "definitions add the quantity names a question mentions, which lifts "
-                         "retrieval from near-zero, though answer accuracy stays low."),
-    "numinamath": ("Unlike the standalone-formula DB, here formulas sit inside step-by-step "
-                   "solution text, so they already carry context; adding the surrounding "
-                   "steps or the originating problem gives the retriever the natural-language "
-                   "anchors a query uses, which is exactly the context that pure formulas lack."),
+    "scifact": (
+        "Scientific sentences are already self-contained, so the baseline is "
+        "strong; light document context helps ranking a little, but heavier "
+        "enrichment mostly adds noise that lowers answer faithfulness."
+    ),
+    "nfcorpus": (
+        "Long biomedical passages are vague on their own; expansion methods "
+        "(generated questions, plain summaries) tend to help answer grounding "
+        "more than raw retrieval, since they restate what the passage answers."
+    ),
+    "wikitablequestions": (
+        "Table rows match queries on exact cell values; adding "
+        "headers/titles/NL summaries can raise retrieval but the "
+        "extra prose often dilutes the precise values an answer needs."
+    ),
+    "chartqa": (
+        "ChartQA ships images with almost no text, so the baseline is near-random; "
+        "any added metadata/summary gives the retriever something to match, which is "
+        "why enrichment helps most here (chart-to-table/axis are OCR placeholders)."
+    ),
+    "formulareasoning": (
+        "Terse formulas are hard to match to long word-problems; variable "
+        "definitions add the quantity names a question mentions, which lifts "
+        "retrieval from near-zero, though answer accuracy stays low."
+    ),
+    "numinamath": (
+        "Unlike the standalone-formula DB, here formulas sit inside step-by-step "
+        "solution text, so they already carry context; adding the surrounding "
+        "steps or the originating problem gives the retriever the natural-language "
+        "anchors a query uses, which is exactly the context that pure formulas lack."
+    ),
 }
 # why answer relevance/faithfulness tends to fall after enrichment, per dataset
 REL_DROP = {
-    "scifact": ("Abstract sentences already answer the claim directly, so titles, "
-                "summaries and generated questions mostly pad the context with "
-                "topic-level text; the model then gives broader, less targeted "
-                "answers (and sometimes echoes the scaffolding), so relevance and "
-                "faithfulness fall even when retrieval improves."),
-    "nfcorpus": ("Expansion methods inject model-written questions/summaries that "
-                 "are not in the source passage; the answer model sometimes responds "
-                 "from that generated scaffolding rather than the passage, lowering "
-                 "faithfulness, and the longer mixed context lets answers drift off "
-                 "the exact question."),
-    "wikitablequestions": ("Wrapping a row in headers, titles and a natural-language "
-                           "summary surrounds the precise cell value with prose; the "
-                           "model tends to answer from the narrative instead of the "
-                           "exact value, so answers become less directly relevant."),
-    "chartqa": ("Most chart enrichments are metadata placeholders with little real "
-                "content, so relevance stays noisy/low — the exception is the vision "
-                "method, which adds genuine chart content and actually raises relevance."),
-    "formulareasoning": ("Formula questions need numeric reasoning the retrieved "
-                         "formula text cannot supply; adding variable definitions, "
-                         "LaTeX or structure expands the context without giving the "
-                         "model the computation, so answers stay only loosely relevant."),
-    "numinamath": ("Each retrieved chunk is one step of a multi-step solution; even with "
-                   "surrounding context the model often lacks the full derivation needed "
-                   "to answer, so answer scores stay modest while retrieval improves most."),
+    "scifact": (
+        "Abstract sentences already answer the claim directly, so titles, "
+        "summaries and generated questions mostly pad the context with "
+        "topic-level text; the model then gives broader, less targeted "
+        "answers (and sometimes echoes the scaffolding), so relevance and "
+        "faithfulness fall even when retrieval improves."
+    ),
+    "nfcorpus": (
+        "Expansion methods inject model-written questions/summaries that "
+        "are not in the source passage; the answer model sometimes responds "
+        "from that generated scaffolding rather than the passage, lowering "
+        "faithfulness, and the longer mixed context lets answers drift off "
+        "the exact question."
+    ),
+    "wikitablequestions": (
+        "Wrapping a row in headers, titles and a natural-language "
+        "summary surrounds the precise cell value with prose; the "
+        "model tends to answer from the narrative instead of the "
+        "exact value, so answers become less directly relevant."
+    ),
+    "chartqa": (
+        "Most chart enrichments are metadata placeholders with little real "
+        "content, so relevance stays noisy/low — the exception is the vision "
+        "method, which adds genuine chart content and actually raises relevance."
+    ),
+    "formulareasoning": (
+        "Formula questions need numeric reasoning the retrieved "
+        "formula text cannot supply; adding variable definitions, "
+        "LaTeX or structure expands the context without giving the "
+        "model the computation, so answers stay only loosely relevant."
+    ),
+    "numinamath": (
+        "Each retrieved chunk is one step of a multi-step solution; even with "
+        "surrounding context the model often lacks the full derivation needed "
+        "to answer, so answer scores stay modest while retrieval improves most."
+    ),
 }
 WHY_REL_DROPS = (
     "<div class='card'><h2>Why does answer relevance (and faithfulness) often drop "
@@ -179,13 +203,19 @@ def main() -> None:
         return
 
     datasets, methods = [], {}
-    for (ds, m) in ret:
+    for ds, m in ret:
         if ds not in datasets:
             datasets.append(ds)
         methods.setdefault(ds, []).append(m)
     # fixed presentation order: structured, unstructured, tables, charts, formulas
-    ORDER = ["scifact", "nfcorpus", "wikitablequestions", "chartqa",
-             "formulareasoning", "numinamath"]
+    ORDER = [
+        "scifact",
+        "nfcorpus",
+        "wikitablequestions",
+        "chartqa",
+        "formulareasoning",
+        "numinamath",
+    ]
     datasets.sort(key=lambda d: ORDER.index(d) if d in ORDER else 999)
     order = ["baseline", "combined_best"]
     for ds in methods:
@@ -196,9 +226,11 @@ def main() -> None:
     H.append("<meta name='viewport' content='width=device-width, initial-scale=1'>")
     H.append("<title>Context Enrichment Results by Dataset</title>")
     H.append(f"<style>{CSS}</style></head><body>")
-    H.append("<header><div class='wrap'><h1>Context Enrichment Results — by Dataset</h1>"
-             "<p>Three enrichment methods (+ combined) vs. baseline, for each of the five "
-             "document types. Green = better than baseline, red = worse.</p></div></header><main>")
+    H.append(
+        "<header><div class='wrap'><h1>Context Enrichment Results — by Dataset</h1>"
+        "<p>Three enrichment methods (+ combined) vs. baseline, for each of the five "
+        "document types. Green = better than baseline, red = worse.</p></div></header><main>"
+    )
     H.append(WHY_REL_DROPS)
 
     for ds in datasets:
@@ -206,30 +238,50 @@ def main() -> None:
         base_a = ans.get((ds, "baseline"), {})
         b_nd, b_fa = _f(base_r.get("nDCG@10")), _f(base_a.get("faithfulness"))
         H.append("<div class='card'>")
-        H.append(f"<h2>{ds}</h2><div class='dt'>{DATA_TYPE.get(ds,'')}</div>")
-        H.append("<table><thead><tr>"
-                 "<th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th>"
-                 "<th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th>"
-                 "<th>Token cost ($)</th></tr></thead><tbody>")
+        H.append(f"<h2>{ds}</h2><div class='dt'>{DATA_TYPE.get(ds, '')}</div>")
+        H.append(
+            "<table><thead><tr>"
+            "<th class='l'>Enrichment method</th><th>Recall@5</th><th>nDCG@10</th>"
+            "<th>MRR</th><th>Hit@5</th><th>Faithfulness</th><th>Answer rel.</th>"
+            "<th>Token cost ($)</th></tr></thead><tbody>"
+        )
         for m in methods[ds]:
             rr, aa, cc = ret[(ds, m)], ans.get((ds, m), {}), cost.get((ds, m), {})
             cls = "base" if m == "baseline" else ""
             label = METHOD_LABEL.get(m, m)
-            base_flag = (m == "baseline")
-            H.append(f"<tr class='{cls}'><td class='l'>{label}</td>"
-                     + _cell(rr.get("Recall@5"), None if base_flag else base_r.get("Recall@5"))
-                     + _cell(rr.get("nDCG@10"), None if base_flag else base_r.get("nDCG@10"))
-                     + _cell(rr.get("MRR"), None if base_flag else base_r.get("MRR"))
-                     + _cell(rr.get("Hit@5"), None if base_flag else base_r.get("Hit@5"))
-                     + _cell(aa.get("faithfulness"), None if base_flag else base_a.get("faithfulness"))
-                     + _cell(aa.get("answer_relevance"), None if base_flag else base_a.get("answer_relevance"))
-                     + f"<td>{cc.get('estimated_cost_usd','n/a')}</td></tr>")
+            base_flag = m == "baseline"
+            H.append(
+                f"<tr class='{cls}'><td class='l'>{label}</td>"
+                + _cell(
+                    rr.get("Recall@5"), None if base_flag else base_r.get("Recall@5")
+                )
+                + _cell(rr.get("nDCG@10"), None if base_flag else base_r.get("nDCG@10"))
+                + _cell(rr.get("MRR"), None if base_flag else base_r.get("MRR"))
+                + _cell(rr.get("Hit@5"), None if base_flag else base_r.get("Hit@5"))
+                + _cell(
+                    aa.get("faithfulness"),
+                    None if base_flag else base_a.get("faithfulness"),
+                )
+                + _cell(
+                    aa.get("answer_relevance"),
+                    None if base_flag else base_a.get("answer_relevance"),
+                )
+                + f"<td>{cc.get('estimated_cost_usd', 'n/a')}</td></tr>"
+            )
         H.append("</tbody></table>")
 
         # ---- data-driven feedback ----
         nb = [m for m in methods[ds] if m != "baseline"]
-        ret_cand = [(m, _f(ret[(ds, m)].get("nDCG@10"))) for m in nb if _f(ret[(ds, m)].get("nDCG@10")) is not None]
-        ans_cand = [(m, _f(ans.get((ds, m), {}).get("faithfulness"))) for m in nb if _f(ans.get((ds, m), {}).get("faithfulness")) is not None]
+        ret_cand = [
+            (m, _f(ret[(ds, m)].get("nDCG@10")))
+            for m in nb
+            if _f(ret[(ds, m)].get("nDCG@10")) is not None
+        ]
+        ans_cand = [
+            (m, _f(ans.get((ds, m), {}).get("faithfulness")))
+            for m in nb
+            if _f(ans.get((ds, m), {}).get("faithfulness")) is not None
+        ]
         best_ret = max(ret_cand, key=lambda x: x[1]) if ret_cand else None
         best_ans = max(ans_cand, key=lambda x: x[1]) if ans_cand else None
         ret_up = best_ret and b_nd is not None and best_ret[1] > b_nd
@@ -243,57 +295,87 @@ def main() -> None:
         parts = []
         if best_ret:
             d = best_ret[1] - (b_nd or 0)
-            parts.append(f"best for retrieval was <b>{METHOD_LABEL.get(best_ret[0],best_ret[0])}</b> "
-                         f"(nDCG@10 {best_ret[1]:.3f}, {d:+.3f} vs baseline)")
+            parts.append(
+                f"best for retrieval was <b>{METHOD_LABEL.get(best_ret[0], best_ret[0])}</b> "
+                f"(nDCG@10 {best_ret[1]:.3f}, {d:+.3f} vs baseline)"
+            )
         if best_ans and b_fa is not None:
             d = best_ans[1] - b_fa
-            parts.append(f"best for answers was <b>{METHOD_LABEL.get(best_ans[0],best_ans[0])}</b> "
-                         f"(faithfulness {best_ans[1]:.3f}, {d:+.3f})")
+            parts.append(
+                f"best for answers was <b>{METHOD_LABEL.get(best_ans[0], best_ans[0])}</b> "
+                f"(faithfulness {best_ans[1]:.3f}, {d:+.3f})"
+            )
         verdict = "Here, " + "; ".join(parts) + "." if parts else ""
-        H.append(f"<div class='fb'><b>Feedback {tag}</b><br>{RATIONALE.get(ds,'')} {verdict}</div>")
-        H.append(f"<div class='fb' style='background:#fff7ed;border-color:#fed7aa'>"
-                 f"<b style='color:#c2410c'>Why answer relevance drops here</b><br>"
-                 f"{REL_DROP.get(ds,'')}</div>")
+        H.append(
+            f"<div class='fb'><b>Feedback {tag}</b><br>{RATIONALE.get(ds, '')} {verdict}</div>"
+        )
+        H.append(
+            f"<div class='fb' style='background:#fff7ed;border-color:#fed7aa'>"
+            f"<b style='color:#c2410c'>Why answer relevance drops here</b><br>"
+            f"{REL_DROP.get(ds, '')}</div>"
+        )
         H.append("</div>")
 
     # ---- final summary table: best & worst method per dataset ----
-    H.append("<div class='card'><h2>Final summary — best &amp; worst enrichment method per dataset</h2>")
-    H.append("<p class='sub'>Best/worst chosen among the non-baseline methods. "
-             "Retrieval ranked by nDCG@10, answers by faithfulness; Δ is vs. baseline.</p>")
-    H.append("<table><thead><tr><th class='l'>Dataset</th><th class='l'>Data type</th>"
-             "<th class='l'>Best (retrieval)</th><th class='l'>Worst (retrieval)</th>"
-             "<th class='l'>Best (answers)</th></tr></thead><tbody>")
+    H.append(
+        "<div class='card'><h2>Final summary — best &amp; worst enrichment method per dataset</h2>"
+    )
+    H.append(
+        "<p class='sub'>Best/worst chosen among the non-baseline methods. "
+        "Retrieval ranked by nDCG@10, answers by faithfulness; Δ is vs. baseline.</p>"
+    )
+    H.append(
+        "<table><thead><tr><th class='l'>Dataset</th><th class='l'>Data type</th>"
+        "<th class='l'>Best (retrieval)</th><th class='l'>Worst (retrieval)</th>"
+        "<th class='l'>Best (answers)</th></tr></thead><tbody>"
+    )
     for ds in datasets:
         nb = [m for m in methods[ds] if m != "baseline"]
         b_nd = _f(ret.get((ds, "baseline"), {}).get("nDCG@10"))
         b_fa = _f(ans.get((ds, "baseline"), {}).get("faithfulness"))
-        rc = [(m, _f(ret[(ds, m)].get("nDCG@10"))) for m in nb
-              if _f(ret[(ds, m)].get("nDCG@10")) is not None]
-        ac = [(m, _f(ans.get((ds, m), {}).get("faithfulness"))) for m in nb
-              if _f(ans.get((ds, m), {}).get("faithfulness")) is not None]
+        rc = [
+            (m, _f(ret[(ds, m)].get("nDCG@10")))
+            for m in nb
+            if _f(ret[(ds, m)].get("nDCG@10")) is not None
+        ]
+        ac = [
+            (m, _f(ans.get((ds, m), {}).get("faithfulness")))
+            for m in nb
+            if _f(ans.get((ds, m), {}).get("faithfulness")) is not None
+        ]
 
         def fmt(pick, base, cls):
             if not pick:
                 return "<td class='l'>n/a</td>"
             m, v = pick
             d = "" if base is None else f" ({v - base:+.3f})"
-            return (f"<td class='l'><span class='{cls}'>{METHOD_LABEL.get(m, m)}</span>"
-                    f"<br><span class='legend'>nDCG/faith {v:.3f}{d}</span></td>")
+            return (
+                f"<td class='l'><span class='{cls}'>{METHOD_LABEL.get(m, m)}</span>"
+                f"<br><span class='legend'>nDCG/faith {v:.3f}{d}</span></td>"
+            )
 
         best_r = max(rc, key=lambda x: x[1]) if rc else None
         worst_r = min(rc, key=lambda x: x[1]) if rc else None
         best_a = max(ac, key=lambda x: x[1]) if ac else None
-        H.append(f"<tr><td class='l ds'>{ds}</td><td class='l'>{DATA_TYPE.get(ds,'')}</td>"
-                 + fmt(best_r, b_nd, "win") + fmt(worst_r, b_nd, "lose")
-                 + fmt(best_a, b_fa, "win") + "</tr>")
+        H.append(
+            f"<tr><td class='l ds'>{ds}</td><td class='l'>{DATA_TYPE.get(ds, '')}</td>"
+            + fmt(best_r, b_nd, "win")
+            + fmt(worst_r, b_nd, "lose")
+            + fmt(best_a, b_fa, "win")
+            + "</tr>"
+        )
     H.append("</tbody></table></div>")
 
-    H.append("<div class='card note'>* chart-to-table, chart axis metadata, and formula "
-             "surrounding-text are documented placeholders (require OCR/vision or are not in "
-             "the source data); their effect is structural, not from real extracted values. "
-             "Answer grades come from an LLM judge and are noisy on small samples.</div>")
-    H.append("</main><footer>Generated from results/enrichment_method_tests/ • "
-             "Octen embeddings • Chroma Cloud • gpt-4o-mini (LangChain→LangSmith)</footer>")
+    H.append(
+        "<div class='card note'>* chart-to-table, chart axis metadata, and formula "
+        "surrounding-text are documented placeholders (require OCR/vision or are not in "
+        "the source data); their effect is structural, not from real extracted values. "
+        "Answer grades come from an LLM judge and are noisy on small samples.</div>"
+    )
+    H.append(
+        "</main><footer>Generated from results/enrichment_method_tests/ • "
+        "Octen embeddings • Chroma Cloud • gpt-4o-mini (LangChain→LangSmith)</footer>"
+    )
     H.append("</body></html>")
 
     OUT.write_text("\n".join(H), encoding="utf-8")

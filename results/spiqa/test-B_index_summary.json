@@ -1,0 +1,60 @@
+{
+  "split": "test-B",
+  "embedding_model": "huggingface:Octen/Octen-Embedding-0.6B:dim1024",
+  "chunk_encode_seconds": 400.34,
+  "question_encode_seconds": 340.64,
+  "num_chunks": 3326,
+  "num_question_vectors_embedded": 54403,
+  "conditions": [
+    {
+      "condition": "baseline",
+      "collection": "spiqa_testB_baseline",
+      "n_questions_per_chunk": 0,
+      "n_chunk_records": 3326,
+      "n_question_records": 0,
+      "total_records": 3326,
+      "chroma_add_seconds": 1.883,
+      "index_size_mb": 49.337
+    },
+    {
+      "condition": "q1",
+      "collection": "spiqa_testB_q1",
+      "n_questions_per_chunk": 1,
+      "n_chunk_records": 3326,
+      "n_question_records": 3326,
+      "total_records": 6652,
+      "chroma_add_seconds": 3.082,
+      "index_size_mb": 65.93
+    },
+    {
+      "condition": "q10",
+      "collection": "spiqa_testB_q10",
+      "n_questions_per_chunk": 10,
+      "n_chunk_records": 3326,
+      "n_question_records": 33099,
+      "total_records": 36425,
+      "chroma_add_seconds": 16.243,
+      "index_size_mb": 228.685
+    },
+    {
+      "condition": "q50",
+      "collection": "spiqa_testB_q50",
+      "n_questions_per_chunk": 50,
+      "n_chunk_records": 3326,
+      "n_question_records": 53904,
+      "total_records": 57230,
+      "chroma_add_seconds": 25.94,
+      "index_size_mb": 344.844
+    },
+    {
+      "condition": "q100",
+      "collection": "spiqa_testB_q100",
+      "n_questions_per_chunk": 100,
+      "n_chunk_records": 3326,
+      "n_question_records": 54403,
+      "total_records": 57729,
+      "chroma_add_seconds": 24.96,
+      "index_size_mb": 344.681
+    }
+  ]
+}

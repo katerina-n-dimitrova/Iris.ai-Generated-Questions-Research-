@@ -1,0 +1,74 @@
+{
+  "protocol": {
+    "articles": 300,
+    "chunks": 933,
+    "eligible_queries": 1691,
+    "unresolved_queries": 0,
+    "alignment_methods": {
+      "exact": 4814
+    },
+    "chunk_size": 1024,
+    "chunk_overlap": 128,
+    "selection_seed": 42,
+    "generation_model": "None for Baseline; gpt-5.4-mini for adaptive conditions",
+    "embedding": "Iris dim-384",
+    "retrieval": "dense chunk vectors + BM25 RRF for Baseline; 0.5 chunk/question vector fusion + BM25 RRF for adaptive conditions",
+    "rrf_k": 60
+  },
+  "conditions": [
+    {
+      "condition": "Baseline",
+      "question_rule": "No generated questions",
+      "quality": {
+        "generated_questions": 0,
+        "questions_per_chunk_min": 0,
+        "questions_per_chunk_mean": 0.0,
+        "questions_per_chunk_max": 0
+      },
+      "stored_vectors": 933,
+      "metrics": {
+        "evidence_recall@1": 0.19362310270057162,
+        "evidence_recall@5": 0.49196727774492416,
+        "evidence_recall@10": 0.663217031342401,
+        "all_evidence_hit@5": 0.1785925487876996,
+        "mrr@10": 0.6459360010513174
+      }
+    },
+    {
+      "condition": "Adaptive generated questions 5\u201320",
+      "question_rule": "clamp(5, 20, round(facts * 0.5))",
+      "quality": {
+        "generated_questions": 14583,
+        "questions_per_chunk_min": 5,
+        "questions_per_chunk_mean": 15.630225080385852,
+        "questions_per_chunk_max": 20
+      },
+      "stored_vectors": 15516,
+      "metrics": {
+        "evidence_recall@1": 0.2020500689927065,
+        "evidence_recall@5": 0.5267100335107431,
+        "evidence_recall@10": 0.7004238123398383,
+        "all_evidence_hit@5": 0.2111176818450621,
+        "mrr@10": 0.6644222916842669
+      }
+    },
+    {
+      "condition": "Adaptive generated questions unbounded",
+      "question_rule": "round(facts * 0.5), no bounds",
+      "quality": {
+        "generated_questions": 15926,
+        "questions_per_chunk_min": 3,
+        "questions_per_chunk_mean": 17.069667738478028,
+        "questions_per_chunk_max": 40
+      },
+      "stored_vectors": 16859,
+      "metrics": {
+        "evidence_recall@1": 0.20131086142322094,
+        "evidence_recall@5": 0.5304553518628031,
+        "evidence_recall@10": 0.7015572639463828,
+        "all_evidence_hit@5": 0.21525724423418097,
+        "mrr@10": 0.6636474144161902
+      }
+    }
+  ]
+}

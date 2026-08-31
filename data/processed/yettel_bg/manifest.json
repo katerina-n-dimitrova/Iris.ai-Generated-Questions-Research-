@@ -1,0 +1,44 @@
+{
+  "built_at": "2026-08-16T22:35:32.994628+00:00",
+  "source_sitemap": "https://www.yettel.bg/bg/sitemap-corporate.xml",
+  "source_url_count": 1083,
+  "document_count": 340,
+  "eligible_before_target_cap": 403,
+  "target_document_count": 340,
+  "chunk_count": 963,
+  "minimum_document_tokens": 1501,
+  "maximum_document_tokens": 4725,
+  "mean_document_tokens": 2243.81,
+  "selection": {
+    "min_tokens": 1500,
+    "max_tokens": 5000,
+    "tokenizer": "cl100k_base"
+  },
+  "chunking": {
+    "chunk_tokens": 1024,
+    "overlap_tokens": 128,
+    "tokenizer": "cl100k_base"
+  },
+  "excluded_content": [
+    "audio",
+    "button",
+    "canvas",
+    "figcaption",
+    "figure",
+    "footer",
+    "form",
+    "header",
+    "iframe",
+    "img",
+    "nav",
+    "noscript",
+    "picture",
+    "script",
+    "source",
+    "style",
+    "svg",
+    "table",
+    "video"
+  ],
+  "date_note": "Yettel article pages generally omit publication dates; date contains sitemap lastmod and date_type records this explicitly."
+}

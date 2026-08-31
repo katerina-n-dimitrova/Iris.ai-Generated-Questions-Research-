@@ -34,9 +34,16 @@ import config
 
 ANSWER_SCORES = config.ANSWER_METRICS_DIR / "answer_scores.csv"
 SCORE_FIELDS = [
-    "dataset", "condition", "num_answers",
-    "exact_match", "token_f1", "llm_correctness",
-    "answer_correctness", "faithfulness", "citation_accuracy", "answer_relevance",
+    "dataset",
+    "condition",
+    "num_answers",
+    "exact_match",
+    "token_f1",
+    "llm_correctness",
+    "answer_correctness",
+    "faithfulness",
+    "citation_accuracy",
+    "answer_relevance",
 ]
 
 
@@ -74,12 +81,16 @@ def llm_judge(client, question: str, gold: str, pred: str) -> float:
         resp = client.chat.completions.create(
             model=config.OPENAI_CHAT_MODEL,
             messages=[
-                {"role": "system", "content":
-                    "You are a strict grader. Reply with only '1' if the "
-                    "predicted answer is correct given the gold answer, else '0'."},
-                {"role": "user", "content":
-                    f"Question: {question}\nGold: {gold}\nPredicted: {pred}\n"
-                    "Correct (1/0)?"},
+                {
+                    "role": "system",
+                    "content": "You are a strict grader. Reply with only '1' if the "
+                    "predicted answer is correct given the gold answer, else '0'.",
+                },
+                {
+                    "role": "user",
+                    "content": f"Question: {question}\nGold: {gold}\nPredicted: {pred}\n"
+                    "Correct (1/0)?",
+                },
             ],
             temperature=0.0,
             max_tokens=2,
@@ -89,8 +100,12 @@ def llm_judge(client, question: str, gold: str, pred: str) -> float:
         return 0.0
 
 
-_LC_NULL = {"faithfulness": None, "citation_accuracy": None,
-            "answer_relevance": None, "answer_correctness": None}
+_LC_NULL = {
+    "faithfulness": None,
+    "citation_accuracy": None,
+    "answer_relevance": None,
+    "answer_correctness": None,
+}
 
 _GRADE_SYSTEM = (
     "You are a strict RAG answer evaluator. Given a question, the retrieved "
@@ -112,22 +127,35 @@ def _get_langchain_llm():
     """ChatOpenAI grader. With LANGCHAIN_TRACING_V2=true these calls are traced
     to LangSmith automatically (no extra code needed)."""
     from langchain_openai import ChatOpenAI
-    return ChatOpenAI(model=config.OPENAI_CHAT_MODEL, temperature=0,
-                      max_tokens=120, api_key=config.OPENAI_API_KEY)
+
+    return ChatOpenAI(
+        model=config.OPENAI_CHAT_MODEL,
+        temperature=0,
+        max_tokens=120,
+        api_key=config.OPENAI_API_KEY,
+    )
 
 
-def _grade_one(llm, question: str, context: str, answer: str,
-               gold: str) -> Dict[str, Optional[float]]:
+def _grade_one(
+    llm, question: str, context: str, answer: str, gold: str
+) -> Dict[str, Optional[float]]:
     import json as _json
-    user = (f"Question: {question}\n\nContext:\n{context[:4000]}\n\n"
-            f"Answer: {answer}\n\nGold answer: {gold or 'N/A'}")
+
+    user = (
+        f"Question: {question}\n\nContext:\n{context[:4000]}\n\n"
+        f"Answer: {answer}\n\nGold answer: {gold or 'N/A'}"
+    )
     try:
         out = llm.invoke([("system", _GRADE_SYSTEM), ("human", user)]).content
         start, end = out.find("{"), out.rfind("}")
-        data = _json.loads(out[start:end + 1])
+        data = _json.loads(out[start : end + 1])
         res = {}
-        for k in ("faithfulness", "answer_relevance", "citation_accuracy",
-                  "answer_correctness"):
+        for k in (
+            "faithfulness",
+            "answer_relevance",
+            "citation_accuracy",
+            "answer_correctness",
+        ):
             v = data.get(k)
             res[k] = float(v) if isinstance(v, (int, float)) else None
         if not gold:
@@ -137,25 +165,38 @@ def _grade_one(llm, question: str, context: str, answer: str,
         return dict(_LC_NULL)
 
 
-def compute_langchain_metrics(rows: List[Dict], concurrency: int = 8
-                              ) -> Dict[str, Optional[float]]:
+def compute_langchain_metrics(
+    rows: List[Dict], concurrency: int = 8
+) -> Dict[str, Optional[float]]:
     """LLM-graded RAG metrics via langchain_openai (faithfulness, answer
     relevance, citation accuracy, answer correctness). Averaged over answers.
     Calls run in a thread pool (latency-bound) and are traced to LangSmith when
     LANGCHAIN_TRACING_V2=true."""
     from concurrent.futures import ThreadPoolExecutor
+
     llm = _get_langchain_llm()
 
     def grade(r):
-        return _grade_one(llm, r.get("query_text", ""), r.get("context", ""),
-                          r.get("generated_answer", ""), r.get("gold_answer", ""))
+        return _grade_one(
+            llm,
+            r.get("query_text", ""),
+            r.get("context", ""),
+            r.get("generated_answer", ""),
+            r.get("gold_answer", ""),
+        )
 
     with ThreadPoolExecutor(max_workers=max(1, concurrency)) as ex:
         graded = list(ex.map(grade, rows))
 
-    acc = {k: [] for k in
-           ("faithfulness", "answer_relevance", "citation_accuracy",
-            "answer_correctness")}
+    acc = {
+        k: []
+        for k in (
+            "faithfulness",
+            "answer_relevance",
+            "citation_accuracy",
+            "answer_correctness",
+        )
+    }
     for g in graded:
         for k, v in g.items():
             if v is not None:
@@ -193,17 +234,31 @@ def evaluate_file(path, client, use_langchain: bool) -> Dict | None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--datasets", nargs="*", default=config.ALL_DATASETS,
-                    choices=config.ALL_DATASETS)
-    ap.add_argument("--conditions", nargs="*", default=list(config.CONDITIONS),
-                    choices=config.CONDITIONS)
-    ap.add_argument("--use-llm-judge", action="store_true",
-                    help="Use the chat model as a 0/1 correctness judge.")
-    ap.add_argument("--use-langchain", action="store_true",
-                    help="Compute LLM-graded RAG metrics via langchain_openai "
-                         "(faithfulness, answer relevance, citation accuracy, "
-                         "answer correctness). Traced to LangSmith if "
-                         "LANGCHAIN_TRACING_V2=true.")
+    ap.add_argument(
+        "--datasets",
+        nargs="*",
+        default=config.ALL_DATASETS,
+        choices=config.ALL_DATASETS,
+    )
+    ap.add_argument(
+        "--conditions",
+        nargs="*",
+        default=list(config.CONDITIONS),
+        choices=config.CONDITIONS,
+    )
+    ap.add_argument(
+        "--use-llm-judge",
+        action="store_true",
+        help="Use the chat model as a 0/1 correctness judge.",
+    )
+    ap.add_argument(
+        "--use-langchain",
+        action="store_true",
+        help="Compute LLM-graded RAG metrics via langchain_openai "
+        "(faithfulness, answer relevance, citation accuracy, "
+        "answer correctness). Traced to LangSmith if "
+        "LANGCHAIN_TRACING_V2=true.",
+    )
     args = ap.parse_args()
 
     client = config.get_openai_client() if args.use_llm_judge else None
@@ -223,15 +278,18 @@ def main() -> None:
         return
 
     groups = {(r["dataset"], r["condition"]) for r in results}
-    common.upsert_csv(ANSWER_SCORES, SCORE_FIELDS, results,
-                      ("dataset", "condition"), groups)
+    common.upsert_csv(
+        ANSWER_SCORES, SCORE_FIELDS, results, ("dataset", "condition"), groups
+    )
 
     print(f"\n{'dataset':<20}{'cond':<10}{'EM':>8}{'F1':>8}{'LLM':>8}")
     print("-" * 54)
     for r in results:
-        print(f"{r['dataset']:<20}{r['condition']:<10}"
-              f"{r['exact_match']:>8}{r['token_f1']:>8}"
-              f"{str(r['llm_correctness']):>8}")
+        print(
+            f"{r['dataset']:<20}{r['condition']:<10}"
+            f"{r['exact_match']:>8}{r['token_f1']:>8}"
+            f"{str(r['llm_correctness']):>8}"
+        )
     print(f"\nSaved -> {ANSWER_SCORES.relative_to(config.PROJECT_ROOT)}")
 
 

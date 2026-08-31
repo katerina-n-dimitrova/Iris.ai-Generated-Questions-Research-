@@ -1,0 +1,84 @@
+{
+  "protocol": {
+    "articles": 609,
+    "chunks": 1830,
+    "eligible_queries": 2255,
+    "unresolved_queries": 0,
+    "alignment_methods": {
+      "exact": 6084
+    },
+    "chunk_size": 1024,
+    "chunk_overlap": 128,
+    "selection_seed": null,
+    "generation_model": "Qwen/Qwen3.5-4B",
+    "embedding": "Iris dim-384",
+    "retrieval": "0.5 chunk/question vector fusion + BM25 RRF",
+    "rrf_k": 60,
+    "article_question_generation": {
+      "articles": 609,
+      "rule": "clamp(5, 20, round(article facts * 0.5))",
+      "dense_fusion": "equal 1/3 chunk + chunk-question + article-question"
+    }
+  },
+  "conditions": [
+    {
+      "condition": "Baseline",
+      "question_rule": "No generated questions",
+      "quality": {
+        "generated_questions": 0,
+        "questions_per_chunk_min": 0,
+        "questions_per_chunk_mean": 0.0,
+        "questions_per_chunk_max": 0
+      },
+      "stored_vectors": 1830,
+      "metrics": {
+        "evidence_recall@1": 0.20594974131559496,
+        "evidence_recall@5": 0.51019955654102,
+        "evidence_recall@10": 0.6663710273466371,
+        "all_evidence_hit@5": 0.21108647450110865,
+        "mrr@10": 0.6442788512300707
+      }
+    },
+    {
+      "condition": "Adaptive generated questions 5\u201320",
+      "question_rule": "clamp(5, 20, round(facts * 0.5))",
+      "quality": {
+        "generated_questions": 18136,
+        "questions_per_chunk_min": 5,
+        "questions_per_chunk_mean": 9.910382513661203,
+        "questions_per_chunk_max": 20
+      },
+      "stored_vectors": 19966,
+      "metrics": {
+        "evidence_recall@1": 0.21548410938654838,
+        "evidence_recall@5": 0.5420177383592018,
+        "evidence_recall@10": 0.7012564671101256,
+        "all_evidence_hit@5": 0.2541019955654102,
+        "mrr@10": 0.6617796431211065
+      }
+    },
+    {
+      "condition": "Adaptive chunk + whole-article questions 5\u201320",
+      "question_rule": "chunk: clamp(5, 20, round(facts * 0.5)); article: clamp(5, 20, round(article facts * 0.5))",
+      "quality": {
+        "generated_questions": 28967,
+        "chunk_questions": 18136,
+        "article_questions": 10831,
+        "questions_per_chunk_min": 5,
+        "questions_per_chunk_max": 20,
+        "questions_per_article_min": 0,
+        "questions_per_article_max": 20,
+        "articles_with_questions": 608,
+        "articles_without_questions": 1
+      },
+      "stored_vectors": 30797,
+      "metrics": {
+        "evidence_recall@1": 0.20846267553584627,
+        "evidence_recall@5": 0.5465262379896526,
+        "evidence_recall@10": 0.704360679970436,
+        "all_evidence_hit@5": 0.25543237250554324,
+        "mrr@10": 0.6541683384366311
+      }
+    }
+  ]
+}

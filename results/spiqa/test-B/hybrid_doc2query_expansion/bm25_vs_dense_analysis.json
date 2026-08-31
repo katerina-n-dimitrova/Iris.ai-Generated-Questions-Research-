@@ -1,0 +1,12 @@
+{
+  "dense_append_q10_ndcg": 0.7956,
+  "bm25_expand_q10_ndcg": 0.9132,
+  "bm25_beats_dense_append": true,
+  "baseline_dense_ndcg": 0.8002,
+  "baseline_hybrid_ndcg": 0.9233,
+  "hybrid_expand_q10_ndcg": 0.8821,
+  "hybrid_beats_dense_only": true,
+  "q50_hybrid_ndcg": 0.8804,
+  "q50_beats_q10": false,
+  "best_condition": "q10_bm25_expand"
+}

@@ -1,0 +1,282 @@
+{
+  "vs_condition": "q10_statement_score_fusion",
+  "count": 69,
+  "queries": [
+    {
+      "eval_query": "For the images used for visualization in the paper, were they selected randomly or picked by the authors?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What is meant by \"linear sweep\" in hyperparameter space?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How many hyperparameter combinations were used for the random hyperparameter search?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Does the paper show how each component of KERM can contribute to passage re-ranking performance quantitatively and qualitatively?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Does the author showed that the distillation on the knowledge graph can be useful for re-ranking task?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Who collected the queries from MSMARCO-Passage dataset to make MSMARCO-TRAIN query set?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What is the example of unreliable relations in knowledge graph for passage re-ranking scenario?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What are some of the limitations of the YOLOv3 object detection model?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How does YOLOv3 improve upon previous versions of the YOLO object detection algorithm?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How many different types of experiments are performed to test the proposed models?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Which variants of LSTM encoder-decoder models are used in this study?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Which evaluation criteria was used to compare the performance of action recognition models?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What is kernel size used in each layer of SegNet?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What are the total number of encoders and decoders used in SegNet?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How many features are used in each layer of SegNet?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What are the advantages of using a flat architecture in SegNet?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Fast YOLO processes double the mAP of other real-time detectors, what is the actual value of the mAP ?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What are the metrics used to compare the performance between YOLO & DPM/RCNN?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How did the authors verify that YOLO learns very general representation of objects ?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What does the authors means by reframing object detection as a \"single regression problem\" ?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "According to the authors, the VGG-16 version of Faster R-CNN is 6 time slower than YOLO, what is the actual speed of the model ?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Why does YOLO struggle in localizing objects correctly ?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Why did the authors chose to train YOLO using VGG-16 and not other neural network architecture ?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Why does Yolo outperform R-CNN in other categories such as cat and train ?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "To obtain the final compact descriptor of the image, why did the authors use PCA instead of other compression algorithms?.",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How does the NetVLAD layer differ from the original VLAD?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What does \"information highways\" mean ?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What are the difference between plain networks and deep highway networks ?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "From the left graph of Figure 1, we observe that even the deepest highway network has same/worse performance than the plain network, so what are the benefits of using the highway networks with deeper layers ?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "The authors claims that the  performance increase with the number of attention module, is that true, knowing that they tried only m = {1,2,3,4} ?",
+      "both_hit": false
+    },
+    {
+      "eval_query": "How did the authors showed that the methods performed worse on the data coming from the second clinical center? Using which metrics ?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "The authors claims that DeepMedic  behaves very well in preserving the hierarchical structure tumours, is that true ? Have they tried it across different types of varying cases?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Did the method proposed in this paper perform on par with or better than the state-of-the-art methods that require users to provide spatial masks for editing?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Who is responsible for designating the control signal?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How do the authors verify that the two characteristics mentioned in the sentence are indispensable for the ideal control signal?  ",
+      "both_hit": false
+    },
+    {
+      "eval_query": "Do α control the strength of the length normalization and β control the strength of the coverage penalty each other?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How can the attention mechanism connecting the bottom layer of the decoder to the top layer of the encoder contribute to improving parallelism?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "In terms of the effectivenesses of coverage penalty and length normalization, how does having RL-based model refinement differ from not having RL-based model refinement?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Is there a disadvantage to using low-precision arithmetic for inference, such as decreased inference accuracy?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Is it true that they used the output from the bottom decoder layer for y_{i-1}, not the decoder-RNN output from the past decoding time step?",
+      "both_hit": false
+    },
+    {
+      "eval_query": "Why are the constraint value of δ and γ separated?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What kinds of domain knowledge do the authors refer to in this context?",
+      "both_hit": false
+    },
+    {
+      "eval_query": "What are the pros and cons of a global approach and a local approach?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "In this sentence, do the current target state and all source states mean hidden states of the encoder?",
+      "both_hit": false
+    },
+    {
+      "eval_query": "What does \"variable-length alignment\" mean?",
+      "both_hit": false
+    },
+    {
+      "eval_query": "Does making higher resolution have to be incorporated into the network? Can't we do this as a separate process?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How well RoBERTa language modeling on Wiki-40B?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What is training method used for decreasing the gap between monolingual model and multilingual model?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What are the two factors to show potential reason for cross-lingual generalization",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How did the authors find potential causes of cross-lingual transfer?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Which factor is more related to model performance between pretraining data size and language similarity?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What is used for measure the quantities of non-English data?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What is the range of the number of non-English tokens found in English corpus? ",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How many categories used in non-English text classifier?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Is the line contains both English and non-English text is the most common in classifier?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Is RoBERTa better for cross-lingual transfer rather than BERT?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How is the authors' work different from the “fast gradient sign” method?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What does an \"adversarial perturbation\" mean?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What are the metrics used to compare the efficiency of different methods which compute the adversarial perturbations?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What does an \"affine classifier\" mean?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "Why did the authors measure the perturbations using the L`2 norm?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What were the various pre processing techniques used before feeding the data to Neural network?",
+      "both_hit": false
+    },
+    {
+      "eval_query": "How does the author conclude that non-local means filter is the best filter for denoising the images ? Are there any other filters that can be used for the same task?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "How CLAHE is better than HE for image equalization?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "What is 'autokeras' ? How it works?",
+      "both_hit": false
+    },
+    {
+      "eval_query": "Author took batch_size to be 16 with 50 epochs while training the model . What was the intution behind taking these particular numbers?",
+      "both_hit": false
+    },
+    {
+      "eval_query": "Can using more epochs while training may increase the validation accuracy ? if no why ?",
+      "both_hit": false
+    },
+    {
+      "eval_query": "Can image content and style be \"fully\" or \"completely\" separated?",
+      "both_hit": true
+    },
+    {
+      "eval_query": "In what way can SBM-Transformer be considered better than Reformer?",
+      "both_hit": true
+    }
+  ]
+}

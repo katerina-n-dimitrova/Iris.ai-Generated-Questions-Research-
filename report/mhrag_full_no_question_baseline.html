@@ -1,0 +1,7 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Full MultiHop-RAG no-question baseline</title><style>
+body{background:#0f1319;color:#e6eaf0;font:14px/1.5 system-ui;margin:0;padding:24px}main{max-width:1800px;margin:auto}table{border-collapse:collapse;width:100%}th,td{border:1px solid #29313d;padding:10px;text-align:center;vertical-align:top}th{background:#161c25}.base{background:#403a18}.left{text-align:left}.note{color:#9aa5b3}code{overflow-wrap:anywhere}
+</style></head><body><main><h1>Full MultiHop-RAG — no-question baseline</h1>
+<p class="note">Complete 609-document corpus; 2255 fully aligned evidence-bearing queries; 1024-token chunks with 128-token overlap. Null queries have no gold evidence and are excluded from evidence-retrieval metrics.</p>
+<table><thead><tr><th>Condition</th><th>Question generation</th><th>Questions</th><th>Documents</th><th>Chunk / overlap</th><th>Chunks / vectors</th><th>Retrieval</th><th>Generator</th><th>Evidence Recall@1</th><th>Evidence Recall@5</th><th>Evidence Recall@10</th><th>Full-evidence@5</th><th>MRR@10</th></tr></thead>
+<tbody><tr class="base"><td><b>Baseline</b></td><td class="left">None</td><td>0</td><td>609</td><td>1024 / 128</td><td>1830</td><td class="left">Dense chunk-vector retrieval + BM25 keyword retrieval; RRF k=60</td><td>None</td><td><b>0.206</b></td><td><b>0.510</b></td><td><b>0.666</b></td><td><b>0.211</b></td><td><b>0.644</b></td></tr></tbody></table>
+<p class="note">Source: <code>results/mhrag_full_baseline_1024_128/metrics.json</code></p></main></body></html>

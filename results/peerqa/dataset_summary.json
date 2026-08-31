@@ -1,0 +1,26 @@
+{
+  "num_papers": 15,
+  "corpora": [
+    "egu/esd",
+    "egu/esurf",
+    "nlpeer/ARR-22",
+    "nlpeer/COLING2020",
+    "nlpeer/F1000-22",
+    "nlpeer/PeerRead-ACL2017"
+  ],
+  "num_sentences_total": 4598,
+  "num_questions_usable": 65,
+  "num_chunks": 333,
+  "avg_sentences_per_chunk": 16.1,
+  "tokens_per_chunk": {
+    "min": 9,
+    "max": 664,
+    "mean": 506.0,
+    "median": 517
+  },
+  "chunk_size_target": 500,
+  "chunk_size_cap": 600,
+  "chunk_overlap_tokens": 100,
+  "num_eval_queries": 65,
+  "already_chunked_note": "PeerQA ships paper text pre-segmented at the SENTENCE level (papers.jsonl: idx/pidx/sidx/type/content/last_heading). Sentences are ~10-30 tokens (far below a RAG chunk) with NO overlap. We pack consecutive sentences into ~500-token chunks (cap 600) with 100-token overlap; gold sentence idxs map onto parent chunks."
+}

@@ -1,0 +1,28 @@
+{
+  "accepted_counts": {
+    "atomic": 410,
+    "relation": 436,
+    "causal": 420,
+    "temporal": 358,
+    "comparison": 385,
+    "compositional": 307,
+    "broad": 188
+  },
+  "chunk_coverage": {
+    "atomic": 87,
+    "relation": 86,
+    "causal": 89,
+    "temporal": 85,
+    "comparison": 83,
+    "compositional": 83,
+    "broad": 70
+  },
+  "rejected": {
+    "ungrounded": 714,
+    "not_self_contained": 429,
+    "roundtrip": 238,
+    "near_duplicate": 33
+  },
+  "roundtrip_parent_top_k": 10,
+  "near_duplicate_cosine": 0.93
+}

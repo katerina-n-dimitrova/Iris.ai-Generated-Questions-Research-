@@ -1,0 +1,560 @@
+{
+  "crosstab_arm": "B1",
+  "crosstab": {
+    "arm": "B1",
+    "mode": "hybrid",
+    "success_metric": "hit@5",
+    "by_query_type": {
+      "inference": {
+        "n": 29,
+        "n_present": 29,
+        "success_present": 0.931,
+        "n_absent": 0,
+        "success_absent": null
+      },
+      "comparison": {
+        "n": 17,
+        "n_present": 0,
+        "success_present": null,
+        "n_absent": 17,
+        "success_absent": 0.941
+      },
+      "temporal": {
+        "n": 23,
+        "n_present": 18,
+        "success_present": 1.0,
+        "n_absent": 5,
+        "success_absent": 1.0
+      }
+    },
+    "overall": {
+      "success_present": 0.957,
+      "n_present": 47,
+      "success_absent": 0.955,
+      "n_absent": 22
+    },
+    "per_query": [
+      {
+        "query_id": "q00022",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00040",
+        "mh_type": "temporal",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q00090",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q00118",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00141",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00189",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00215",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00222",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00232",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00349",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00421",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00428",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q00485",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q00539",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 0,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q00558",
+        "mh_type": "temporal",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q00581",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00610",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00652",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00661",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q00684",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00693",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00712",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q00768",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00782",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q00848",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00850",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00912",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q00963",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q00999",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01025",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q01045",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01088",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q01098",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01144",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01218",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01292",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01357",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01406",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01412",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01413",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01441",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q01445",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01454",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q01500",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01518",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01661",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01670",
+        "mh_type": "temporal",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q01682",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01709",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01799",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q01886",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01922",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01975",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q01985",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q02005",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q02018",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q02111",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q02119",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q02125",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q02137",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q02219",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q02271",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q02351",
+        "mh_type": "temporal",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q02357",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q02415",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q02469",
+        "mh_type": "inference",
+        "cw_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "q02477",
+        "mh_type": "temporal",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q02487",
+        "mh_type": "comparison",
+        "cw_type": "DISJUNCTIVE",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "q02499",
+        "mh_type": "temporal",
+        "cw_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      }
+    ]
+  },
+  "coverage": {
+    "B1": {
+      "arm": "B1",
+      "coverage": 0.681,
+      "n_present": 47,
+      "n": 69
+    },
+    "E1": {
+      "arm": "E1",
+      "coverage": 1.0,
+      "n_present": 69,
+      "n": 69
+    }
+  },
+  "type_distribution": {
+    "B1": {
+      "VERIFICATION": 156,
+      "DISJUNCTIVE": 32,
+      "CONCEPT": 501,
+      "EXTENT": 356,
+      "EXAMPLE": 262,
+      "COMPARISON": 139,
+      "CAUSE": 110,
+      "CONSEQUENCE": 167,
+      "PROCEDURAL": 77
+    },
+    "E1": {
+      "VERIFICATION": 207,
+      "DISJUNCTIVE": 159,
+      "CONCEPT": 212,
+      "EXTENT": 187,
+      "EXAMPLE": 179,
+      "COMPARISON": 312,
+      "CAUSE": 183,
+      "CONSEQUENCE": 201,
+      "PROCEDURAL": 160
+    }
+  }
+}

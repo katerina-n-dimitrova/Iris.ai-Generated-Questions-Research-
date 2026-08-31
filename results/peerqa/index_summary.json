@@ -1,0 +1,41 @@
+{
+  "embedding_model": "huggingface:Octen/Octen-Embedding-0.6B:dim1024",
+  "chunk_encode_seconds": 65.26,
+  "question_encode_seconds": 30.68,
+  "num_chunks": 333,
+  "num_question_vectors_embedded": 4276,
+  "conditions": [
+    {
+      "condition": "baseline",
+      "n_questions_per_chunk": 0,
+      "num_embeddings": 333,
+      "record_type": "chunk_text",
+      "chroma_add_seconds": 0.236,
+      "index_size_mb": 11.528
+    },
+    {
+      "condition": "q5",
+      "n_questions_per_chunk": 5,
+      "num_embeddings": 1665,
+      "record_type": "generated_questions",
+      "chroma_add_seconds": 0.47,
+      "index_size_mb": 17.588
+    },
+    {
+      "condition": "q10",
+      "n_questions_per_chunk": 10,
+      "num_embeddings": 3329,
+      "record_type": "generated_questions",
+      "chroma_add_seconds": 0.912,
+      "index_size_mb": 26.302
+    },
+    {
+      "condition": "q13",
+      "n_questions_per_chunk": 13,
+      "num_embeddings": 4276,
+      "record_type": "generated_questions",
+      "chroma_add_seconds": 1.177,
+      "index_size_mb": 32.472
+    }
+  ]
+}

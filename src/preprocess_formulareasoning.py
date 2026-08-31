@@ -54,8 +54,9 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]", " ", s.lower())).strip()
 
 
-def _gold_for_question(args: List[Dict[str, Any]],
-                       formula_vars: List[Tuple[str, List[str]]]) -> List[str]:
+def _gold_for_question(
+    args: List[Dict[str, Any]], formula_vars: List[Tuple[str, List[str]]]
+) -> List[str]:
     """A formula is relevant if every variable name appears in the question's
     annotated quantity names."""
     qtext = " ; ".join(_norm(a.get("en_name", "")) for a in args)
@@ -66,8 +67,9 @@ def _gold_for_question(args: List[Dict[str, Any]],
     return gold
 
 
-def build_documents(use_llm: bool = False, max_samples: int = config.MAX_DATASET_SAMPLES
-                    ) -> Dict[str, List[Dict[str, Any]]]:
+def build_documents(
+    use_llm: bool = False, max_samples: int = config.MAX_DATASET_SAMPLES
+) -> Dict[str, List[Dict[str, Any]]]:
     client = config.get_openai_client() if use_llm else None
     formulas = _load("formulas.json")
 
@@ -81,54 +83,69 @@ def build_documents(use_llm: bool = False, max_samples: int = config.MAX_DATASET
             continue
         variables = _formula_vars(f)
         var_names = [nm for nm, _ in variables]
-        var_readable = ", ".join(f"{nm} ({sym})" if sym else nm
-                                 for nm, sym in variables)
+        var_readable = ", ".join(
+            f"{nm} ({sym})" if sym else nm for nm, sym in variables
+        )
 
-        base_text = formula_en + (f"  | variables: {', '.join(var_names)}"
-                                  if var_names else "")
-        baseline.append(make_record(
-            chunk_id=f"formula_{key}_baseline",
-            dataset="formulareasoning",
-            input_type=SPEC.input_type,
-            condition="baseline",
-            text_for_embedding=base_text,
-            original_text=formula_en,
-            source_id=key,
-            title=formula_en,
-        ))
+        base_text = formula_en + (
+            f"  | variables: {', '.join(var_names)}" if var_names else ""
+        )
+        baseline.append(
+            make_record(
+                chunk_id=f"formula_{key}_baseline",
+                dataset="formulareasoning",
+                input_type=SPEC.input_type,
+                condition="baseline",
+                text_for_embedding=base_text,
+                original_text=formula_en,
+                source_id=key,
+                title=formula_en,
+            )
+        )
 
-        summary = common.llm_summary(client, f"Physics formula {formula_en} "
-                                     f"with variables {var_readable}",
-                                     kind="physics formula") \
-            if use_llm else ", ".join(var_names)
-        enriched_text = render_enriched({
-            "Dataset": "FormulaReasoning",
-            "Document type": "physics formula",
-            "Formula": formula_en,
-            "Variables": var_readable,
-            "Keywords / quantities": summary,
-        })
-        enriched.append(make_record(
-            chunk_id=f"formula_{key}_enriched",
-            dataset="formulareasoning",
-            input_type=SPEC.input_type,
-            condition="enriched",
-            text_for_embedding=enriched_text,
-            original_text=formula_en,
-            source_id=key,
-            title=formula_en,
-        ))
+        summary = (
+            common.llm_summary(
+                client,
+                f"Physics formula {formula_en} with variables {var_readable}",
+                kind="physics formula",
+            )
+            if use_llm
+            else ", ".join(var_names)
+        )
+        enriched_text = render_enriched(
+            {
+                "Dataset": "FormulaReasoning",
+                "Document type": "physics formula",
+                "Formula": formula_en,
+                "Variables": var_readable,
+                "Keywords / quantities": summary,
+            }
+        )
+        enriched.append(
+            make_record(
+                chunk_id=f"formula_{key}_enriched",
+                dataset="formulareasoning",
+                input_type=SPEC.input_type,
+                condition="enriched",
+                text_for_embedding=enriched_text,
+                original_text=formula_en,
+                source_id=key,
+                title=formula_en,
+            )
+        )
 
     return {"baseline": baseline, "enriched": enriched}
 
 
-def build_queries(max_samples: int = config.MAX_DATASET_SAMPLES) -> List[Dict[str, Any]]:
+def build_queries(
+    max_samples: int = config.MAX_DATASET_SAMPLES,
+) -> List[Dict[str, Any]]:
     formulas = _load("formulas.json")
     tests = _load("HeF_test.json")
 
-    formula_vars = [(str(f["key"]),
-                     [_norm(nm) for nm, _ in _formula_vars(f)])
-                    for f in formulas]
+    formula_vars = [
+        (str(f["key"]), [_norm(nm) for nm, _ in _formula_vars(f)]) for f in formulas
+    ]
 
     queries: List[Dict[str, Any]] = []
     for t in tests:
@@ -139,13 +156,15 @@ def build_queries(max_samples: int = config.MAX_DATASET_SAMPLES) -> List[Dict[st
         gold = _gold_for_question(t.get("arguments", []), formula_vars)
         if not gold:
             continue  # keep only queries with a derivable gold formula
-        queries.append({
-            "query_id": str(t.get("id")),
-            "dataset": "formulareasoning",
-            "text": text,
-            "gold_source_ids": gold,
-            "gold_answer": str(t.get("answer", "")),
-        })
+        queries.append(
+            {
+                "query_id": str(t.get("id")),
+                "dataset": "formulareasoning",
+                "text": text,
+                "gold_source_ids": gold,
+                "gold_answer": str(t.get("answer", "")),
+            }
+        )
         if len(queries) >= max_samples:
             break
     return queries
@@ -160,8 +179,10 @@ def main() -> None:
     docs = build_documents(args.use_llm, args.max_samples)
     for condition in config.CONDITIONS:
         n = common.write_jsonl(SPEC.processed_path(condition), docs[condition])
-        print(f"formulareasoning {condition}: {n} chunks "
-              f"-> {SPEC.processed_path(condition).name}")
+        print(
+            f"formulareasoning {condition}: {n} chunks "
+            f"-> {SPEC.processed_path(condition).name}"
+        )
 
     queries = build_queries(args.max_samples)
     qpath = config.PROCESSED_DIR / "formulareasoning_queries.jsonl"

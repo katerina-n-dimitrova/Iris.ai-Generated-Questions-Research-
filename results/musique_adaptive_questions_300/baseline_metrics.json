@@ -1,0 +1,39 @@
+{
+  "protocol": {
+    "dataset": "dgslibisey/MuSiQue",
+    "source_split": "development (answerable)",
+    "text_only": true,
+    "articles": 300,
+    "chunks": 300,
+    "eligible_queries": 185,
+    "unresolved_queries": 0,
+    "alignment_methods": {
+      "paragraph_support_idx": 493
+    },
+    "chunk_size": 1024,
+    "chunk_overlap": 128,
+    "selection_seed": 42,
+    "generation_model": "None for Baseline; gpt-5.4-mini for adaptive conditions",
+    "embedding": "Iris dim-384",
+    "retrieval": "dense chunk vectors + BM25 RRF for Baseline; 0.5 chunk/question vector fusion + BM25 RRF for adaptive conditions",
+    "rrf_k": 60
+  },
+  "condition": {
+    "condition": "Baseline",
+    "question_rule": "No generated questions",
+    "quality": {
+      "generated_questions": 0,
+      "questions_per_chunk_min": 0,
+      "questions_per_chunk_mean": 0.0,
+      "questions_per_chunk_max": 0
+    },
+    "stored_vectors": 300,
+    "metrics": {
+      "evidence_recall@1": 0.38063063063063063,
+      "evidence_recall@5": 0.7414414414414414,
+      "evidence_recall@10": 0.8207207207207207,
+      "all_evidence_hit@5": 0.4540540540540541,
+      "mrr@10": 0.9621621621621622
+    }
+  }
+}

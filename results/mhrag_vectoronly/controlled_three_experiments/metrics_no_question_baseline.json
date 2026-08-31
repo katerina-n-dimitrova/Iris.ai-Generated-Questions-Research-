@@ -1,0 +1,21 @@
+{
+  "protocol": {
+    "dataset": "MultiHop-RAG closed 15-article pilot",
+    "test_queries": 17,
+    "chunk_size": 1024,
+    "chunk_overlap": 128,
+    "generated_questions": 0,
+    "stored_vectors": 44,
+    "retrieval": "dense chunk vectors + BM25 chunk RRF",
+    "rrf_k": 60
+  },
+  "condition": "Baseline",
+  "metrics": {
+    "evidence_recall@1": 0.2892156862745098,
+    "evidence_recall@5": 0.838235294117647,
+    "evidence_recall@10": 0.9411764705882352,
+    "all_evidence_hit@5": 0.5882352941176471,
+    "mrr@10": 0.8529411764705882
+  },
+  "index": "mhrag_ctl_article_article_manual1024_chunks"
+}

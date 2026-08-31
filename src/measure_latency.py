@@ -56,33 +56,37 @@ def main() -> None:
         row: Dict = {"dataset": dataset, "condition": condition}
 
         if not offline.empty:
-            o = offline[(offline.dataset == dataset)
-                        & (offline.condition == condition)]
+            o = offline[(offline.dataset == dataset) & (offline.condition == condition)]
             if not o.empty:
                 o = o.iloc[0]
-                row.update({
-                    "num_chunks": int(o["num_chunks"]),
-                    "avg_tokens_per_chunk": o["avg_tokens_per_chunk"],
-                    "total_embedding_time_s": o["total_embedding_time_seconds"],
-                    "avg_embed_ms_per_chunk": o["avg_embedding_time_per_chunk_ms"],
-                    "total_indexing_time_s": o["total_indexing_time_seconds"],
-                    "index_size_mb": o["index_size_mb"],
-                })
+                row.update(
+                    {
+                        "num_chunks": int(o["num_chunks"]),
+                        "avg_tokens_per_chunk": o["avg_tokens_per_chunk"],
+                        "total_embedding_time_s": o["total_embedding_time_seconds"],
+                        "avg_embed_ms_per_chunk": o["avg_embedding_time_per_chunk_ms"],
+                        "total_indexing_time_s": o["total_indexing_time_seconds"],
+                        "index_size_mb": o["index_size_mb"],
+                    }
+                )
 
         if not online.empty:
-            q = online[(online.dataset == dataset)
-                       & (online.condition == condition)]
+            q = online[(online.dataset == dataset) & (online.condition == condition)]
             if not q.empty:
                 t = q["total_retrieval_latency_ms"]
-                row.update({
-                    "num_queries": len(q),
-                    "query_embed_ms_mean":
-                        round(q["query_embedding_latency_ms"].mean(), 3),
-                    "chroma_search_ms_mean":
-                        round(q["chroma_search_latency_ms"].mean(), 3),
-                    "retrieval_ms_mean": round(t.mean(), 3),
-                    "retrieval_ms_p95": round(t.quantile(0.95), 3),
-                })
+                row.update(
+                    {
+                        "num_queries": len(q),
+                        "query_embed_ms_mean": round(
+                            q["query_embedding_latency_ms"].mean(), 3
+                        ),
+                        "chroma_search_ms_mean": round(
+                            q["chroma_search_latency_ms"].mean(), 3
+                        ),
+                        "retrieval_ms_mean": round(t.mean(), 3),
+                        "retrieval_ms_p95": round(t.quantile(0.95), 3),
+                    }
+                )
         rows.append(row)
 
     df = pd.DataFrame(rows)

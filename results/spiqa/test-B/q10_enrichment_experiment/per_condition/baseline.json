@@ -1,0 +1,23 @@
+{
+  "condition": "baseline",
+  "metrics": {
+    "hit@1": 0.4459,
+    "hit@5": 0.7568,
+    "hit@10": 0.8108,
+    "recall@1": 0.1275,
+    "recall@5": 0.415,
+    "recall@10": 0.5826,
+    "mrr": 0.5696,
+    "ndcg@10": 0.6128
+  },
+  "questions_generated": 0,
+  "questions_kept": 0,
+  "filtered_pct": 0.0,
+  "n_embeddings": 1026,
+  "index_size_mb": 9.328,
+  "search_p95_ms": 0.078,
+  "search_mean_ms": 0.082,
+  "query_embed_mean_ms": 34.716,
+  "encode_seconds": 0.0,
+  "build_seconds": 3.1
+}

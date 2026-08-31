@@ -1,0 +1,63 @@
+{
+  "protocol": {
+    "test_queries": 17,
+    "article_vectors": 15,
+    "chunking": "1024 / 128",
+    "dense_fusion": "equal 1/3 article, chunk, and question cosine",
+    "sparse_fusion": "BM25 chunk ranking via RRF k=60"
+  },
+  "conditions": [
+    {
+      "condition": "Baseline B",
+      "question_generation": "Fixed 10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 1024,
+      "chunk_overlap": 128,
+      "articles_embedded": 15,
+      "chunks_embedded": 44,
+      "stored_vectors": 209,
+      "generation_model": "gpt-5.4-mini",
+      "embedding": "Iris dim384",
+      "dense_fusion": "1/3 whole-article + 1/3 chunk + 1/3 mapped-question cosine",
+      "retrieval": "three-way dense score fusion + BM25 chunk RRF",
+      "metrics": {
+        "evidence_recall@1": 0.3088235294117647,
+        "evidence_recall@5": 0.8284313725490196,
+        "evidence_recall@10": 0.9411764705882352,
+        "all_evidence_hit@5": 0.5294117647058824,
+        "mrr@10": 0.892156862745098
+      },
+      "indexes": [
+        "mhrag_ctl_article_whole_articles",
+        "mhrag_ctl_article_article_manual1024_chunks",
+        "mhrag_ctl_article_article_manual1024_questions"
+      ]
+    },
+    {
+      "condition": "Adaptive facts B",
+      "question_generation": "Adaptive 5\u201320 questions from distinct-fact analysis",
+      "generated_questions": 239,
+      "chunk_size": 1024,
+      "chunk_overlap": 128,
+      "articles_embedded": 15,
+      "chunks_embedded": 44,
+      "stored_vectors": 298,
+      "generation_model": "gpt-5.4-mini",
+      "embedding": "Iris dim384",
+      "dense_fusion": "1/3 whole-article + 1/3 chunk + 1/3 mapped-question cosine",
+      "retrieval": "three-way dense score fusion + BM25 chunk RRF",
+      "metrics": {
+        "evidence_recall@1": 0.3382352941176471,
+        "evidence_recall@5": 0.9068627450980392,
+        "evidence_recall@10": 0.9411764705882352,
+        "all_evidence_hit@5": 0.7058823529411765,
+        "mrr@10": 0.9215686274509803
+      },
+      "indexes": [
+        "mhrag_ctl_article_whole_articles",
+        "mhrag_ctl_article_adaptive_fact1024_chunks",
+        "mhrag_ctl_article_adaptive_fact1024_questions"
+      ]
+    }
+  ]
+}

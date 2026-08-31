@@ -1,0 +1,22 @@
+{
+  "baseline": {
+    "collection": "mhrag_vo_baseline_chunks",
+    "num_vectors": 154,
+    "embed_seconds": 11.79,
+    "add_seconds": 0.09,
+    "index_size_mb": 29.987
+  },
+  "generated": {
+    "collection": "mhrag_vo_generated_questions",
+    "num_vectors": 1540,
+    "num_parent_chunks": 154,
+    "questions_per_chunk_avg": 10.0,
+    "embed_seconds": 7.32,
+    "add_seconds": 0.5,
+    "index_size_mb": 36.391
+  },
+  "embedding_model": "huggingface:Octen/Octen-Embedding-0.6B:dim1024",
+  "vector_dim": 1024,
+  "distance_metric": "cosine",
+  "index_ratio_B_over_A": 10.0
+}

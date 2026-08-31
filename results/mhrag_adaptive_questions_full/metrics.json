@@ -1,0 +1,152 @@
+{
+  "protocol": {
+    "articles": 609,
+    "chunks": 1830,
+    "eligible_queries": 2255,
+    "unresolved_queries": 0,
+    "alignment_methods": {
+      "exact": 6084
+    },
+    "chunk_size": 1024,
+    "chunk_overlap": 128,
+    "selection_seed": null,
+    "generation_model": "gpt-5.4-mini",
+    "embedding": "Iris dim-384",
+    "retrieval": "0.5 chunk/question vector fusion + BM25 RRF",
+    "rrf_k": 60,
+    "skipped_question_generation_chunks": 29,
+    "article_question_generation": {
+      "articles": 609,
+      "rule": "clamp(5, 20, round(article facts * 0.5))",
+      "dense_fusion": "equal 1/3 chunk + chunk-question + article-question"
+    },
+    "article_summary_generation": {
+      "articles": 609,
+      "summaries": 609,
+      "summary_length": "120-180 words",
+      "dense_fusion": "equal 1/3 chunk + chunk-question + article-summary"
+    },
+    "unbounded_article_question_generation": {
+      "articles": 609,
+      "rule": "round(article facts * 0.5), no bounds",
+      "dense_fusion": "equal 1/3 chunk + chunk-question + article-question"
+    }
+  },
+  "conditions": [
+    {
+      "condition": "Baseline",
+      "question_rule": "No generated questions",
+      "quality": {
+        "generated_questions": 0,
+        "questions_per_chunk_min": 0,
+        "questions_per_chunk_mean": 0.0,
+        "questions_per_chunk_max": 0
+      },
+      "stored_vectors": 1830,
+      "metrics": {
+        "evidence_recall@1": 0.20594974131559496,
+        "evidence_recall@5": 0.51019955654102,
+        "evidence_recall@10": 0.6663710273466371,
+        "all_evidence_hit@5": 0.21108647450110865,
+        "mrr@10": 0.6442788512300707
+      }
+    },
+    {
+      "condition": "Adaptive generated questions 5–20",
+      "question_rule": "clamp(5, 20, round(facts * 0.5))",
+      "quality": {
+        "generated_questions": 28165,
+        "questions_per_chunk_min": 0,
+        "questions_per_chunk_mean": 15.390710382513662,
+        "questions_per_chunk_max": 20
+      },
+      "stored_vectors": 29995,
+      "metrics": {
+        "evidence_recall@1": 0.21747967479674796,
+        "evidence_recall@5": 0.5503325942350332,
+        "evidence_recall@10": 0.7055432372505543,
+        "all_evidence_hit@5": 0.26031042128603105,
+        "mrr@10": 0.6696058142399607
+      }
+    },
+    {
+      "condition": "Adaptive generated questions unbounded",
+      "question_rule": "round(facts * 0.5), no bounds",
+      "quality": {
+        "generated_questions": 30816,
+        "questions_per_chunk_min": 0,
+        "questions_per_chunk_mean": 16.839344262295082,
+        "questions_per_chunk_max": 44
+      },
+      "stored_vectors": 32646,
+      "metrics": {
+        "evidence_recall@1": 0.21674057649667405,
+        "evidence_recall@5": 0.5511456023651147,
+        "evidence_recall@10": 0.7080561714708057,
+        "all_evidence_hit@5": 0.2572062084257206,
+        "mrr@10": 0.6698729454827016
+      }
+    },
+    {
+      "condition": "Adaptive chunk + whole-article questions 5–20",
+      "question_rule": "chunk: clamp(5, 20, round(facts * 0.5)); article: clamp(5, 20, round(article facts * 0.5))",
+      "quality": {
+        "generated_questions": 40247,
+        "chunk_questions": 28165,
+        "article_questions": 12082,
+        "questions_per_chunk_min": 0,
+        "questions_per_chunk_max": 20,
+        "questions_per_article_min": 7,
+        "questions_per_article_max": 20
+      },
+      "stored_vectors": 42077,
+      "metrics": {
+        "evidence_recall@1": 0.21954915003695488,
+        "evidence_recall@5": 0.5506651884700665,
+        "evidence_recall@10": 0.7077235772357724,
+        "all_evidence_hit@5": 0.258980044345898,
+        "mrr@10": 0.6723202407348748
+      }
+    },
+    {
+      "condition": "Adaptive chunk questions + whole-article summary",
+      "question_rule": "adaptive bounded chunk questions + one 120-180-word article summary",
+      "quality": {
+        "generated_questions": 28165,
+        "chunk_questions": 28165,
+        "article_summaries": 609,
+        "questions_per_chunk_min": 0,
+        "questions_per_chunk_max": 20
+      },
+      "stored_vectors": 30604,
+      "metrics": {
+        "evidence_recall@1": 0.21685144124168515,
+        "evidence_recall@5": 0.552180339985218,
+        "evidence_recall@10": 0.709349593495935,
+        "all_evidence_hit@5": 0.24878048780487805,
+        "mrr@10": 0.6733581459191216
+      }
+    },
+    {
+      "condition": "Adaptive chunk + whole-article questions unbounded",
+      "question_rule": "chunk and article: round(facts * 0.5), no bounds",
+      "quality": {
+        "generated_questions": 61227,
+        "chunk_questions": 30816,
+        "article_questions": 30411,
+        "questions_per_chunk_min": 0,
+        "questions_per_chunk_max": 44,
+        "questions_per_article_min": 7,
+        "questions_per_article_max": 464
+      },
+      "stored_vectors": 63057,
+      "metrics": {
+        "evidence_recall@1": 0.21888396156688836,
+        "evidence_recall@5": 0.5463045084996305,
+        "evidence_recall@10": 0.711160384331116,
+        "all_evidence_hit@5": 0.2492239467849224,
+        "mrr@10": 0.6711732305634744
+      }
+    }
+  ]
+}

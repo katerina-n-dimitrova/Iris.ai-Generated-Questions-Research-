@@ -1,0 +1,622 @@
+{
+  "protocol": {
+    "questions_per_article": 10,
+    "articles": 15,
+    "question_to_chunk_mapping": "verbatim evidence + established fuzzy fallback",
+    "embedding": "Iris dim384 for chunks, questions, and user queries",
+    "test_queries": 17,
+    "score_fusion": "0.5 chunk cosine + 0.5 best supporting-question cosine",
+    "threshold_selected_on": "development only",
+    "experiment_2b_thresholds": {
+      "article_manual512": 0.653627,
+      "article_manual1024": 0.556713,
+      "article_gepa512": 0.556454,
+      "article_mipro512": 0.575588
+    },
+    "experiment_2b_bm25_threshold": 0.671142
+  },
+  "conditions": [
+    {
+      "experiment": "Experiment 1B",
+      "condition": "Article-E1-ManualPrompt",
+      "config": "article_manual512",
+      "retrieval_method": "article_dual",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 512,
+      "chunk_overlap": 128,
+      "stored_vectors": 243,
+      "prompt_version": "manual_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.21078431372549017,
+        "evidence_recall@5": 0.5833333333333333,
+        "evidence_recall@10": 0.8284313725490196,
+        "all_evidence_hit@5": 0.29411764705882354,
+        "mrr@10": 0.7156862745098039
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_manual512_chunks",
+        "mhrag_ctl_article_article_manual512_questions"
+      ],
+      "route_analysis": null,
+      "threshold": null
+    },
+    {
+      "experiment": "Experiment 1B",
+      "condition": "Article-E1-BM25",
+      "config": "article_manual512",
+      "retrieval_method": "article_dual_bm25",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 512,
+      "chunk_overlap": 128,
+      "stored_vectors": 243,
+      "prompt_version": "manual_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.19117647058823528,
+        "evidence_recall@5": 0.6715686274509803,
+        "evidence_recall@10": 0.838235294117647,
+        "all_evidence_hit@5": 0.35294117647058826,
+        "mrr@10": 0.7254901960784315
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_manual512_chunks",
+        "mhrag_ctl_article_article_manual512_questions"
+      ],
+      "route_analysis": null,
+      "threshold": null
+    },
+    {
+      "experiment": "Experiment 1B",
+      "condition": "Article-E1-LargeChunk",
+      "config": "article_manual1024",
+      "retrieval_method": "article_dual",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 1024,
+      "chunk_overlap": 128,
+      "stored_vectors": 194,
+      "prompt_version": "manual_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.2892156862745098,
+        "evidence_recall@5": 0.7254901960784313,
+        "evidence_recall@10": 0.8970588235294117,
+        "all_evidence_hit@5": 0.4117647058823529,
+        "mrr@10": 0.8627450980392156
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_manual1024_chunks",
+        "mhrag_ctl_article_article_manual1024_questions"
+      ],
+      "route_analysis": null,
+      "threshold": null
+    },
+    {
+      "experiment": "Experiment 1B",
+      "condition": "Article-E1-LargeChunk-BM25",
+      "config": "article_manual1024",
+      "retrieval_method": "article_dual_bm25",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 1024,
+      "chunk_overlap": 128,
+      "stored_vectors": 194,
+      "prompt_version": "manual_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.2892156862745098,
+        "evidence_recall@5": 0.8284313725490196,
+        "evidence_recall@10": 0.9411764705882352,
+        "all_evidence_hit@5": 0.5882352941176471,
+        "mrr@10": 0.8627450980392156
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_manual1024_chunks",
+        "mhrag_ctl_article_article_manual1024_questions"
+      ],
+      "route_analysis": null,
+      "threshold": null
+    },
+    {
+      "experiment": "Experiment 1B",
+      "condition": "Article-E1-GEPA",
+      "config": "article_gepa512",
+      "retrieval_method": "article_dual",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 512,
+      "chunk_overlap": 128,
+      "stored_vectors": 243,
+      "prompt_version": "gepa_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.14705882352941177,
+        "evidence_recall@5": 0.5637254901960784,
+        "evidence_recall@10": 0.8480392156862745,
+        "all_evidence_hit@5": 0.17647058823529413,
+        "mrr@10": 0.5931372549019607
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_gepa512_chunks",
+        "mhrag_ctl_article_article_gepa512_questions"
+      ],
+      "route_analysis": null,
+      "threshold": null
+    },
+    {
+      "experiment": "Experiment 1B",
+      "condition": "Article-E1-MIPROv2",
+      "config": "article_mipro512",
+      "retrieval_method": "article_dual",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 512,
+      "chunk_overlap": 128,
+      "stored_vectors": 243,
+      "prompt_version": "miprov2_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.3088235294117647,
+        "evidence_recall@5": 0.6617647058823529,
+        "evidence_recall@10": 0.7892156862745098,
+        "all_evidence_hit@5": 0.35294117647058826,
+        "mrr@10": 0.8647058823529411
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_mipro512_chunks",
+        "mhrag_ctl_article_article_mipro512_questions"
+      ],
+      "route_analysis": null,
+      "threshold": null
+    },
+    {
+      "experiment": "Experiment 2B",
+      "condition": "Article-E2-ManualPrompt",
+      "config": "article_manual512",
+      "retrieval_method": "article_fallback",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 512,
+      "chunk_overlap": 128,
+      "stored_vectors": 243,
+      "prompt_version": "manual_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.2156862745098039,
+        "evidence_recall@5": 0.5735294117647058,
+        "evidence_recall@10": 0.7352941176470589,
+        "all_evidence_hit@5": 0.23529411764705882,
+        "mrr@10": 0.7450980392156863
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_manual512_chunks",
+        "mhrag_ctl_article_article_manual512_questions"
+      ],
+      "route_analysis": {
+        "question_route_queries": 2,
+        "fallback_route_queries": 15,
+        "question_route_metrics": {
+          "evidence_recall@1": 0.3333333333333333,
+          "evidence_recall@5": 0.3333333333333333,
+          "evidence_recall@10": 0.3333333333333333,
+          "all_evidence_hit@5": 0.0,
+          "mrr@10": 1.0
+        },
+        "fallback_route_metrics": {
+          "evidence_recall@1": 0.2,
+          "evidence_recall@5": 0.6055555555555555,
+          "evidence_recall@10": 0.7888888888888889,
+          "all_evidence_hit@5": 0.26666666666666666,
+          "mrr@10": 0.711111111111111
+        },
+        "weak_question_without_fallback": {
+          "evidence_recall@1": 0.2611111111111111,
+          "evidence_recall@5": 0.5944444444444446,
+          "evidence_recall@10": 0.75,
+          "all_evidence_hit@5": 0.26666666666666666,
+          "mrr@10": 0.8027777777777777
+        },
+        "weak_question_with_fallback": {
+          "evidence_recall@1": 0.2,
+          "evidence_recall@5": 0.6055555555555555,
+          "evidence_recall@10": 0.7888888888888889,
+          "all_evidence_hit@5": 0.26666666666666666,
+          "mrr@10": 0.711111111111111
+        },
+        "fallback_delta_evidence_recall@5": 0.01111111111111096
+      },
+      "threshold": 0.653627
+    },
+    {
+      "experiment": "Experiment 3B",
+      "condition": "Article-E3-ManualPrompt",
+      "config": "article_manual512",
+      "retrieval_method": "article_question",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 512,
+      "chunk_overlap": 128,
+      "stored_vectors": 150,
+      "prompt_version": "manual_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.2696078431372549,
+        "evidence_recall@5": 0.5637254901960784,
+        "evidence_recall@10": 0.7009803921568627,
+        "all_evidence_hit@5": 0.23529411764705882,
+        "mrr@10": 0.8259803921568627
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_manual512_chunks",
+        "mhrag_ctl_article_article_manual512_questions"
+      ],
+      "route_analysis": null,
+      "threshold": null
+    },
+    {
+      "experiment": "Experiment 2B",
+      "condition": "Article-E2-BM25",
+      "config": "article_manual512",
+      "retrieval_method": "article_fallback_bm25",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 512,
+      "chunk_overlap": 128,
+      "stored_vectors": 243,
+      "prompt_version": "manual_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.2598039215686274,
+        "evidence_recall@5": 0.6127450980392156,
+        "evidence_recall@10": 0.8529411764705882,
+        "all_evidence_hit@5": 0.29411764705882354,
+        "mrr@10": 0.8382352941176471
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_manual512_chunks",
+        "mhrag_ctl_article_article_manual512_questions"
+      ],
+      "route_analysis": {
+        "question_route_queries": 2,
+        "fallback_route_queries": 15,
+        "question_route_metrics": {
+          "evidence_recall@1": 0.3333333333333333,
+          "evidence_recall@5": 0.3333333333333333,
+          "evidence_recall@10": 0.3333333333333333,
+          "all_evidence_hit@5": 0.0,
+          "mrr@10": 1.0
+        },
+        "fallback_route_metrics": {
+          "evidence_recall@1": 0.25,
+          "evidence_recall@5": 0.65,
+          "evidence_recall@10": 0.9222222222222222,
+          "all_evidence_hit@5": 0.3333333333333333,
+          "mrr@10": 0.8166666666666667
+        },
+        "weak_question_without_fallback": {
+          "evidence_recall@1": 0.2611111111111111,
+          "evidence_recall@5": 0.5944444444444446,
+          "evidence_recall@10": 0.75,
+          "all_evidence_hit@5": 0.26666666666666666,
+          "mrr@10": 0.8027777777777777
+        },
+        "weak_question_with_fallback": {
+          "evidence_recall@1": 0.25,
+          "evidence_recall@5": 0.65,
+          "evidence_recall@10": 0.9222222222222222,
+          "all_evidence_hit@5": 0.3333333333333333,
+          "mrr@10": 0.8166666666666667
+        },
+        "fallback_delta_evidence_recall@5": 0.05555555555555547
+      },
+      "threshold": 0.671142
+    },
+    {
+      "experiment": "Experiment 3B",
+      "condition": "Article-E3-BM25",
+      "config": "article_manual512",
+      "retrieval_method": "article_question_bm25",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 512,
+      "chunk_overlap": 128,
+      "stored_vectors": 150,
+      "prompt_version": "manual_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.2107843137254902,
+        "evidence_recall@5": 0.6029411764705882,
+        "evidence_recall@10": 0.838235294117647,
+        "all_evidence_hit@5": 0.23529411764705882,
+        "mrr@10": 0.7598039215686274
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_manual512_chunks",
+        "mhrag_ctl_article_article_manual512_questions"
+      ],
+      "route_analysis": null,
+      "threshold": null
+    },
+    {
+      "experiment": "Experiment 2B",
+      "condition": "Article-E2-LargeChunk",
+      "config": "article_manual1024",
+      "retrieval_method": "article_fallback",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 1024,
+      "chunk_overlap": 128,
+      "stored_vectors": 194,
+      "prompt_version": "manual_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.3480392156862745,
+        "evidence_recall@5": 0.6519607843137254,
+        "evidence_recall@10": 0.946078431372549,
+        "all_evidence_hit@5": 0.23529411764705882,
+        "mrr@10": 0.9607843137254901
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_manual1024_chunks",
+        "mhrag_ctl_article_article_manual1024_questions"
+      ],
+      "route_analysis": {
+        "question_route_queries": 12,
+        "fallback_route_queries": 5,
+        "question_route_metrics": {
+          "evidence_recall@1": 0.3611111111111111,
+          "evidence_recall@5": 0.7083333333333334,
+          "evidence_recall@10": 0.923611111111111,
+          "all_evidence_hit@5": 0.3333333333333333,
+          "mrr@10": 1.0
+        },
+        "fallback_route_metrics": {
+          "evidence_recall@1": 0.31666666666666665,
+          "evidence_recall@5": 0.5166666666666666,
+          "evidence_recall@10": 1.0,
+          "all_evidence_hit@5": 0.0,
+          "mrr@10": 0.8666666666666666
+        },
+        "weak_question_without_fallback": {
+          "evidence_recall@1": 0.31666666666666665,
+          "evidence_recall@5": 0.7333333333333333,
+          "evidence_recall@10": 0.8333333333333333,
+          "all_evidence_hit@5": 0.4,
+          "mrr@10": 0.9
+        },
+        "weak_question_with_fallback": {
+          "evidence_recall@1": 0.31666666666666665,
+          "evidence_recall@5": 0.5166666666666666,
+          "evidence_recall@10": 1.0,
+          "all_evidence_hit@5": 0.0,
+          "mrr@10": 0.8666666666666666
+        },
+        "fallback_delta_evidence_recall@5": -0.21666666666666667
+      },
+      "threshold": 0.556713
+    },
+    {
+      "experiment": "Experiment 3B",
+      "condition": "Article-E3-LargeChunk",
+      "config": "article_manual1024",
+      "retrieval_method": "article_question",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 1024,
+      "chunk_overlap": 128,
+      "stored_vectors": 150,
+      "prompt_version": "manual_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.3480392156862745,
+        "evidence_recall@5": 0.7156862745098039,
+        "evidence_recall@10": 0.8970588235294117,
+        "all_evidence_hit@5": 0.35294117647058826,
+        "mrr@10": 0.9705882352941176
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_manual1024_chunks",
+        "mhrag_ctl_article_article_manual1024_questions"
+      ],
+      "route_analysis": null,
+      "threshold": null
+    },
+    {
+      "experiment": "Experiment 3B",
+      "condition": "Article-E3-LargeChunk-BM25",
+      "config": "article_manual1024",
+      "retrieval_method": "article_question_bm25",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 1024,
+      "chunk_overlap": 128,
+      "stored_vectors": 150,
+      "prompt_version": "manual_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.3382352941176471,
+        "evidence_recall@5": 0.8284313725490196,
+        "evidence_recall@10": 0.9607843137254901,
+        "all_evidence_hit@5": 0.5294117647058824,
+        "mrr@10": 0.9411764705882353
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_manual1024_chunks",
+        "mhrag_ctl_article_article_manual1024_questions"
+      ],
+      "route_analysis": null,
+      "threshold": null
+    },
+    {
+      "experiment": "Experiment 2B",
+      "condition": "Article-E2-GEPA",
+      "config": "article_gepa512",
+      "retrieval_method": "article_fallback",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 512,
+      "chunk_overlap": 128,
+      "stored_vectors": 243,
+      "prompt_version": "gepa_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.1568627450980392,
+        "evidence_recall@5": 0.6519607843137255,
+        "evidence_recall@10": 0.7549019607843137,
+        "all_evidence_hit@5": 0.29411764705882354,
+        "mrr@10": 0.6588235294117647
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_gepa512_chunks",
+        "mhrag_ctl_article_article_gepa512_questions"
+      ],
+      "route_analysis": {
+        "question_route_queries": 8,
+        "fallback_route_queries": 9,
+        "question_route_metrics": {
+          "evidence_recall@1": 0.10416666666666666,
+          "evidence_recall@5": 0.625,
+          "evidence_recall@10": 0.75,
+          "all_evidence_hit@5": 0.25,
+          "mrr@10": 0.55625
+        },
+        "fallback_route_metrics": {
+          "evidence_recall@1": 0.2037037037037037,
+          "evidence_recall@5": 0.6759259259259259,
+          "evidence_recall@10": 0.7592592592592592,
+          "all_evidence_hit@5": 0.3333333333333333,
+          "mrr@10": 0.75
+        },
+        "weak_question_without_fallback": {
+          "evidence_recall@1": 0.05555555555555555,
+          "evidence_recall@5": 0.4166666666666667,
+          "evidence_recall@10": 0.6203703703703703,
+          "all_evidence_hit@5": 0.1111111111111111,
+          "mrr@10": 0.37716049382716055
+        },
+        "weak_question_with_fallback": {
+          "evidence_recall@1": 0.2037037037037037,
+          "evidence_recall@5": 0.6759259259259259,
+          "evidence_recall@10": 0.7592592592592592,
+          "all_evidence_hit@5": 0.3333333333333333,
+          "mrr@10": 0.75
+        },
+        "fallback_delta_evidence_recall@5": 0.25925925925925924
+      },
+      "threshold": 0.556454
+    },
+    {
+      "experiment": "Experiment 3B",
+      "condition": "Article-E3-GEPA",
+      "config": "article_gepa512",
+      "retrieval_method": "article_question",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 512,
+      "chunk_overlap": 128,
+      "stored_vectors": 150,
+      "prompt_version": "gepa_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.0784313725490196,
+        "evidence_recall@5": 0.5147058823529411,
+        "evidence_recall@10": 0.6813725490196078,
+        "all_evidence_hit@5": 0.17647058823529413,
+        "mrr@10": 0.461437908496732
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_gepa512_chunks",
+        "mhrag_ctl_article_article_gepa512_questions"
+      ],
+      "route_analysis": null,
+      "threshold": null
+    },
+    {
+      "experiment": "Experiment 2B",
+      "condition": "Article-E2-MIPROv2",
+      "config": "article_mipro512",
+      "retrieval_method": "article_fallback",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 512,
+      "chunk_overlap": 128,
+      "stored_vectors": 243,
+      "prompt_version": "miprov2_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.24509803921568624,
+        "evidence_recall@5": 0.5931372549019607,
+        "evidence_recall@10": 0.7156862745098039,
+        "all_evidence_hit@5": 0.29411764705882354,
+        "mrr@10": 0.7696078431372549
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_mipro512_chunks",
+        "mhrag_ctl_article_article_mipro512_questions"
+      ],
+      "route_analysis": {
+        "question_route_queries": 8,
+        "fallback_route_queries": 9,
+        "question_route_metrics": {
+          "evidence_recall@1": 0.3125,
+          "evidence_recall@5": 0.5208333333333333,
+          "evidence_recall@10": 0.6458333333333333,
+          "all_evidence_hit@5": 0.25,
+          "mrr@10": 0.7916666666666667
+        },
+        "fallback_route_metrics": {
+          "evidence_recall@1": 0.18518518518518517,
+          "evidence_recall@5": 0.6574074074074073,
+          "evidence_recall@10": 0.7777777777777778,
+          "all_evidence_hit@5": 0.3333333333333333,
+          "mrr@10": 0.75
+        },
+        "weak_question_without_fallback": {
+          "evidence_recall@1": 0.14814814814814814,
+          "evidence_recall@5": 0.6296296296296295,
+          "evidence_recall@10": 0.7592592592592592,
+          "all_evidence_hit@5": 0.3333333333333333,
+          "mrr@10": 0.6481481481481481
+        },
+        "weak_question_with_fallback": {
+          "evidence_recall@1": 0.18518518518518517,
+          "evidence_recall@5": 0.6574074074074073,
+          "evidence_recall@10": 0.7777777777777778,
+          "all_evidence_hit@5": 0.3333333333333333,
+          "mrr@10": 0.75
+        },
+        "fallback_delta_evidence_recall@5": 0.02777777777777779
+      },
+      "threshold": 0.575588
+    },
+    {
+      "experiment": "Experiment 3B",
+      "condition": "Article-E3-MIPROv2",
+      "config": "article_mipro512",
+      "retrieval_method": "article_question",
+      "question_generation": "10 questions per complete article",
+      "generated_questions": 150,
+      "chunk_size": 512,
+      "chunk_overlap": 128,
+      "stored_vectors": 150,
+      "prompt_version": "miprov2_article_v1",
+      "generation_model": "gpt-5.4-mini",
+      "metrics": {
+        "evidence_recall@1": 0.22549019607843135,
+        "evidence_recall@5": 0.5784313725490196,
+        "evidence_recall@10": 0.7058823529411765,
+        "all_evidence_hit@5": 0.29411764705882354,
+        "mrr@10": 0.7156862745098039
+      },
+      "indexes": [
+        "mhrag_ctl_article_article_mipro512_chunks",
+        "mhrag_ctl_article_article_mipro512_questions"
+      ],
+      "route_analysis": null,
+      "threshold": null
+    }
+  ]
+}

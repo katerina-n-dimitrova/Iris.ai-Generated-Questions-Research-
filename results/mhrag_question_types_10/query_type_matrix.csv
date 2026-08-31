@@ -1,0 +1,4 @@
+benchmark_query_type,baseline,atomic,relation,causal,temporal,comparison,compositional,broad
+comparison,0.4118,0.4608,0.2941,0.4314,0.3922,0.2549,0.2549,0.3725
+inference,0.4741,0.3046,0.3707,0.4741,0.158,0.3103,0.3132,0.3908
+temporal,0.5652,0.3406,0.1812,0.3623,0.4493,0.1739,0.1957,0.3986

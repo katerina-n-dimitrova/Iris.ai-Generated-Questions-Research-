@@ -32,8 +32,13 @@ def write_jsonl(path: Path, rows: Iterable[Dict[str, Any]]) -> int:
     return n
 
 
-def upsert_csv(path: Path, fieldnames: Sequence[str], new_rows: List[Dict],
-               group_fields: Sequence[str], rebuilt_groups: set) -> None:
+def upsert_csv(
+    path: Path,
+    fieldnames: Sequence[str],
+    new_rows: List[Dict],
+    group_fields: Sequence[str],
+    rebuilt_groups: set,
+) -> None:
     """
     Write `new_rows` to a CSV, preserving any existing rows whose group
     (tuple of group_fields, e.g. (dataset, condition)) was NOT rebuilt this run.
@@ -133,11 +138,51 @@ def estimate_tokens(text: str) -> int:
 # --------------------------------------------------------------------------- #
 _WORD_RE = re.compile(r"[A-Za-z][A-Za-z\-]{2,}")
 _STOPWORDS = {
-    "the", "and", "for", "are", "but", "not", "you", "all", "any", "can",
-    "had", "her", "was", "one", "our", "out", "has", "his", "this", "that",
-    "with", "from", "they", "have", "were", "their", "which", "these", "such",
-    "also", "into", "than", "then", "them", "been", "more", "most", "other",
-    "some", "what", "when", "where", "while", "about", "between",
+    "the",
+    "and",
+    "for",
+    "are",
+    "but",
+    "not",
+    "you",
+    "all",
+    "any",
+    "can",
+    "had",
+    "her",
+    "was",
+    "one",
+    "our",
+    "out",
+    "has",
+    "his",
+    "this",
+    "that",
+    "with",
+    "from",
+    "they",
+    "have",
+    "were",
+    "their",
+    "which",
+    "these",
+    "such",
+    "also",
+    "into",
+    "than",
+    "then",
+    "them",
+    "been",
+    "more",
+    "most",
+    "other",
+    "some",
+    "what",
+    "when",
+    "where",
+    "while",
+    "about",
+    "between",
 }
 
 

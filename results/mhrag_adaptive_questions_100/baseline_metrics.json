@@ -1,0 +1,36 @@
+{
+  "protocol": {
+    "articles": 100,
+    "chunks": 313,
+    "eligible_queries": 845,
+    "unresolved_queries": 0,
+    "alignment_methods": {
+      "exact": 2560
+    },
+    "chunk_size": 1024,
+    "chunk_overlap": 128,
+    "selection_seed": 42,
+    "generation_model": "None for Baseline; gpt-5.4-mini for adaptive conditions",
+    "embedding": "Iris dim-384",
+    "retrieval": "dense chunk vectors + BM25 RRF for Baseline; 0.5 chunk/question vector fusion + BM25 RRF for adaptive conditions",
+    "rrf_k": 60
+  },
+  "condition": {
+    "condition": "Baseline",
+    "question_rule": "No generated questions",
+    "quality": {
+      "generated_questions": 0,
+      "questions_per_chunk_min": 0,
+      "questions_per_chunk_mean": 0.0,
+      "questions_per_chunk_max": 0
+    },
+    "stored_vectors": 313,
+    "metrics": {
+      "evidence_recall@1": 0.1776134122287968,
+      "evidence_recall@5": 0.48471400394477315,
+      "evidence_recall@10": 0.6866863905325444,
+      "all_evidence_hit@5": 0.14911242603550295,
+      "mrr@10": 0.6484084718700104
+    }
+  }
+}

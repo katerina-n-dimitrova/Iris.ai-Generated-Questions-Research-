@@ -1,0 +1,19 @@
+{
+  "question_count": 2556,
+  "model": "gpt-5.4-mini",
+  "seed": 20260817,
+  "generation_split": "evaluation",
+  "question_types": {
+    "temporal_query": 583,
+    "inference_query": 816,
+    "comparison_query": 856,
+    "null_query": 301
+  },
+  "evidence_document_counts": {
+    "4": 174,
+    "3": 723,
+    "2": 1358,
+    "0": 301
+  },
+  "leakage_note": "Evaluation prompts and artifacts are isolated from all chunk-enrichment question generation."
+}

@@ -70,8 +70,16 @@ CHROMA_DATABASE = os.getenv("CHROMA_DATABASE", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 OPENAI_CHAT_MODEL = os.getenv("OPENAI_CHAT_MODEL", "gpt-4o-mini")
 OPENAI_EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+XAI_API_KEY = os.getenv("XAI_API_KEY", "")
+XAI_CHAT_MODEL = os.getenv("XAI_CHAT_MODEL", "grok-4.6")
+XAI_BASE_URL = os.getenv("XAI_BASE_URL", "https://api.x.ai/v1")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_CHAT_MODEL = os.getenv("GROQ_CHAT_MODEL", "qwen/qwen3.6-27b")
+GROQ_BASE_URL = os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
 
-CHROMA_COLLECTION_PREFIX = os.getenv("CHROMA_COLLECTION_PREFIX", "context_enrichment_rag")
+CHROMA_COLLECTION_PREFIX = os.getenv(
+    "CHROMA_COLLECTION_PREFIX", "context_enrichment_rag"
+)
 
 # --------------------------------------------------------------------------- #
 # Experiment knobs
@@ -92,10 +100,10 @@ CONDITIONS = ("baseline", "enriched")
 class DatasetSpec:
     """Static description of one dataset used in the experiment."""
 
-    name: str               # short key, e.g. "scifact"
-    hf_id: str              # Hugging Face dataset id
+    name: str  # short key, e.g. "scifact"
+    hf_id: str  # Hugging Face dataset id
     hf_config: Optional[str]  # HF config name, if any
-    input_type: str         # structured_text | unstructured_text | table | chart
+    input_type: str  # structured_text | unstructured_text | table | chart
     description: str
 
     @property
@@ -183,6 +191,27 @@ def get_openai_client():
     return OpenAI(api_key=OPENAI_API_KEY)
 
 
+def get_xai_client():
+    """Return an OpenAI-compatible client pointed at the xAI Grok API."""
+    from openai import OpenAI
+
+    if not XAI_API_KEY or XAI_API_KEY.startswith("your_"):
+        raise RuntimeError(
+            "XAI_API_KEY is not set. Add your xAI key to .env to generate "
+            "enrichment questions with Grok."
+        )
+    return OpenAI(api_key=XAI_API_KEY, base_url=XAI_BASE_URL)
+
+
+def get_groq_client():
+    """Return an OpenAI-compatible client pointed at the Groq API."""
+    from openai import OpenAI
+
+    if not GROQ_API_KEY or GROQ_API_KEY.startswith("your_"):
+        raise RuntimeError("GROQ_API_KEY is not set. Add your Groq key to .env.")
+    return OpenAI(api_key=GROQ_API_KEY, base_url=GROQ_BASE_URL, timeout=180.0)
+
+
 def get_chroma_client():
     """
     Return a ChromaDB client based on CHROMA_MODE.
@@ -195,11 +224,15 @@ def get_chroma_client():
     import chromadb
 
     if CHROMA_MODE == "cloud":
-        missing = [k for k, v in {
-            "CHROMA_API_KEY": CHROMA_API_KEY,
-            "CHROMA_TENANT": CHROMA_TENANT,
-            "CHROMA_DATABASE": CHROMA_DATABASE,
-        }.items() if not v or v.startswith("your_")]
+        missing = [
+            k
+            for k, v in {
+                "CHROMA_API_KEY": CHROMA_API_KEY,
+                "CHROMA_TENANT": CHROMA_TENANT,
+                "CHROMA_DATABASE": CHROMA_DATABASE,
+            }.items()
+            if not v or v.startswith("your_")
+        ]
         if missing:
             raise RuntimeError(
                 "CHROMA_MODE=cloud but missing credentials: "

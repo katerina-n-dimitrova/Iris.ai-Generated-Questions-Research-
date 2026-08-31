@@ -1,0 +1,11 @@
+{
+  "total_gold_evidence_facts": 221,
+  "exact_matched": 221,
+  "fuzzy_matched": 0,
+  "unresolved": 0,
+  "facts_crossing_chunk_boundaries": 160,
+  "queries_removed_unresolved_mapping": 0,
+  "avg_gold_chunks_per_query": 4.417,
+  "avg_evidence_facts_per_query": 2.631,
+  "fuzzy_matches": []
+}

@@ -1,0 +1,72 @@
+
+=== PeerQA questions-only experiment | papers=15 | conditions=[0, 5, 10, 13] ===
+Dataset summary: {
+  "num_papers": 15,
+  "corpora": [
+    "egu/esd",
+    "egu/esurf",
+    "nlpeer/ARR-22",
+    "nlpeer/COLING2020",
+    "nlpeer/F1000-22",
+    "nlpeer/PeerRead-ACL2017"
+  ],
+  "num_sentences_total": 4598,
+  "num_questions_usable": 65,
+  "num_chunks": 333,
+  "avg_sentences_per_chunk": 16.1,
+  "tokens_per_chunk": {
+    "min": 9,
+    "max": 664,
+    "mean": 506.0,
+    "median": 517
+  },
+  "chunk_size_target": 500,
+  "chunk_size_cap": 600,
+  "chunk_overlap_tokens": 100,
+  "num_eval_queries": 65,
+  "already_chunked_note": "PeerQA ships paper text pre-segmented at the SENTENCE level (papers.jsonl: idx/pidx/sidx/type/content/last_heading). Sentences are ~10-30 tokens (far below a RAG chunk) with NO overlap. We pack consecutive sentences into ~500-token chunks (cap 600) with 100-token overlap; gold sentence idxs map onto parent chunks."
+}
+  65 eval queries over 333 chunks
+Generating up to 13 questions/chunk (cached)...
+  [gen] 25/325 (cache 33)
+  [gen] 50/325 (cache 58)
+  [gen] 75/325 (cache 83)
+  [gen] 100/325 (cache 108)
+  [gen] 125/325 (cache 133)
+  [gen] 150/325 (cache 158)
+  [gen] 175/325 (cache 183)
+  [gen] 200/325 (cache 208)
+  [gen] 225/325 (cache 233)
+  [gen] 250/325 (cache 258)
+  [gen] 275/325 (cache 283)
+  [gen] 300/325 (cache 308)
+  [gen] 325/325 (cache 333)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Generation summary: {
+  "requested_per_chunk": 13,
+  "chunks_total": 333,
+  "chunks_newly_generated": 325,
+  "questions_generated_total": 4276,
+  "avg_questions_per_chunk": 12.84,
+  "prompt_tokens": 203597,
+  "completion_tokens": 78976,
+  "gen_seconds_sum": 1394.7,
+  "wall_seconds": 117.6,
+  "estimated_cost_usd": 0.0779
+}
+Building Chroma collections...
+[embeddings] backend=huggingface model=Octen/Octen-Embedding-0.6B
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 5937.20it/s]
+/Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/src/embeddings.py:59: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  self.dim = int(self.model.get_sentence_embedding_dimension())
+  built peerqa_baseline: 333 embeddings (chunk_text) 11.528 MB
+  built peerqa_q5: 1665 embeddings (generated_questions) 17.588 MB
+  built peerqa_q10: 3329 embeddings (generated_questions) 26.302 MB
+  built peerqa_q13: 4276 embeddings (generated_questions) 32.472 MB
+Evaluating retrieval...
+  baseline  Hit@1=0.323 Hit@5=0.615 Hit@10=0.754 MRR=0.469 nDCG@10=0.530 search_p95=5.709ms
+  q5        Hit@1=0.169 Hit@5=0.508 Hit@10=0.677 MRR=0.325 nDCG@10=0.394 search_p95=6.517ms
+  q10       Hit@1=0.231 Hit@5=0.600 Hit@10=0.754 MRR=0.382 nDCG@10=0.470 search_p95=7.273ms
+  q13       Hit@1=0.292 Hit@5=0.692 Hit@10=0.800 MRR=0.435 nDCG@10=0.519 search_p95=7.625ms
+
+Saved -> results/peerqa/peerqa_results.json

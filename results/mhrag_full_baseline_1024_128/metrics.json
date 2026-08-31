@@ -1,0 +1,41 @@
+{
+  "condition": "Baseline",
+  "protocol": {
+    "dataset": "yixuantt/MultiHopRAG full corpus",
+    "documents": 609,
+    "chunks": 1830,
+    "raw_queries": 2556,
+    "null_queries_excluded": 301,
+    "evaluated_queries": 2255,
+    "queries_excluded_for_unresolved_evidence": 0,
+    "chunk_size": 1024,
+    "chunk_overlap": 128,
+    "generated_questions": 0,
+    "stored_vectors": 1830,
+    "embedding": "Iris dim-384",
+    "retrieval": "dense chunks + BM25 RRF",
+    "rrf_k": 60
+  },
+  "metrics": {
+    "evidence_recall@1": 0.20594974131559496,
+    "evidence_recall@5": 0.51019955654102,
+    "evidence_recall@10": 0.6663710273466371,
+    "all_evidence_hit@5": 0.21108647450110865,
+    "mrr@10": 0.6442788512300707
+  },
+  "alignment": {
+    "articles": 609,
+    "chunks": 1830,
+    "raw_queries": 2556,
+    "null_queries_excluded": 301,
+    "evidence_queries": 2255,
+    "fully_aligned_queries": 2255,
+    "queries_excluded_for_unresolved_evidence": 0,
+    "unresolved_evidence_facts": 0,
+    "alignment_methods": {
+      "exact": 6084
+    },
+    "chunk_size": 1024,
+    "chunk_overlap": 128
+  }
+}

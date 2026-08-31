@@ -1,0 +1,35 @@
+{
+  "accepted_atomic_questions": 536,
+  "accepted_chunk_level_questions": 140,
+  "avg_accepted_per_chunk": 7.04,
+  "top1_match_type": {
+    "chunk_level": 27,
+    "atomic": 42
+  },
+  "gold_match_winning_type": {
+    "chunk_level": 18,
+    "atomic": 63
+  },
+  "false_positive_winning_type": {
+    "atomic": 142,
+    "chunk_level": 122
+  },
+  "lower_ranked_gold_winning_type": {
+    "atomic": 33,
+    "chunk_level": 14
+  },
+  "gold_match_type_by_benchmark_qtype": {
+    "inference": {
+      "chunk_level": 13,
+      "atomic": 28
+    },
+    "temporal": {
+      "atomic": 19,
+      "chunk_level": 2
+    },
+    "comparison": {
+      "atomic": 16,
+      "chunk_level": 3
+    }
+  }
+}

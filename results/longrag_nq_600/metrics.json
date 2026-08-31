@@ -1,0 +1,73 @@
+{
+  "protocol": {
+    "dataset": "TIGER-Lab/LongRAG",
+    "configuration": "nq",
+    "source_split": "subset_100",
+    "selection": "first 600 unique context titles",
+    "documents": 600,
+    "chunks": 1106,
+    "source_queries_scanned": 36,
+    "eligible_queries": 30,
+    "gold_definition": "chunk contains at least one normalized gold short answer",
+    "chunk_size": 1024,
+    "chunk_overlap": 128,
+    "seed": 42,
+    "generation_model": "gpt-5.4-mini",
+    "embedding": "Iris dim-384",
+    "rrf_k": 60
+  },
+  "conditions": [
+    {
+      "condition": "Baseline",
+      "generated_questions": 0,
+      "question_rule": "No generated questions",
+      "stored_vectors": 1106,
+      "metrics": {
+        "evidence_recall@1": 0.6333333333333333,
+        "evidence_recall@5": 1.0,
+        "evidence_recall@10": 1.0,
+        "all_evidence_hit@5": 1.0,
+        "mrr@10": 0.7999999999999999
+      }
+    },
+    {
+      "condition": "Adaptive generated questions 5\u201320",
+      "generated_questions": 17482,
+      "question_rule": "clamp(5, 20, round(facts \u00d7 0.5))",
+      "stored_vectors": 18588,
+      "metrics": {
+        "evidence_recall@1": 0.7666666666666667,
+        "evidence_recall@5": 1.0,
+        "evidence_recall@10": 1.0,
+        "all_evidence_hit@5": 1.0,
+        "mrr@10": 0.8583333333333333
+      }
+    },
+    {
+      "condition": "Adaptive generated questions unbounded",
+      "generated_questions": 20754,
+      "question_rule": "round(facts \u00d7 0.5), no bounds",
+      "stored_vectors": 21860,
+      "metrics": {
+        "evidence_recall@1": 0.7666666666666667,
+        "evidence_recall@5": 1.0,
+        "evidence_recall@10": 1.0,
+        "all_evidence_hit@5": 1.0,
+        "mrr@10": 0.8583333333333332
+      }
+    },
+    {
+      "condition": "Adaptive chunk + whole-article questions 5\u201320",
+      "generated_questions": 26181,
+      "question_rule": "5\u201320 per chunk + 5\u201320 per whole document",
+      "stored_vectors": 27287,
+      "metrics": {
+        "evidence_recall@1": 0.7333333333333333,
+        "evidence_recall@5": 1.0,
+        "evidence_recall@10": 1.0,
+        "all_evidence_hit@5": 1.0,
+        "mrr@10": 0.8444444444444444
+      }
+    }
+  ]
+}

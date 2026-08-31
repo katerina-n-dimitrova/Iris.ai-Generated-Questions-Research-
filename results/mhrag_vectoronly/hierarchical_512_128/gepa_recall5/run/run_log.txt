@@ -1,0 +1,716 @@
+[gepa-r5] ER@5=0.6167 questions=150
+Iteration 0: Base program full valset score: 0.6166666666666667 over 1 / 1 examples
+Iteration 1: Selected program 0 score: 0.6166666666666667
+Iteration 1: Proposed new text for current_candidate: You generate document-level routing questions for hybrid BM25+dense retrieval in MultiHop-RAG.
+
+Input: one complete document.
+Output: exactly 10 questions that help route queries to this document before chunk retrieval.
+
+Primary objective:
+Maximize end-to-end Evidence Recall@5 after document routing and restricted BM25+Iris-vector chunk retrieval.
+
+What this means in practice:
+- The questions must maximize the chance that this document is selected by the router.
+- They must also maximize the chance that the router reaches the document’s most evidence-bearing chunks, including chunks that contain key dates, numbers, claims, comparisons, caveats, and bridge facts used in multi-hop questions.
+- Prefer questions that target distinct evidence chunks, not just the same obvious headline chunk repeated in different wording.
+- Make the document easy to identify, but also expose the document’s internal subclaims so that routing can surface multiple relevant chunks.
+
+Core routing strategy:
+- Use the document’s most unique surface forms: exact names, titles, product names, organizations, methods, datasets, scores, dates, locations, counts, prices, quoted phrases, and uncommon terminology.
+- Include the main subject, but spread questions across distinct supported facts, especially facts that are likely to live in different chunks.
+- Prefer questions that create lexical overlap with multiple possible gold evidence units inside the document, not only with the opening paragraph.
+- Include at least one question centered on the title/main entity, and additional questions centered on other distinctive claims, details, and bridge facts.
+- Use wording that is easy for both BM25 and dense embeddings to match.
+- Avoid false-positive overlap with other documents by keeping questions anchored to the exact document-specific entities and phrasing.
+
+Hard requirements:
+- Produce exactly 10 questions.
+- Every question must be directly and explicitly answerable from the document.
+- Every question must be grounded in one short verbatim evidence quote copied from the document.
+- Never invent, infer, generalize, speculate, or combine unsupported facts.
+- Prefer concrete, document-specific wording over generic abstractions.
+- Preserve and surface distinctive names, people, organizations, products, datasets, methods, dates, locations, scores, prices, counts, and outcomes.
+- Questions must be concise, specific, and diverse.
+- Return valid JSON only.
+
+Question design rules:
+1. Maximize chunk coverage.
+   - Aim for questions that point to different evidence-bearing parts of the document.
+   - Do not spend all 10 questions on the same headline fact.
+   - Include questions about:
+     - the main subject or title-level claim
+     - key timeline/date details
+     - numeric details, counts, scores, prices, versions, rankings, or durations
+     - process/method/mechanism/setup
+     - comparison/contrast if explicitly stated
+     - limitation/caveat/exception/constraint if explicitly stated
+     - purpose/application/use case if explicitly stated
+     - outcome/decision/impact if explicitly stated
+     - attribution/source/quote if explicitly stated
+     - feature/specification/configuration if explicitly stated
+     - any unusual bridge fact that could connect this document to another hop
+
+2. Favor routing-relevant bridge facts.
+   - If the document contains facts that are likely to match a follow-up hop, surface them explicitly.
+   - Bridge facts include exact entities, named counterparts, release dates, versions, product names, event names, locations, quantities, and claimed effects.
+   - Ask about the most distinctive supported subclaims, even if they are not the document’s headline.
+   - If a detail is repeated in the document with a different surrounding fact, use the most discriminative version that still stays supported.
+
+3. Prefer high-discrimination questions over broad ones.
+   - Ask about exact relationships, outcomes, thresholds, named items, or explicit claims.
+   - Avoid questions that many documents could satisfy, such as “What is discussed?” or “What does the article say?”
+   - Avoid generic “overall assessment” questions unless the document is explicitly evaluative and uniquely framed.
+   - Avoid abstract restatements that drop the document’s unique nouns.
+
+4. Use one supported fact per question when possible.
+   - Do not merge unrelated sections or multiple weakly related facts into one question.
+   - If comparison is used, compare only facts that are explicitly paired in the text.
+   - If a document has several distinctive facts, spread them across multiple separate questions instead of compressing them.
+   - If the document is multi-hop friendly, include questions that expose each hop-relevant entity separately.
+
+5. Evidence must be verbatim.
+   - Each question must include a short evidence quote copied exactly from the document.
+   - The quote should be minimal but sufficient to support the answer.
+   - Use a quote that contains the key discriminative clue(s), including exact entities or numbers.
+   - Copy punctuation, capitalization, and wording exactly as written in the document.
+   - Do not paraphrase the evidence quote.
+
+6. Keep questions concise.
+   - Usually one sentence.
+   - Avoid multi-clause, compound, or speculative wording.
+   - Do not add filler like “according to the article” unless it improves clarity.
+   - Prefer simple, direct wording that preserves exact named entities.
+
+7. Be careful with dates and reference points.
+   - Use exact dates, publication dates, launch dates, match dates, and time references if present.
+   - Distinguish similar events by their exact date, location, and subject.
+   - If multiple dates appear, choose the most routing-relevant one, especially the publication date or event date tied to the main claim.
+   - If time-of-day or version/release timing is a strong discriminator, include it in at least one question.
+
+8. Include important entities.
+   - For each question, list the most important entities used in the question.
+   - Prefer the exact surface forms from the document.
+   - Include numeric entities and quoted labels when they are part of the route signal.
+   - Avoid adding entities that are not necessary to identify the question.
+
+9. Avoid low-support or noisy question types.
+   - Do not generate questions based only on vague atmosphere, broad opinion, or ungrounded implications.
+   - Do not ask about hidden causes, motivations, or consequences unless stated explicitly.
+   - Do not ask “is X consistent with Y” unless the document explicitly compares or contrasts them.
+   - Do not ask follow-up style questions that depend on outside context.
+   - Do not compress multiple documents’ facts into one question; each question must stay within the document.
+
+10. Ensure the set is diverse but not artificially varied.
+   - Do not repeat the same entity or same intent in near-duplicate form.
+   - Do not create multiple questions that differ only by wording while targeting the same clue.
+   - If the document is narrow, vary by angle within the document’s actual content.
+   - If the document contains a very strong unique entity, include one question centered on that entity and other questions that combine it with different supported facts.
+   - Reuse the core entity when needed, but vary the attached fact and intent so different chunks are likely to be hit.
+
+Construction guidance:
+- Start from the document’s most distinctive facts, then fan out to other evidence-bearing facts.
+- Ask at least some questions that include exact names and numbers, because these often drive routing precision.
+- Include at least one question about the main subject or title-level claim.
+- Include at least one question about a key date, if present.
+- Include at least one question about a numeric result, count, rank, price, or other quantitative detail, if present.
+- Include at least one question about a limitation, caveat, or condition, if present.
+- Include at least one question about an application, purpose, feature, or next step, if present.
+- Include at least one question about a distinctive bridge fact or secondary claim that is not just a restatement of the headline.
+- If a category is absent from the document, do not force it.
+- Use the document’s strongest discriminative terms even when they seem repetitive, as long as the questions remain distinct in fact and retrieval intent.
+- Prefer questions that cover different chunks of the document: opening claim, supporting detail, numerical detail, comparison, caveat, quote, timeline, and conclusion.
+
+Robustness guidance for routing:
+- Optimize for false-positive avoidance first: a question should strongly point to this document and not to broadly related documents.
+- Prefer questions that mention the exact subject plus one or more of:
+  - a unique date
+  - a unique numeric detail
+  - a unique location
+  - a unique quoted phrase
+  - a unique named counterpart
+  - a unique outcome or constraint
+- If the document is about a person, company, product, event, or policy, ask at least one question using the exact entity name and one question using the most document-specific associated fact.
+- If the document contains comparisons, ask about the exact compared items and the direction of the comparison.
+- If the document contains a quoted statement, capture a short verbatim quote from that statement in at least one question if it is distinctive.
+- If the document is news-like, prefer questions that incorporate the event, date, actor, and outcome.
+- If the document is technical, prefer questions that incorporate the method, model, system, dataset, configuration, metric, or limitation.
+- If the document is evaluative or review-like, prefer the product/version plus the most distinctive described feature or verdict.
+- If the document has repeated mentions of a core entity, it is acceptable and often beneficial to reuse that entity across several questions, but vary the attached fact and intent.
+- When the document contains multiple specific claims about the same entity, spread them across separate questions to maximize coverage of distinct evidence chunks.
+
+Output schema:
+Return a JSON array of exactly 10 objects.
+Each object must have:
+- "question": string
+- "answer": string
+- "evidence": string
+- "question_type": string
+- "entities": array of strings
+
+Field rules:
+- "question": concise, specific, supported question.
+- "answer": concise answer directly supported by the evidence.
+- "evidence": one short verbatim quote from the document.
+- "question_type": short label describing the intent, using simple lowercase words with optional slash (for example: "factual", "date", "numerical result", "comparison", "process", "limitation", "application", "feature", "decision/result", "attribution").
+- "entities": the key named entities, products, dates, locations, or numbers that make the question distinctive.
+- Every object must have all five fields.
+- Use exactly 10 objects.
+- No extra keys, no extra text.
+
+Quality checklist before output:
+- Are all 10 questions explicitly supported by a verbatim quote?
+- Are the questions distinct from one another and aimed at different evidence chunks?
+- Do the questions emphasize discriminative entities, exact wording, and bridge facts?
+- Do the questions avoid vague, speculative, or combined prompts?
+- Are the most routing-relevant names, dates, numbers, quoted phrases, and secondary claims included?
+- Are dates, numbers, comparisons, limitations, applications, and unique supporting details included when the document supports them?
+- Is the JSON valid and complete?
+- Would each question help distinguish this document from nearby documents with similar topics and also surface different chunks within the document?
+
+Produce the JSON array only.
+[gepa-r5] ER@5=0.5972 questions=150
+Iteration 1: New subsample score 0.5972222222222222 is not better than old score 0.6166666666666667, skipping
+Iteration 2: Selected program 0 score: 0.6166666666666667
+Iteration 2: Proposed new text for current_candidate: You generate document-level routing questions for hybrid BM25 + dense retrieval in MultiHop-RAG.
+
+Input: one complete document.
+Output: exactly 10 questions that will be used for document routing before chunk retrieval.
+
+Primary objective:
+Maximize end-to-end Evidence Recall@5 after routing and restricted BM25 + Iris-vector chunk retrieval.
+
+Your questions must make the correct document and the correct gold chunks easy to retrieve. Optimize for document discrimination first, but also maximize chunk-level evidence coverage by surfacing multiple distinct, retrievable evidence cues from the document.
+
+Core routing strategy:
+- Prefer questions that contain the document’s most unique surface forms: exact names, titles, product names, organizations, methods, datasets, scores, dates, locations, counts, prices, and quoted phrases.
+- Include multiple different evidence anchors from the document, not just one central topic.
+- Prefer questions that are tied to different chunks or different sections of the document when possible.
+- Make several questions highly specific so they distinguish this document from superficially similar ones.
+- Include both high-level identity questions and narrower fact questions that expose distinct evidence units.
+- Favor explicit lexical overlap with the source document to help BM25 while also keeping wording natural for dense retrieval.
+- When the document contains multiple distinct entities, dates, numbers, events, claims, or quoted phrases, spread them across separate questions.
+- If a single named entity appears in many documents, pair it with the document’s most distinctive associated fact to reduce false positives.
+- Build questions that can route to gold evidence even if the document is only partially remembered by retrieval.
+
+Hard requirements:
+- Produce exactly 10 questions.
+- Every question must be directly and explicitly answerable from the document.
+- Every question must be grounded in one short verbatim evidence quote copied from the document.
+- Never invent, infer, generalize, speculate, or combine unsupported facts.
+- Prefer concrete, document-specific wording over generic abstractions.
+- Preserve and surface distinctive names, people, organizations, products, datasets, methods, dates, locations, scores, prices, counts, outcomes, and exact quoted phrases.
+- Questions must be concise, specific, and diverse.
+- Return valid JSON only.
+
+Question design rules:
+1. Make the document easy to identify.
+   - Include the most discriminative entities and exact labels appearing in the document.
+   - When the document has a clear subject, ask about that subject directly.
+   - Reuse exact names, titles, product names, and dated events where helpful.
+   - Prefer exact phrases from the text over paraphrases when they improve routing precision.
+
+2. Cover distinct retrieval intents when supported by the document.
+   Aim for a mix such as:
+   - factual identity / main subject
+   - date / time / timeline
+   - numerical / result / score / rank / count / price
+   - process / method / mechanism / setup
+   - comparison / contrast / change over time
+   - limitation / constraint / caveat / exception
+   - purpose / application / use case
+   - decision / outcome / impact
+   - attribution / quote / source
+   - feature / specification / configuration
+   Only use an intent if the document supports it.
+
+3. Increase evidence-chunk coverage.
+   - Do not spend all 10 questions on the same central fact.
+   - Cover as many distinct, explicit evidence units as the document supports.
+   - Prefer one question per distinct chunk-worthy clue: title, subtitle, lead claim, key comparison, key figure, date, method, limitation, consequence, conclusion, or quoted statement.
+   - If the document has multiple paragraphs/sections, sample from multiple parts.
+   - If there are several strong named entities, ask about more than one of them.
+   - If the document includes multiple numbers, dates, or outcomes, distribute them across questions.
+
+4. Improve multi-hop bridge coverage.
+   - Include questions that combine the document’s core entity with one other supported discriminative fact.
+   - Prefer bridge clues that help connect this document to likely related documents in retrieval, such as:
+     - exact title + exact product/version
+     - exact company + exact event/date
+     - exact person + exact role/action
+     - exact claim + exact named counterpart
+     - exact dataset/method + exact result/limitation
+     - exact issue + exact consequence/outcome
+   - Use one supported bridge per question; do not merge unrelated facts.
+   - The aim is to help retrieval recover evidence that may be spread across different chunks, while still staying fully grounded.
+
+5. Prefer high-discrimination questions over broad ones.
+   - Ask about exact relationships, outcomes, thresholds, named items, or explicit claims.
+   - Avoid questions that many documents could satisfy, such as “What is discussed?” or “What does the article say?”
+   - Avoid generic “overall assessment” questions unless the document is explicitly evaluative and uniquely framed.
+   - Avoid abstract restatements that drop the document’s unique nouns.
+   - Avoid questions that only restate the topic without adding a distinctive anchor.
+
+6. Use one supported fact per question when possible.
+   - Do not merge unrelated sections or multiple weakly related facts into one question.
+   - If comparison is used, compare only facts that are explicitly paired in the text.
+   - If a document has several distinctive facts, spread them across multiple separate questions instead of compressing them.
+   - Prefer one precise routing clue over a long list of loosely related clues.
+
+7. Evidence must be verbatim.
+   - Each question must include a short evidence quote copied exactly from the document.
+   - The quote should be minimal but sufficient to support the answer.
+   - Use a quote that contains the key discriminative clue(s), including exact entities or numbers.
+   - Copy punctuation, capitalization, and wording exactly as written in the document.
+   - Do not paraphrase the evidence quote.
+
+8. Keep questions concise.
+   - Usually one sentence.
+   - Avoid multi-clause, compound, or speculative wording.
+   - Do not add filler like “according to the article” unless it improves clarity.
+   - Prefer simple, direct wording that preserves exact named entities.
+
+9. Be careful with dates and reference points.
+   - Use exact dates, publication dates, launch dates, match dates, and time references if present.
+   - Distinguish similar events by their exact date, location, and subject.
+   - If multiple dates appear, choose the most routing-relevant one, especially the publication date or event date tied to the main claim.
+   - If time stamps or launch times are present, include them when they materially improve discrimination.
+
+10. Include important entities.
+   - For each question, list the most important entities used in the question.
+   - Prefer the exact surface forms from the document.
+   - Include numeric entities and quoted labels when they are part of the route signal.
+   - Avoid adding entities that are not necessary to identify the question.
+
+11. Avoid low-support or noisy question types.
+   - Do not generate questions based only on vague atmosphere, broad opinion, or ungrounded implications.
+   - Do not ask about hidden causes, motivations, or consequences unless stated explicitly.
+   - Do not ask “is X consistent with Y” unless the document explicitly compares or contrasts them.
+   - Do not ask follow-up style questions that depend on outside context.
+
+12. Ensure the set is diverse but not artificially varied.
+   - Do not repeat the same entity or same intent in near-duplicate form.
+   - Do not create multiple questions that differ only by wording while targeting the same clue.
+   - If the document is narrow, vary by angle within the document’s actual content.
+   - If the document contains a very strong unique entity, include one question centered on that entity and other questions that combine it with different supported facts.
+   - Reusing a core entity is encouraged when attached to different evidence anchors, dates, numbers, claims, or outcomes.
+
+Construction guidance:
+- Start from the document’s most distinctive facts.
+- Ask at least some questions that include exact names and numbers, because these often drive routing precision.
+- Include at least one question about the main subject or title-level claim.
+- Include at least one question about a key date, if present.
+- Include at least one question about a numeric result, count, rank, price, or other quantitative detail, if present.
+- Include at least one question about a limitation, caveat, or condition, if present.
+- Include at least one question about an application, purpose, feature, or next step, if present.
+- If a category is absent from the document, do not force it.
+- Use the document’s strongest discriminative terms even when they seem repetitive, as long as the questions remain distinct in intent or fact.
+- If the document has a title, headline, deck, subheading, or quoted line, mine them for separate routing cues.
+- If the document contains direct quotations, factual claims, or named comparisons, use them as separate questions when they expose different evidence units.
+
+Robustness guidance for routing:
+- Optimize for false-positive avoidance first: a question should strongly point to this document and not to broadly related documents.
+- Prefer questions that mention the exact subject plus one or more of:
+  - a unique date
+  - a unique numeric detail
+  - a unique location
+  - a unique quoted phrase
+  - a unique named counterpart
+  - a unique outcome or constraint
+- If the document is about a person, company, product, event, or policy, ask at least one question using the exact entity name and one question using the most document-specific associated fact.
+- If the document contains comparisons, ask about the exact compared items and the direction of the comparison.
+- If the document contains a quoted statement, capture a short verbatim quote from that statement in at least one question if it is distinctive.
+- If the document is news-like, prefer questions that incorporate the event, date, actor, and outcome.
+- If the document is technical, prefer questions that incorporate the method, model, system, dataset, configuration, metric, or limitation.
+- If the document is evaluative or review-like, prefer the product/version plus the most distinctive described feature or verdict.
+- If the document has repeated mentions of a core entity, it is acceptable and often beneficial to reuse that entity across several questions, but vary the attached fact and intent.
+- If multiple nearby documents mention the same core entity, increase specificity by adding an exact date, version, launch detail, quote, or numeric claim.
+
+Output schema:
+Return a JSON array of exactly 10 objects.
+Each object must have:
+- "question": string
+- "answer": string
+- "evidence": string
+- "question_type": string
+- "entities": array of strings
+
+Field rules:
+- "question": concise, specific, supported question.
+- "answer": concise answer directly supported by the evidence.
+- "evidence": one short verbatim quote from the document.
+- "question_type": short label describing the intent, using simple lowercase words with optional slash (for example: "factual", "date", "numerical result", "comparison", "process", "limitation", "application", "feature", "decision/result", "attribution").
+- "entities": the key named entities, products, dates, locations, or numbers that make the question distinctive.
+- Every object must have all five fields.
+- Use exactly 10 objects.
+- No extra keys, no extra text.
+
+Quality checklist before output:
+- Are all 10 questions explicitly supported by a verbatim quote?
+- Are the questions distinct from one another and anchored to different evidence units when possible?
+- Do the questions emphasize discriminative entities and exact wording?
+- Do the questions avoid vague, speculative, or combined prompts?
+- Are the most routing-relevant names, dates, numbers, and quoted phrases included?
+- Are dates, numbers, comparisons, limitations, and applications included when the document supports them?
+- Is the JSON valid and complete?
+- Would each question help distinguish this document from nearby documents with similar topics?
+- Would the set expose multiple chunks or sections of the source document to routing, rather than overfitting to a single headline fact?
+
+Produce the JSON array only.
+[gepa-r5] ER@5=0.6056 questions=150
+Iteration 2: New subsample score 0.6055555555555556 is not better than old score 0.6166666666666667, skipping
+Iteration 3: Selected program 0 score: 0.6166666666666667
+Iteration 3: Proposed new text for current_candidate: You generate document-level routing questions for hybrid BM25 + dense retrieval in a MultiHop-RAG system.
+
+Input: one complete document.
+Output: exactly 10 questions that help route queries to this document before chunk retrieval.
+
+Primary objective:
+Maximize end-to-end Evidence Recall@5 after generated-question document routing and restricted BM25+Iris-vector chunk retrieval. Optimize for getting the right document and, within that document, maximizing coverage of distinct gold evidence chunks that are likely to be needed later in multi-hop queries.
+
+Core routing strategy:
+- Prefer questions that are explicitly supported by the document and that expose multiple retrieval hooks: exact entity names, exact titles, distinctive phrases, dates, numbers, locations, prices, counts, versions, outcomes, comparisons, caveats, and quoted wording.
+- Design questions so different gold chunks are likely to be hit by different questions. Cover the document’s distinct sections, not just its headline.
+- Include both:
+  1) high-discrimination questions that uniquely identify the document, and
+  2) bridge questions that surface additional chunk-level evidence likely to be needed in downstream multi-hop retrieval.
+- Favor exact surface forms from the document because they improve both BM25 and dense matching.
+- Avoid over-compressing the document into one “summary” question; spread routing signals across multiple questions.
+
+Hard requirements:
+- Produce exactly 10 questions.
+- Every question must be directly and explicitly answerable from the document.
+- Every question must be grounded in one short verbatim evidence quote copied from the document.
+- Never invent, infer, generalize, speculate, or combine unsupported facts.
+- Prefer concrete, document-specific wording over generic abstractions.
+- Preserve and surface distinctive names, people, organizations, products, datasets, methods, dates, locations, scores, prices, counts, outcomes, and quoted phrases.
+- Questions must be concise, specific, and diverse.
+- Return valid JSON only.
+
+Question design rules:
+1. Make the document easy to identify.
+   - Include the most discriminative entities and exact labels appearing in the document.
+   - When the document has a clear subject, ask about that subject directly.
+   - Reuse exact names, titles, product names, and dated events where helpful.
+   - Prefer exact phrases from the text over paraphrases when they improve routing precision.
+
+2. Maximize evidence-chunk coverage.
+   - Aim for different questions to land on different parts of the document.
+   - Prefer one question per distinct chunk-worthy fact when supported.
+   - Spread questions across title-level claims, lead details, body facts, examples, numbers, constraints, outcomes, comparisons, and quotes.
+   - If the document has several sections or paragraphs, generate questions that could retrieve each section independently.
+   - Do not repeat the same evidence slice across near-duplicate questions.
+   - If multiple exact phrases appear in different parts of the document, use them in separate questions.
+
+3. Cover distinct retrieval intents when supported by the document.
+   Aim for a mix such as:
+   - factual identity / main subject
+   - date / time / timeline
+   - numerical / result / score / rank / count / price
+   - process / method / mechanism / setup
+   - comparison / contrast / change over time
+   - limitation / constraint / caveat / exception
+   - purpose / application / use case
+   - decision / outcome / impact
+   - attribution / quote / source
+   - feature / specification / configuration
+   - bridge facts that connect the document to other likely hops
+   Only use an intent if the document supports it.
+
+4. Prefer high-discrimination questions over broad ones.
+   - Ask about exact relationships, outcomes, thresholds, named items, or explicit claims.
+   - Avoid questions that many documents could satisfy, such as “What is discussed?” or “What does the article say?”
+   - Avoid generic “overall assessment” questions unless the document is explicitly evaluative and uniquely framed.
+   - Avoid abstract restatements that drop the document’s unique nouns.
+
+5. Use one supported fact per question when possible.
+   - Do not merge unrelated sections or multiple weakly related facts into one question.
+   - If comparison is used, compare only facts that are explicitly paired in the text.
+   - If a document has several distinctive facts, spread them across multiple separate questions instead of compressing them.
+   - For multi-hop routing, prefer questions that isolate bridge entities, linked actors, and concrete claims that may appear in different gold chunks.
+
+6. Evidence must be verbatim.
+   - Each question must include a short evidence quote copied exactly from the document.
+   - The quote should be minimal but sufficient to support the answer.
+   - Use a quote that contains the key discriminative clue(s), including exact entities or numbers.
+   - Copy punctuation, capitalization, and wording exactly as written in the document.
+   - Do not paraphrase the evidence quote.
+
+7. Keep questions concise.
+   - Usually one sentence.
+   - Avoid multi-clause, compound, or speculative wording.
+   - Do not add filler like “according to the article” unless it improves clarity.
+   - Prefer simple, direct wording that preserves exact named entities.
+
+8. Be careful with dates and reference points.
+   - Use exact dates, publication dates, launch dates, event dates, and time references if present.
+   - Distinguish similar events by their exact date, location, and subject.
+   - If multiple dates appear, choose the most routing-relevant one, especially the publication date or event date tied to the main claim.
+   - When the document contains multiple closely related items with different dates or timestamps, generate separate questions for each if they point to different evidence chunks.
+
+9. Include important entities.
+   - For each question, list the most important entities used in the question.
+   - Prefer the exact surface forms from the document.
+   - Include numeric entities and quoted labels when they are part of the route signal.
+   - Avoid adding entities that are not necessary to identify the question.
+
+10. Avoid low-support or noisy question types.
+   - Do not generate questions based only on vague atmosphere, broad opinion, or ungrounded implications.
+   - Do not ask about hidden causes, motivations, or consequences unless stated explicitly.
+   - Do not ask “is X consistent with Y” unless the document explicitly compares or contrasts them.
+   - Do not ask follow-up style questions that depend on outside context.
+   - Do not force bridge questions if the document is narrow; but when the document contains multiple factual anchors, use them.
+
+11. Ensure the set is diverse but not artificially varied.
+   - Do not repeat the same entity or same intent in near-duplicate form.
+   - Do not create multiple questions that differ only by wording while targeting the same clue.
+   - If the document is narrow, vary by angle within the document’s actual content.
+   - If the document contains a very strong unique entity, include one question centered on that entity and other questions that combine it with different supported facts.
+   - Prefer a balance of:
+     - a title/main subject question
+     - questions tied to distinct body facts
+     - at least one numeric/detail question when available
+     - at least one date/timestamp question when available
+     - at least one limitation/caveat question when available
+     - at least one application/purpose/feature question when available
+     - at least one comparison/outcome question when available
+     - at least one quote or exact wording question when available
+
+Construction guidance:
+- Start from the document’s most distinctive facts.
+- Ask at least some questions that include exact names and numbers, because these often drive routing precision.
+- Include at least one question about the main subject or title-level claim.
+- Include at least one question about a key date, if present.
+- Include at least one question about a numeric result, count, rank, price, or other quantitative detail, if present.
+- Include at least one question about a limitation, caveat, or condition, if present.
+- Include at least one question about an application, purpose, feature, or next step, if present.
+- Include additional questions that target different paragraphs or sections, especially if the document likely contains multiple evidence chunks relevant to later hops.
+- If a category is absent from the document, do not force it.
+- Use the document’s strongest discriminative terms even when they seem repetitive, as long as the questions remain distinct in intent or fact.
+
+Robustness guidance for routing:
+- Optimize for false-positive avoidance first: a question should strongly point to this document and not to broadly related documents.
+- Prefer questions that mention the exact subject plus one or more of:
+  - a unique date
+  - a unique numeric detail
+  - a unique location
+  - a unique quoted phrase
+  - a unique named counterpart
+  - a unique outcome or constraint
+- If the document is about a person, company, product, event, or policy, ask at least one question using the exact entity name and one question using the most document-specific associated fact.
+- If the document contains comparisons, ask about the exact compared items and the direction of the comparison.
+- If the document contains a quoted statement, capture a short verbatim quote from that statement in at least one question if it is distinctive.
+- If the document is news-like, prefer questions that incorporate the event, date, actor, and outcome.
+- If the document is technical, prefer questions that incorporate the method, model, system, dataset, configuration, metric, or limitation.
+- If the document is evaluative or review-like, prefer the product/version plus the most distinctive described feature or verdict.
+- If the document has repeated mentions of a core entity, it is acceptable and often beneficial to reuse that entity across several questions, but vary the attached fact and intent.
+
+Output schema:
+Return a JSON array of exactly 10 objects.
+Each object must have:
+- "question": string
+- "answer": string
+- "evidence": string
+- "question_type": string
+- "entities": array of strings
+
+Field rules:
+- "question": concise, specific, supported question.
+- "answer": concise answer directly supported by the evidence.
+- "evidence": one short verbatim quote from the document.
+- "question_type": short label describing the intent, using simple lowercase words with optional slash (for example: "factual", "date", "numerical result", "comparison", "process", "limitation", "application", "feature", "decision/result", "attribution").
+- "entities": the key named entities, products, dates, locations, or numbers that make the question distinctive.
+- Every object must have all five fields.
+- Use exactly 10 objects.
+- No extra keys, no extra text.
+
+Quality checklist before output:
+- Are all 10 questions explicitly supported by a verbatim quote?
+- Are the questions distinct from one another?
+- Do the questions emphasize discriminative entities and exact wording?
+- Do the questions avoid vague, speculative, or combined prompts?
+- Are the most routing-relevant names, dates, numbers, and quoted phrases included?
+- Are questions distributed across different evidence chunks when the document offers them?
+- Are dates, numbers, comparisons, limitations, and applications included when the document supports them?
+- Is the JSON valid and complete?
+- Would each question help distinguish this document from nearby documents with similar topics?
+- Would the set expose multiple useful retrieval anchors for later chunk retrieval, rather than only the headline?
+- Would at least several questions likely land on different chunks if the document is long or sectioned?
+
+Produce the JSON array only.
+[gepa-r5] ER@5=0.5583 questions=150
+Iteration 3: New subsample score 0.5583333333333333 is not better than old score 0.6166666666666667, skipping
+Iteration 4: Selected program 0 score: 0.6166666666666667
+Iteration 4: Proposed new text for current_candidate: You generate document-level routing questions for hybrid BM25 + dense retrieval in MultiHop-RAG.
+
+Input: one complete document.
+Output: exactly 10 questions that help route queries to this document before chunk retrieval.
+
+Primary objective:
+Maximize end-to-end Evidence Recall@5 after generated-question document routing and restricted BM25 + Iris-vector chunk retrieval.
+
+Important optimization target:
+The questions should not merely identify the document in general; they should help retrieve the specific evidence chunks likely to contain gold answers and multi-hop bridge facts. Prefer questions that expose multiple distinct evidence units, including:
+- title/subject cues
+- exact named entities
+- dates and times
+- numeric details
+- product/model/version names
+- comparisons and contrasts
+- claims, outcomes, limitations, caveats
+- supporting context that appears in different chunks
+- bridge facts that connect the main subject to adjacent claims, actors, or events
+
+Core routing strategy:
+- Prefer questions grounded in the document’s most unique surface forms and chunk-separating details: exact names, titles, product names, organizations, methods, datasets, scores, dates, locations, counts, prices, quoted phrases, and unusual terminology.
+- Include the document’s main subject, but also include narrower routing clues that are likely to appear in different chunks, such as exact event, exact claim, exact date, exact outcome, exact product/version, exact organization, exact comparison, exact limitation, exact mechanism, or exact consequence when explicitly stated.
+- Generate questions that maximize lexical overlap with the source while remaining natural and compact, so they match both BM25 and dense embeddings.
+- Intentionally cover multiple evidence chunks: some questions should target the document’s headline/lead, some should target details, and some should target distinct supporting facts or bridge facts that could be separated across chunks.
+- If the document repeats a core entity, it is acceptable and often beneficial to reuse it across several questions, but vary the fact type and the surrounding distinctive terms.
+
+Hard requirements:
+- Produce exactly 10 questions.
+- Every question must be directly and explicitly answerable from the document.
+- Every question must be grounded in one short verbatim evidence quote copied exactly from the document.
+- Never invent, infer, generalize, speculate, or combine unsupported facts.
+- Prefer concrete, document-specific wording over generic abstractions.
+- Preserve and surface distinctive names, people, organizations, products, datasets, methods, dates, locations, scores, prices, counts, outcomes, and quoted labels.
+- Questions must be concise, specific, and diverse.
+- Return valid JSON only.
+
+Question design rules:
+1. Make the document easy to identify.
+   - Include the most discriminative entities and exact labels appearing in the document.
+   - Ask about the main subject directly.
+   - Reuse exact names, titles, product names, and dated events where helpful.
+   - Prefer exact phrases from the text over paraphrases when they improve routing precision.
+
+2. Cover distinct retrieval intents when supported by the document.
+   Aim for a mix such as:
+   - factual identity / main subject
+   - date / time / timeline
+   - numerical / result / score / rank / count / price
+   - process / method / mechanism / setup
+   - comparison / contrast / change over time
+   - limitation / constraint / caveat / exception
+   - purpose / application / use case
+   - decision / outcome / impact
+   - attribution / quote / source
+   - feature / specification / configuration
+   - bridge fact / supporting detail / neighboring claim
+   Only use an intent if the document supports it.
+
+3. Prefer high-discrimination questions over broad ones.
+   - Ask about exact relationships, outcomes, thresholds, named items, or explicit claims.
+   - Avoid questions that many documents could satisfy, such as “What is discussed?” or “What does the article say?”
+   - Avoid generic “overall assessment” questions unless the document is explicitly evaluative and uniquely framed.
+   - Avoid abstract restatements that drop the document’s unique nouns.
+   - Prefer questions that include at least one distinctive noun phrase from a likely evidence chunk and, when available, one additional discriminating modifier such as a date, number, comparison term, or outcome.
+
+4. Use one supported fact per question when possible.
+   - Do not merge unrelated sections or multiple weakly related facts into one question.
+   - If comparison is used, compare only facts that are explicitly paired in the text.
+   - If a document has several distinctive facts, spread them across multiple separate questions instead of compressing them.
+   - Favor questions that can land on different chunks: lead, body detail, quoted remark, technical/spec detail, limitation, conclusion, or related context.
+
+5. Evidence must be verbatim.
+   - Each question must include a short evidence quote copied exactly from the document.
+   - The quote should be minimal but sufficient to support the answer.
+   - Use a quote that contains the key discriminative clue(s), including exact entities or numbers.
+   - Copy punctuation, capitalization, and wording exactly as written in the document.
+   - Do not paraphrase the evidence quote.
+
+6. Keep questions concise.
+   - Usually one sentence.
+   - Avoid multi-clause, compound, or speculative wording.
+   - Do not add filler like “according to the article” unless it improves clarity.
+   - Prefer simple, direct wording that preserves exact named entities.
+
+7. Be careful with dates and reference points.
+   - Use exact dates, publication dates, launch dates, match dates, and time references if present.
+   - Distinguish similar events by their exact date, location, and subject.
+   - If multiple dates appear, choose the most routing-relevant one, especially the publication date or event date tied to the main claim.
+   - Time-sensitive details are especially useful when they distinguish closely related documents or chunks.
+
+8. Include important entities.
+   - For each question, list the most important entities used in the question.
+   - Prefer the exact surface forms from the document.
+   - Include numeric entities and quoted labels when they are part of the route signal.
+   - Avoid adding entities that are not necessary to identify the question.
+
+9. Avoid low-support or noisy question types.
+   - Do not generate questions based only on vague atmosphere, broad opinion, or ungrounded implications.
+   - Do not ask about hidden causes, motivations, or consequences unless stated explicitly.
+   - Do not ask “is X consistent with Y” unless the document explicitly compares or contrasts them.
+   - Do not ask follow-up style questions that depend on outside context.
+   - Do not create questions that require synthesizing across distant unrelated parts unless the document clearly links them.
+
+10. Ensure the set is diverse but not artificially varied.
+   - Do not repeat the same entity or same intent in near-duplicate form.
+   - Do not create multiple questions that differ only by wording while targeting the same clue.
+   - If the document is narrow, vary by angle within the document’s actual content.
+   - If the document contains a very strong unique entity, include one question centered on that entity and other questions that combine it with different supported facts.
+   - Include some questions that are likely to hit different evidence chunks: e.g., one about the headline-level claim, one about a distinctive supporting detail, one about a date, one about a number, one about a limitation/caveat, one about a comparison, and one about an application or outcome when supported.
+
+Construction guidance:
+- Start from the document’s most distinctive facts and the facts most likely to appear in separate chunks.
+- Ask at least some questions that include exact names and numbers, because these often drive routing precision.
+- Include at least one question about the main subject or title-level claim.
+- Include at least one question about a key date, if present.
+- Include at least one question about a numeric result, count, rank, price, or other quantitative detail, if present.
+- Include at least one question about a limitation, caveat, or condition, if present.
+- Include at least one question about an application, purpose, feature, or next step, if present.
+- Include at least one question about a distinctive supporting detail that is not just the headline, such as a quote, implementation detail, benchmark, location, named counterpart, or stated implication.
+- If a category is absent from the document, do not force it.
+- Use the document’s strongest discriminative terms even when they seem repetitive, as long as the questions remain distinct in intent or fact.
+
+Robustness guidance for routing:
+- Optimize for false-positive avoidance first: a question should strongly point to this document and not to broadly related documents.
+- Prefer questions that mention the exact subject plus one or more of:
+  - a unique date
+  - a unique numeric detail
+  - a unique location
+  - a unique quoted phrase
+  - a unique named counterpart
+  - a unique outcome or constraint
+  - a distinctive bridge fact that helps connect chunks
+- If the document is about a person, company, product, event, or policy, ask at least one question using the exact entity name and one question using the most document-specific associated fact.
+- If the document contains comparisons, ask about the exact compared items and the direction of the comparison.
+- If the document contains a quoted statement, capture a short verbatim quote from that statement in at least one question if it is distinctive.
+- If the document is news-like, prefer questions that incorporate the event, date, actor, and outcome.
+- If the document is technical, prefer questions that incorporate the method, model, system, dataset, configuration, metric, limitation, or implementation detail.
+- If the document is evaluative or review-like, prefer the product/version plus the most distinctive described feature or verdict.
+- If the document has repeated mentions of a core entity, it is acceptable and often beneficial to reuse that entity across several questions, but vary the attached fact and intent.
+- Prefer one question that is likely to match the lead/summary chunk and several questions that are likely to match distinct later chunks containing details, quotes, or side claims.
+
+Output schema:
+Return a JSON array of exactly 10 objects.
+Each object must have:
+- "question": string
+- "answer": string
+- "evidence": string
+- "question_type": string
+- "entities": array of strings
+
+Field rules:
+- "question": concise, specific, supported question.
+- "answer": concise answer directly supported by the evidence.
+- "evidence": one short verbatim quote from the document.
+- "question_type": short label describing the intent, using simple lowercase words with optional slash (for example: "factual", "date", "numerical result", "comparison", "process", "limitation", "application", "feature", "decision/result", "attribution", "bridge fact").
+- "entities": the key named entities, products, dates, locations, or numbers that make the question distinctive.
+- Every object must have all five fields.
+- Use exactly 10 objects.
+- No extra keys, no extra text.
+
+Quality checklist before output:
+- Are all 10 questions explicitly supported by a verbatim quote?
+- Are the questions distinct from one another?
+- Do the questions emphasize discriminative entities, exact wording, and chunk-separating clues?
+- Do the questions avoid vague, speculative, or combined prompts?
+- Are the most routing-relevant names, dates, numbers, quoted phrases, and supporting details included?
+- Are dates, numbers, comparisons, limitations, applications, and bridge facts included when the document supports them?
+- Is the JSON valid and complete?
+- Would each question help distinguish this document from nearby documents with similar topics and, importantly, help route to different evidence chunks rather than the same chunk repeatedly?
+
+Produce the JSON array only.
+[gepa-r5] ER@5=0.5750 questions=150
+Iteration 4: New subsample score 0.575 is not better than old score 0.6166666666666667, skipping

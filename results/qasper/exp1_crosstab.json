@@ -1,0 +1,359 @@
+{
+  "crosstab_arm": "B1",
+  "crosstab": {
+    "arm": "B1",
+    "mode": "hybrid",
+    "success_metric": "hit@10",
+    "by_query_type": {
+      "VERIFICATION": {
+        "n": 6,
+        "n_present": 4,
+        "success_present": 0.5,
+        "n_absent": 2,
+        "success_absent": 0.5
+      },
+      "DISJUNCTIVE": {
+        "n": 0,
+        "n_present": 0,
+        "success_present": null,
+        "n_absent": 0,
+        "success_absent": null
+      },
+      "CONCEPT": {
+        "n": 12,
+        "n_present": 11,
+        "success_present": 0.727,
+        "n_absent": 1,
+        "success_absent": 1.0
+      },
+      "EXTENT": {
+        "n": 6,
+        "n_present": 6,
+        "success_present": 0.667,
+        "n_absent": 0,
+        "success_absent": null
+      },
+      "EXAMPLE": {
+        "n": 12,
+        "n_present": 12,
+        "success_present": 0.583,
+        "n_absent": 0,
+        "success_absent": null
+      },
+      "COMPARISON": {
+        "n": 2,
+        "n_present": 1,
+        "success_present": 1.0,
+        "n_absent": 1,
+        "success_absent": 0.0
+      },
+      "CAUSE": {
+        "n": 1,
+        "n_present": 1,
+        "success_present": 1.0,
+        "n_absent": 0,
+        "success_absent": null
+      },
+      "CONSEQUENCE": {
+        "n": 2,
+        "n_present": 2,
+        "success_present": 1.0,
+        "n_absent": 0,
+        "success_absent": null
+      },
+      "PROCEDURAL": {
+        "n": 3,
+        "n_present": 3,
+        "success_present": 1.0,
+        "n_absent": 0,
+        "success_absent": null
+      }
+    },
+    "overall": {
+      "success_present": 0.7,
+      "n_present": 40,
+      "success_absent": 0.5,
+      "n_absent": 4
+    },
+    "per_query": [
+      {
+        "query_id": "6bf5620f295b5243230bc97b340fae6e92304595",
+        "query_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "4986f420884f917d1f60d3cea04dc8e64d3b5bf1",
+        "query_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "747b847d687f703cc20a87877c5b138f26ff137d",
+        "query_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "111afb77cfbf4c98e0458606378fa63a0e965e36",
+        "query_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "6568a31241167f618ef5ede939053feaa2fb0d7e",
+        "query_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "50cc6c5f2dcf5fb87b56007f6a825fa7c90b64ed",
+        "query_type": "CONCEPT",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "0fc2b5bc2ead08a6fe0280fb3a47477c6df1587c",
+        "query_type": "VERIFICATION",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "f94b53db307685d572aefad52cd55f53d23769c2",
+        "query_type": "PROCEDURAL",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "aa7d327ef98f9f9847b447d4def04889b4508d7a",
+        "query_type": "EXTENT",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "b8d7d055ddb94f5826a9aad7479b4a92a9c8a2f0",
+        "query_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "551457ed34ca7fc0878c85bc664b135c21059b58",
+        "query_type": "EXAMPLE",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "692c9c5d9ff9cd3e0ce8b5e4fa68dda9bd23dec1",
+        "query_type": "EXTENT",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "935d6a6187e6a0c9c0da8e53a42697f853f5c248",
+        "query_type": "CONCEPT",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "3b77b4defc8a139992bd0b07b5cf718382cb1a5f",
+        "query_type": "CONCEPT",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "01a41c0a4a7365cd37d28690735114f2ff5229f2",
+        "query_type": "EXAMPLE",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "00c57e45ac6afbdfa67350a57e81b4fad0ed2885",
+        "query_type": "VERIFICATION",
+        "success": 0,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "22714f6cad2d5c54c28823e7285dc85e8d6bc109",
+        "query_type": "PROCEDURAL",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "82642d3111287abf736b781043d49536fe48c350",
+        "query_type": "PROCEDURAL",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "5a81732d52f64e81f1f83e8fd3514251227efbc7",
+        "query_type": "EXAMPLE",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "7b4992e2d26577246a16ac0d1efc995ab4695d24",
+        "query_type": "EXAMPLE",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "9a9d225f9ac35ed35ea02f554f6056af3b42471d",
+        "query_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "ea56148a8356a1918bedcf0a99ae667c27792cfe",
+        "query_type": "EXTENT",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "cd32a38e0f33b137ab590e1677e8fb073724df7f",
+        "query_type": "EXTENT",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "ed67359889cf61fa11ee291d6c378cccf83d599d",
+        "query_type": "CONCEPT",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "425bd2ccfd95ead91d8f2b1b1c8ab9fc3446cb82",
+        "query_type": "CAUSE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "955de9f7412ba98a0c91998919fa048d339b1d48",
+        "query_type": "CONSEQUENCE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "3b371ea554fa6639c76a364060258454e4b931d4",
+        "query_type": "CONSEQUENCE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "ddb23a71113cbc092cbc158066d891cae261e2c6",
+        "query_type": "EXTENT",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "aa6d956c2860f58fc9baea74c353c9d985b05605",
+        "query_type": "EXTENT",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "4c18081ae3b676cc7831403d11bc070c10120f8e",
+        "query_type": "CONCEPT",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "e025061e199b121f2ac8f3d9637d9bf987d65cd5",
+        "query_type": "CONCEPT",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "61652a3da85196564401d616d251084a25ab4596",
+        "query_type": "COMPARISON",
+        "success": 0,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "8d074aabf4f51c8455618c5bf7689d3f62c4da1d",
+        "query_type": "COMPARISON",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "fe2666ace293b4bfac3182db6d0c6f03ea799277",
+        "query_type": "VERIFICATION",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "70a1b0f9f26f1b82c14783f1b76dfb5400444aa4",
+        "query_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "d3ca5f1814860a88ff30761fec3d860d35e39167",
+        "query_type": "EXAMPLE",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "72e4e26d0dd79c590c28b10938952a9f9497ff1e",
+        "query_type": "VERIFICATION",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "58ee0cbf1d8e3711c617b1cd3d7aca8620e26187",
+        "query_type": "EXAMPLE",
+        "success": 0,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "f71b52e00e0be80c926f153b9fe0a06dd93af11e",
+        "query_type": "CONCEPT",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "54e945ea4b014e11ed4e1e61abc2aa9e68fea310",
+        "query_type": "CONCEPT",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "08b57deb237f15061e4029b6718f1393fa26acce",
+        "query_type": "CONCEPT",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "9b7655d39c7a19a23eb8944568eb5618042b9026",
+        "query_type": "CONCEPT",
+        "success": 1,
+        "same_type_on_gold": true
+      },
+      {
+        "query_id": "1329280df5ee9e902b2742bde4a97bc3e6573ff3",
+        "query_type": "CONCEPT",
+        "success": 1,
+        "same_type_on_gold": false
+      },
+      {
+        "query_id": "58c6737070ef559e9220a8d08adc481fdcd53a24",
+        "query_type": "CONCEPT",
+        "success": 0,
+        "same_type_on_gold": true
+      }
+    ]
+  },
+  "coverage": {
+    "B1": {
+      "arm": "B1",
+      "coverage": 0.909,
+      "n_present": 40,
+      "n": 44
+    },
+    "E1": {
+      "arm": "E1",
+      "coverage": 0.977,
+      "n_present": 43,
+      "n": 44
+    }
+  }
+}

@@ -33,10 +33,17 @@ import embeddings
 
 OFFLINE_LOG = config.LATENCY_LOG_DIR / "offline_indexing.csv"
 OFFLINE_FIELDS = [
-    "dataset", "condition", "num_documents", "num_chunks",
-    "avg_tokens_per_chunk", "total_embedding_time_seconds",
-    "avg_embedding_time_per_chunk_ms", "chroma_add_time_seconds",
-    "total_indexing_time_seconds", "index_size_mb", "embedding_model",
+    "dataset",
+    "condition",
+    "num_documents",
+    "num_chunks",
+    "avg_tokens_per_chunk",
+    "total_embedding_time_seconds",
+    "avg_embedding_time_per_chunk_ms",
+    "chroma_add_time_seconds",
+    "total_indexing_time_seconds",
+    "index_size_mb",
+    "embedding_model",
 ]
 
 
@@ -55,8 +62,9 @@ def _index_size_mb() -> float:
     return _dir_size_mb(config.CHROMA_PERSIST_DIR)
 
 
-def build_collection(client, dataset: str, condition: str, batch_size: int = 256
-                     ) -> dict | None:
+def build_collection(
+    client, dataset: str, condition: str, batch_size: int = 256
+) -> dict | None:
     spec = config.DATASETS[dataset]
     path = spec.processed_path(condition)
     if not path.exists():
@@ -72,8 +80,11 @@ def build_collection(client, dataset: str, condition: str, batch_size: int = 256
     texts = [r["text_for_embedding"] for r in records]
     metadatas = []
     for r in records:
-        md = {"dataset": r["dataset"], "condition": r["condition"],
-              "input_type": r["input_type"]}
+        md = {
+            "dataset": r["dataset"],
+            "condition": r["condition"],
+            "input_type": r["input_type"],
+        }
         # Chroma metadata values must be scalar; copy non-null source fields.
         for k, v in r.get("metadata", {}).items():
             if v is not None:
@@ -82,8 +93,7 @@ def build_collection(client, dataset: str, condition: str, batch_size: int = 256
 
     num_chunks = len(records)
     num_documents = len({(m.get("source_id") or i) for i, m in enumerate(metadatas)})
-    avg_tokens = round(
-        sum(common.estimate_tokens(t) for t in texts) / num_chunks, 2)
+    avg_tokens = round(sum(common.estimate_tokens(t) for t in texts) / num_chunks, 2)
 
     embedder = embeddings.get_embedder()
     coll_name = spec.collection_name(condition)
@@ -94,24 +104,26 @@ def build_collection(client, dataset: str, condition: str, batch_size: int = 256
     except Exception:
         pass
     collection = client.create_collection(
-        name=coll_name, metadata={"hnsw:space": "cosine"})
+        name=coll_name, metadata={"hnsw:space": "cosine"}
+    )
 
     t0 = time.perf_counter()
     embed_time = 0.0
     add_time = 0.0
-    for i in tqdm(range(0, num_chunks, batch_size),
-                  desc=f"  {dataset}/{condition}", leave=False):
-        batch_texts = texts[i:i + batch_size]
+    for i in tqdm(
+        range(0, num_chunks, batch_size), desc=f"  {dataset}/{condition}", leave=False
+    ):
+        batch_texts = texts[i : i + batch_size]
         te = time.perf_counter()
         vecs = embedder.embed_documents(batch_texts)
         embed_time += time.perf_counter() - te
 
         ta = time.perf_counter()
         collection.add(
-            ids=ids[i:i + batch_size],
+            ids=ids[i : i + batch_size],
             embeddings=vecs,
             documents=batch_texts,
-            metadatas=metadatas[i:i + batch_size],
+            metadatas=metadatas[i : i + batch_size],
         )
         add_time += time.perf_counter() - ta
     total_time = time.perf_counter() - t0
@@ -131,17 +143,27 @@ def build_collection(client, dataset: str, condition: str, batch_size: int = 256
         "index_size_mb": index_size_mb,
         "embedding_model": embedder.name,
     }
-    print(f"  {dataset}/{condition}: {num_chunks} chunks, "
-          f"{row['total_indexing_time_seconds']}s, {index_size_mb} MB")
+    print(
+        f"  {dataset}/{condition}: {num_chunks} chunks, "
+        f"{row['total_indexing_time_seconds']}s, {index_size_mb} MB"
+    )
     return row
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--datasets", nargs="*", default=config.ALL_DATASETS,
-                    choices=config.ALL_DATASETS)
-    ap.add_argument("--conditions", nargs="*", default=list(config.CONDITIONS),
-                    choices=config.CONDITIONS)
+    ap.add_argument(
+        "--datasets",
+        nargs="*",
+        default=config.ALL_DATASETS,
+        choices=config.ALL_DATASETS,
+    )
+    ap.add_argument(
+        "--conditions",
+        nargs="*",
+        default=list(config.CONDITIONS),
+        choices=config.CONDITIONS,
+    )
     args = ap.parse_args()
 
     print(f"Embedding signature: {embeddings.embedding_signature()}")
@@ -157,9 +179,12 @@ def main() -> None:
 
     if rows:
         groups = {(r["dataset"], r["condition"]) for r in rows}
-        common.upsert_csv(OFFLINE_LOG, OFFLINE_FIELDS, rows,
-                          ("dataset", "condition"), groups)
-        print(f"\nOffline indexing log -> {OFFLINE_LOG.relative_to(config.PROJECT_ROOT)}")
+        common.upsert_csv(
+            OFFLINE_LOG, OFFLINE_FIELDS, rows, ("dataset", "condition"), groups
+        )
+        print(
+            f"\nOffline indexing log -> {OFFLINE_LOG.relative_to(config.PROJECT_ROOT)}"
+        )
 
 
 if __name__ == "__main__":

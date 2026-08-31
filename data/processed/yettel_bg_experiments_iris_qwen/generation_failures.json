@@ -1,0 +1,26 @@
+[
+  {
+    "chunk_id": "yettel_bg_0161::c03",
+    "error": "No facts for yettel_bg_0161::c03"
+  },
+  {
+    "chunk_id": "yettel_bg_0094::c00",
+    "error": "No facts for yettel_bg_0094::c00"
+  },
+  {
+    "chunk_id": "yettel_bg_0100::c00",
+    "error": "No facts for yettel_bg_0100::c00"
+  },
+  {
+    "chunk_id": "yettel_bg_0314::c00",
+    "error": "Iris Qwen failed after 6 attempts"
+  },
+  {
+    "chunk_id": "yettel_bg_0215::c00",
+    "error": "Iris Qwen failed after 6 attempts"
+  },
+  {
+    "chunk_id": "yettel_bg_0011::c01",
+    "error": "Iris Qwen failed after 6 attempts"
+  }
+]

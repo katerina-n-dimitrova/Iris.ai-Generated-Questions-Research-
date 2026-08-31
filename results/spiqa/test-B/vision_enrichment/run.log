@@ -1,0 +1,60 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[embeddings] backend=huggingface model=Octen/Octen-Embedding-0.6B
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 4721.00it/s]
+/Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/src/embeddings.py:59: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  self.dim = int(self.model.get_sentence_embedding_dimension())
+papers=20 chunks=1026 queries=74 figure_units=216 with_vision=216 figure_answerable_queries=74 (huggingface:Octen/Octen-Embedding-0.6B:dim1024)
+conditions=[0, 1, 10, 50, 100]
+  [gen] vision arm: 810 text chunks reused from base cache; generating up to 100 questions for 216 vision-enriched figure/table chunks...
+  [test-Bvis20] generated 25/216 (cache total 835)
+  [test-Bvis20] generated 50/216 (cache total 860)
+  [test-Bvis20] generated 75/216 (cache total 885)
+  [test-Bvis20] generated 100/216 (cache total 910)
+  [test-Bvis20] generated 125/216 (cache total 935)
+  [test-Bvis20] generated 150/216 (cache total 960)
+  [test-Bvis20] generated 175/216 (cache total 985)
+  [test-Bvis20] generated 200/216 (cache total 1010)
+  [test-Bvis20] generated 216/216 (cache total 1026)
+  [gen] figure-chunk generation: {"split": "test-Bvis20", "requested_per_chunk": 100, "chunks_total": 216, "chunks_newly_generated": 216, "chunks_cached_now": 1026, "questions_generated_this_run": 4390, "avg_questions_per_chunk": 20.3, "prompt_tokens_this_run": 96993, "completion_tokens_this_run": 72039, "sum_gen_seconds_this_run": 1194.1, "avg_gen_seconds_per_chunk": 5.528, "wall_seconds_this_run": 151.2, "estimated_cost_usd": 0.0578}
+
+=== arm: novision (split=test-Bnov20) ===
+  built spiqa_testBnov20_baseline: 1026 records (0 question vecs) 21.251 MB
+  built spiqa_testBnov20_q1: 2052 records (1026 question vecs) 25.226 MB
+  built spiqa_testBnov20_q10: 11217 records (10191 question vecs) 72.387 MB
+  built spiqa_testBnov20_q50: 17339 records (16313 question vecs) 104.061 MB
+  built spiqa_testBnov20_q100: 17538 records (16512 question vecs) 103.866 MB
+  novision baseline  nDCG@10=0.613 Hit@1=0.446 Hit@5=0.757 MRR=0.573 | figQ nDCG@10=0.6131 figQ Hit@5=0.7568
+  novision q1        nDCG@10=0.572 Hit@1=0.378 Hit@5=0.676 MRR=0.510 | figQ nDCG@10=0.5715 figQ Hit@5=0.6757
+  novision q10       nDCG@10=0.674 Hit@1=0.500 Hit@5=0.824 MRR=0.646 | figQ nDCG@10=0.6738 figQ Hit@5=0.8243
+  novision q50       nDCG@10=0.666 Hit@1=0.527 Hit@5=0.784 MRR=0.640 | figQ nDCG@10=0.6656 figQ Hit@5=0.7838
+  novision q100      nDCG@10=0.665 Hit@1=0.527 Hit@5=0.784 MRR=0.640 | figQ nDCG@10=0.6648 figQ Hit@5=0.7838
+
+=== arm: vision (split=test-Bvis20) ===
+  built spiqa_testBvis20_baseline: 1026 records (0 question vecs) 21.883 MB
+  built spiqa_testBvis20_q1: 2052 records (1026 question vecs) 26.175 MB
+  built spiqa_testBvis20_q10: 11235 records (10209 question vecs) 73.067 MB
+  built spiqa_testBvis20_q50: 18825 records (17799 question vecs) 110.608 MB
+  built spiqa_testBvis20_q100: 19074 records (18048 question vecs) 115.705 MB
+  vision   baseline  nDCG@10=0.641 Hit@1=0.527 Hit@5=0.757 MRR=0.620 | figQ nDCG@10=0.6407 figQ Hit@5=0.7568
+  vision   q1        nDCG@10=0.564 Hit@1=0.311 Hit@5=0.703 MRR=0.489 | figQ nDCG@10=0.5638 figQ Hit@5=0.7027
+  vision   q10       nDCG@10=0.691 Hit@1=0.540 Hit@5=0.851 MRR=0.663 | figQ nDCG@10=0.6911 figQ Hit@5=0.8514
+  vision   q50       nDCG@10=0.672 Hit@1=0.500 Hit@5=0.757 MRR=0.622 | figQ nDCG@10=0.672 figQ Hit@5=0.7568
+  vision   q100      nDCG@10=0.663 Hit@1=0.486 Hit@5=0.757 MRR=0.613 | figQ nDCG@10=0.663 figQ Hit@5=0.7568
+| condition | n_questions_per_chunk | hit@1 | hit@5 | hit@10 | mrr | ndcg@10 | figQ_hit@5 | figQ_ndcg@10 | figQ_mrr | figQ_n | total_embeddings | index_size_mb | embeddings_x_baseline | search_ms_p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| baseline | 0 | 0.4459 | 0.7568 | 0.8108 | 0.5732 | 0.6131 | 0.7568 | 0.6131 | 0.5732 | 74 | 1026 | 21.251 | 1.0 | 7.026 |
+| q1 | 1 | 0.3784 | 0.6757 | 0.8243 | 0.5105 | 0.5715 | 0.6757 | 0.5715 | 0.5105 | 74 | 2052 | 25.226 | 2.0 | 8.741 |
+| q10 | 10 | 0.5 | 0.8243 | 0.8919 | 0.6462 | 0.6738 | 0.8243 | 0.6738 | 0.6462 | 74 | 11217 | 72.387 | 10.93 | 11.017 |
+| q50 | 50 | 0.527 | 0.7838 | 0.8649 | 0.6399 | 0.6656 | 0.7838 | 0.6656 | 0.6399 | 74 | 17339 | 104.061 | 16.9 | 11.267 |
+| q100 | 100 | 0.527 | 0.7838 | 0.8649 | 0.6396 | 0.6648 | 0.7838 | 0.6648 | 0.6396 | 74 | 17538 | 103.866 | 17.09 | 13.068 |
+
+(vision arm)
+| condition | n_questions_per_chunk | hit@1 | hit@5 | hit@10 | mrr | ndcg@10 | figQ_hit@5 | figQ_ndcg@10 | figQ_mrr | figQ_n | total_embeddings | index_size_mb | embeddings_x_baseline | search_ms_p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| baseline | 0 | 0.527 | 0.7568 | 0.7973 | 0.6195 | 0.6407 | 0.7568 | 0.6407 | 0.6195 | 74 | 1026 | 21.883 | 1.0 | 8.445 |
+| q1 | 1 | 0.3108 | 0.7027 | 0.8243 | 0.4887 | 0.5638 | 0.7027 | 0.5638 | 0.4887 | 74 | 2052 | 26.175 | 2.0 | 9.027 |
+| q10 | 10 | 0.5405 | 0.8514 | 0.9189 | 0.6632 | 0.6911 | 0.8514 | 0.6911 | 0.6632 | 74 | 11235 | 73.067 | 10.95 | 12.992 |
+| q50 | 50 | 0.5 | 0.7568 | 0.9054 | 0.6215 | 0.672 | 0.7568 | 0.672 | 0.6215 | 74 | 18825 | 110.608 | 18.35 | 16.807 |
+| q100 | 100 | 0.4865 | 0.7568 | 0.8919 | 0.6134 | 0.663 | 0.7568 | 0.663 | 0.6134 | 74 | 19074 | 115.705 | 18.59 | 14.462 |
+
+All outputs under /Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/results/spiqa/test-B/vision_enrichment

@@ -1,0 +1,18 @@
+{
+  "q10": {
+    "generated": 1208,
+    "kept": 1029,
+    "filtered_pct": 14.8,
+    "unfiltered_hybrid_ndcg": 0.8821,
+    "filtered_hybrid_ndcg": 0.9036,
+    "filtering_helped": true
+  },
+  "q50": {
+    "generated": 1937,
+    "kept": 1570,
+    "filtered_pct": 18.9,
+    "unfiltered_hybrid_ndcg": 0.8804,
+    "filtered_hybrid_ndcg": 0.912,
+    "filtering_helped": true
+  }
+}

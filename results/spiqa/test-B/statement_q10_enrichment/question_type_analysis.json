@@ -1,0 +1,103 @@
+{
+  "per_type": {
+    "method": {
+      "count": 616,
+      "kept": 370,
+      "rt_pass": 416,
+      "anchored": 546,
+      "keep_rate": 0.601,
+      "rt_pass_rate": 0.675
+    },
+    "numeric_detail": {
+      "count": 574,
+      "kept": 387,
+      "rt_pass": 419,
+      "anchored": 522,
+      "keep_rate": 0.674,
+      "rt_pass_rate": 0.73
+    },
+    "comparison": {
+      "count": 234,
+      "kept": 168,
+      "rt_pass": 182,
+      "anchored": 217,
+      "keep_rate": 0.718,
+      "rt_pass_rate": 0.778
+    },
+    "result": {
+      "count": 975,
+      "kept": 624,
+      "rt_pass": 711,
+      "anchored": 857,
+      "keep_rate": 0.64,
+      "rt_pass_rate": 0.729
+    },
+    "definition": {
+      "count": 1729,
+      "kept": 1036,
+      "rt_pass": 1194,
+      "anchored": 1499,
+      "keep_rate": 0.599,
+      "rt_pass_rate": 0.691
+    },
+    "dataset": {
+      "count": 148,
+      "kept": 83,
+      "rt_pass": 90,
+      "anchored": 134,
+      "keep_rate": 0.561,
+      "rt_pass_rate": 0.608
+    },
+    "figure": {
+      "count": 220,
+      "kept": 67,
+      "rt_pass": 84,
+      "anchored": 167,
+      "keep_rate": 0.305,
+      "rt_pass_rate": 0.382
+    },
+    "limitation": {
+      "count": 149,
+      "kept": 76,
+      "rt_pass": 88,
+      "anchored": 130,
+      "keep_rate": 0.51,
+      "rt_pass_rate": 0.591
+    },
+    "table": {
+      "count": 130,
+      "kept": 35,
+      "rt_pass": 49,
+      "anchored": 97,
+      "keep_rate": 0.269,
+      "rt_pass_rate": 0.377
+    },
+    "metric": {
+      "count": 106,
+      "kept": 69,
+      "rt_pass": 73,
+      "anchored": 97,
+      "keep_rate": 0.651,
+      "rt_pass_rate": 0.689
+    },
+    "other": {
+      "count": 30,
+      "kept": 13,
+      "rt_pass": 17,
+      "anchored": 25,
+      "keep_rate": 0.433,
+      "rt_pass_rate": 0.567
+    }
+  },
+  "winning_type_on_retrieved_gold": {
+    "definition": 18,
+    "result": 16,
+    "numeric_detail": 11,
+    "comparison": 6,
+    "method": 6,
+    "limitation": 3,
+    "metric": 1,
+    "dataset": 1,
+    "figure": 1
+  }
+}

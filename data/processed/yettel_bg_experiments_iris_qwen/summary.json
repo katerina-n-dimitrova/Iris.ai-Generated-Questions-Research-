@@ -1,0 +1,13 @@
+{
+  "articles": 340,
+  "chunks": 963,
+  "eligible_queries": 2255,
+  "unresolved_queries": 0,
+  "alignment_methods": {
+    "canonical_chunk_id": 5581
+  },
+  "chunk_size": 1024,
+  "chunk_overlap": 128,
+  "selection_seed": 20260817,
+  "null_queries_excluded": 301
+}

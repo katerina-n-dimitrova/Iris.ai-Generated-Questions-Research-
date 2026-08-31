@@ -1,0 +1,262 @@
+{
+  "num_papers": 15,
+  "conditions": [
+    0,
+    5,
+    10,
+    13
+  ],
+  "dataset_summary": {
+    "num_papers": 15,
+    "corpora": [
+      "egu/esd",
+      "egu/esurf",
+      "nlpeer/ARR-22",
+      "nlpeer/COLING2020",
+      "nlpeer/F1000-22",
+      "nlpeer/PeerRead-ACL2017"
+    ],
+    "num_sentences_total": 4598,
+    "num_questions_usable": 65,
+    "num_chunks": 333,
+    "avg_sentences_per_chunk": 16.1,
+    "tokens_per_chunk": {
+      "min": 9,
+      "max": 664,
+      "mean": 506.0,
+      "median": 517
+    },
+    "chunk_size_target": 500,
+    "chunk_size_cap": 600,
+    "chunk_overlap_tokens": 100,
+    "num_eval_queries": 65,
+    "already_chunked_note": "PeerQA ships paper text pre-segmented at the SENTENCE level (papers.jsonl: idx/pidx/sidx/type/content/last_heading). Sentences are ~10-30 tokens (far below a RAG chunk) with NO overlap. We pack consecutive sentences into ~500-token chunks (cap 600) with 100-token overlap; gold sentence idxs map onto parent chunks."
+  },
+  "generation": {
+    "requested_per_chunk": 13,
+    "chunks_total": 333,
+    "chunks_newly_generated": 325,
+    "questions_generated_total": 4276,
+    "avg_questions_per_chunk": 12.84,
+    "prompt_tokens": 203597,
+    "completion_tokens": 78976,
+    "gen_seconds_sum": 1394.7,
+    "wall_seconds": 117.6,
+    "estimated_cost_usd": 0.0779
+  },
+  "index": {
+    "embedding_model": "huggingface:Octen/Octen-Embedding-0.6B:dim1024",
+    "chunk_encode_seconds": 65.26,
+    "question_encode_seconds": 30.68,
+    "num_chunks": 333,
+    "num_question_vectors_embedded": 4276,
+    "conditions": [
+      {
+        "condition": "baseline",
+        "n_questions_per_chunk": 0,
+        "num_embeddings": 333,
+        "record_type": "chunk_text",
+        "chroma_add_seconds": 0.236,
+        "index_size_mb": 11.528
+      },
+      {
+        "condition": "q5",
+        "n_questions_per_chunk": 5,
+        "num_embeddings": 1665,
+        "record_type": "generated_questions",
+        "chroma_add_seconds": 0.47,
+        "index_size_mb": 17.588
+      },
+      {
+        "condition": "q10",
+        "n_questions_per_chunk": 10,
+        "num_embeddings": 3329,
+        "record_type": "generated_questions",
+        "chroma_add_seconds": 0.912,
+        "index_size_mb": 26.302
+      },
+      {
+        "condition": "q13",
+        "n_questions_per_chunk": 13,
+        "num_embeddings": 4276,
+        "record_type": "generated_questions",
+        "chroma_add_seconds": 1.177,
+        "index_size_mb": 32.472
+      }
+    ]
+  },
+  "eval": [
+    {
+      "condition": "baseline",
+      "n_questions_per_chunk": 0,
+      "num_queries": 65,
+      "metrics": {
+        "hit@1": 0.3231,
+        "recall@1": 0.2654,
+        "hit@5": 0.6154,
+        "recall@5": 0.5462,
+        "hit@10": 0.7538,
+        "recall@10": 0.6936,
+        "mrr": 0.4692,
+        "ndcg@10": 0.5302
+      },
+      "latency_ms": {
+        "query_embed_mean": 36.677,
+        "search_mean": 5.374,
+        "search_p50": 5.207,
+        "search_p95": 5.709,
+        "total_mean": 42.051
+      }
+    },
+    {
+      "condition": "q5",
+      "n_questions_per_chunk": 5,
+      "num_queries": 65,
+      "metrics": {
+        "hit@1": 0.1692,
+        "recall@1": 0.1051,
+        "hit@5": 0.5077,
+        "recall@5": 0.4051,
+        "hit@10": 0.6769,
+        "recall@10": 0.5795,
+        "mrr": 0.3246,
+        "ndcg@10": 0.3942
+      },
+      "latency_ms": {
+        "query_embed_mean": 28.172,
+        "search_mean": 6.009,
+        "search_p50": 6.007,
+        "search_p95": 6.517,
+        "total_mean": 34.181
+      }
+    },
+    {
+      "condition": "q10",
+      "n_questions_per_chunk": 10,
+      "num_queries": 65,
+      "metrics": {
+        "hit@1": 0.2308,
+        "recall@1": 0.1628,
+        "hit@5": 0.6,
+        "recall@5": 0.5128,
+        "hit@10": 0.7538,
+        "recall@10": 0.6654,
+        "mrr": 0.3824,
+        "ndcg@10": 0.4696
+      },
+      "latency_ms": {
+        "query_embed_mean": 28.006,
+        "search_mean": 6.65,
+        "search_p50": 6.621,
+        "search_p95": 7.273,
+        "total_mean": 34.656
+      }
+    },
+    {
+      "condition": "q13",
+      "n_questions_per_chunk": 13,
+      "num_queries": 65,
+      "metrics": {
+        "hit@1": 0.2923,
+        "recall@1": 0.2167,
+        "hit@5": 0.6923,
+        "recall@5": 0.5782,
+        "hit@10": 0.8,
+        "recall@10": 0.7167,
+        "mrr": 0.4355,
+        "ndcg@10": 0.5188
+      },
+      "latency_ms": {
+        "query_embed_mean": 28.517,
+        "search_mean": 7.082,
+        "search_p50": 6.976,
+        "search_p95": 7.625,
+        "total_mean": 35.599
+      }
+    }
+  ],
+  "table": [
+    {
+      "condition": "baseline",
+      "n_questions_per_chunk": 0,
+      "index_content": "chunk_text",
+      "hit@1": 0.3231,
+      "hit@5": 0.6154,
+      "hit@10": 0.7538,
+      "mrr": 0.4692,
+      "ndcg@10": 0.5302,
+      "recall@10": 0.6936,
+      "num_embeddings": 333,
+      "index_size_mb": 11.528,
+      "index_add_s": 0.236,
+      "query_embed_ms": 36.677,
+      "search_ms_mean": 5.374,
+      "search_ms_p95": 5.709,
+      "num_queries": 65,
+      "embeddings_x_baseline": 1.0,
+      "storage_x_baseline": 1.0
+    },
+    {
+      "condition": "q5",
+      "n_questions_per_chunk": 5,
+      "index_content": "generated_questions",
+      "hit@1": 0.1692,
+      "hit@5": 0.5077,
+      "hit@10": 0.6769,
+      "mrr": 0.3246,
+      "ndcg@10": 0.3942,
+      "recall@10": 0.5795,
+      "num_embeddings": 1665,
+      "index_size_mb": 17.588,
+      "index_add_s": 0.47,
+      "query_embed_ms": 28.172,
+      "search_ms_mean": 6.009,
+      "search_ms_p95": 6.517,
+      "num_queries": 65,
+      "embeddings_x_baseline": 5.0,
+      "storage_x_baseline": 1.53
+    },
+    {
+      "condition": "q10",
+      "n_questions_per_chunk": 10,
+      "index_content": "generated_questions",
+      "hit@1": 0.2308,
+      "hit@5": 0.6,
+      "hit@10": 0.7538,
+      "mrr": 0.3824,
+      "ndcg@10": 0.4696,
+      "recall@10": 0.6654,
+      "num_embeddings": 3329,
+      "index_size_mb": 26.302,
+      "index_add_s": 0.912,
+      "query_embed_ms": 28.006,
+      "search_ms_mean": 6.65,
+      "search_ms_p95": 7.273,
+      "num_queries": 65,
+      "embeddings_x_baseline": 10.0,
+      "storage_x_baseline": 2.28
+    },
+    {
+      "condition": "q13",
+      "n_questions_per_chunk": 13,
+      "index_content": "generated_questions",
+      "hit@1": 0.2923,
+      "hit@5": 0.6923,
+      "hit@10": 0.8,
+      "mrr": 0.4355,
+      "ndcg@10": 0.5188,
+      "recall@10": 0.7167,
+      "num_embeddings": 4276,
+      "index_size_mb": 32.472,
+      "index_add_s": 1.177,
+      "query_embed_ms": 28.517,
+      "search_ms_mean": 7.082,
+      "search_ms_p95": 7.625,
+      "num_queries": 65,
+      "embeddings_x_baseline": 12.84,
+      "storage_x_baseline": 2.82
+    }
+  ],
+  "embedding_model": "huggingface:Octen/Octen-Embedding-0.6B:dim1024",
+  "llm_model": "gpt-4o-mini"
+}

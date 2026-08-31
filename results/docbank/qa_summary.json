@@ -1,0 +1,10 @@
+{
+  "num_qa": 118,
+  "num_documents": 15,
+  "avg_qa_per_doc": 7.9,
+  "prompt_tokens": 69702,
+  "completion_tokens": 16348,
+  "gen_seconds_sum": 238.4,
+  "wall_seconds": 32.6,
+  "estimated_cost_usd": 0.0203
+}

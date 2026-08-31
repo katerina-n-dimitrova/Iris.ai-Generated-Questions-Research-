@@ -1,0 +1,37 @@
+{
+  "config": {
+    "selection_seed": 42,
+    "num_papers": 15,
+    "question_budget": 10,
+    "llm_model": "gpt-4o-mini",
+    "llm_temperature": 0.3,
+    "embedding_model": "huggingface:Octen/Octen-Embedding-0.6B:dim1024",
+    "rrf_k": 60,
+    "k_values": [
+      1,
+      5,
+      10
+    ],
+    "bootstrap_n": 1000,
+    "bootstrap_seed": 123,
+    "bootstrap_ci": 0.95,
+    "min_chunk_words": 6,
+    "min_alpha_ratio": 0.5
+  },
+  "dataset": {
+    "num_papers": 15,
+    "num_chunks": 790,
+    "num_abstract_chunks": 15,
+    "num_queries": 50,
+    "queries_by_answer_type": {
+      "extractive": 30,
+      "boolean": 8,
+      "abstractive": 12
+    },
+    "avg_gold_per_query": 2.12,
+    "max_gold_per_query": 8,
+    "chunks_per_paper_avg": 52.7
+  },
+  "arms": {},
+  "wall_seconds": 4.4
+}

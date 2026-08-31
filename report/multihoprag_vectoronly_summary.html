@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang=en><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width, initial-scale=1">
+<title>MultiHop-RAG · Baseline vs 10-Questions — Fair Comparison</title>
+<style>
+:root{--bg:#fff;--fg:#1a1d24;--muted:#5b6572;--line:#e4e8ee;--card:#f7f9fc;--good:#0a7d3f;--bad:#c0392b;--flat:#8a94a2;--a:#2563eb;--b:#9333ea;}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1319;--fg:#e6eaf0;--muted:#9aa5b3;--line:#242b36;--card:#161c25;--good:#38d17a;--bad:#ff6b5e;--flat:#7a8494;--a:#6ea0ff;--b:#c98bff;}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:34px 20px 80px}
+h1{font-size:25px;margin:0 0 6px}h2{font-size:19px;margin:34px 0 10px;border-bottom:2px solid var(--line);padding-bottom:6px}
+.lede{color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+@media(max-width:640px){.two{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.panel h3{margin:0 0 8px;font-size:16px}.panel.a h3{color:var(--a)}.panel.b h3{color:var(--b)}
+.panel ul{margin:8px 0 0;padding-left:18px;font-size:14px;color:var(--muted)}.panel li{margin:3px 0}
+.panel b{color:var(--fg)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;margin:8px 0}
+th,td{border:1px solid var(--line);padding:9px 10px;text-align:center}th{background:var(--card)}td:first-child,th:first-child{text-align:left}
+td.a{color:var(--a);font-weight:600}td.b{color:var(--b);font-weight:600}
+.good{color:var(--good);font-weight:600}.bad{color:var(--bad);font-weight:600}.flat{color:var(--flat)}
+.verdict{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--a);border-radius:10px;padding:16px 18px;margin:18px 0;font-size:15.5px}
+.big{font-size:34px;font-weight:800;letter-spacing:-.5px}.big .a{color:var(--a)}.big .b{color:var(--b)}
+.note{font-size:13px;color:var(--muted);margin-top:6px}
+</style></head><body><div class=wrap>
+
+<h1>Baseline chunks vs 10-questions-per-chunk</h1>
+<p class=lede>Dense vector search only (cosine, local ChromaDB). Same 15 articles, same 154 chunks,
+same 84 eligible queries, same embedding model — the <b>only</b> difference is what gets indexed.</p>
+
+<div class=two>
+  <div class="panel a"><h3>A · Baseline (original chunks)</h3>
+    <div class=big><span class=a>0.558</span></div>
+    <div class=note>Evidence Recall@5</div>
+    <ul>
+      <li>Index: <b>154 vectors</b> (1 per chunk), 29.987 MB</li>
+      <li>Hit@1 <b>0.488</b> · Hit@5 <b>0.976</b></li>
+      <li>All-Evidence Hit@5 <b>0.214</b></li>
+      <li>First relevant chunk at rank <b>1.952</b> (avg)</li>
+      <li>Answer EM <b>0.786</b> · F1 0.794</li>
+    </ul>
+  </div>
+  <div class="panel b"><h3>B · 10 questions per chunk</h3>
+    <div class=big><span class=b>0.554</span></div>
+    <div class=note>Evidence Recall@5</div>
+    <ul>
+      <li>Index: <b>1540 vectors</b> (10 per chunk), 36.391 MB — <b>10.0×</b></li>
+      <li>Hit@1 <b>0.524</b> · Hit@5 <b>0.893</b></li>
+      <li>All-Evidence Hit@5 <b>0.238</b></li>
+      <li>First relevant chunk at rank <b>2.329</b> (avg)</li>
+      <li>Answer EM <b>0.738</b> · F1 0.754</li>
+    </ul>
+  </div>
+</div>
+
+<h2>The fairest single metric — Evidence Recall@k</h2>
+<p class=lede>Of the unique gold evidence facts each query needs, what fraction landed in the top-k retrieved chunks.
+It measures the exact research question ("retrieval of gold evidence"), gives multi-hop partial credit, and both
+methods return the same thing (ranked unique parent chunks). <b>* = statistically significant (p&lt;0.05).</b></p>
+<table>
+<thead><tr><th>Metric</th><th class=a>A chunks</th><th class=b>B questions</th><th>Δ (B−A)</th><th>p</th><th>Winner</th></tr></thead>
+<tbody><tr><td>Evidence Recall@1</td><td class='a'>0.197</td><td class='b'>0.201</td><td class='good'>+0.004</td><td>0.90</td><td>B (questions)</td></tr>
+<tr><td>Evidence Recall@3</td><td class='a'>0.433</td><td class='b'>0.380</td><td class='bad'>-0.053</td><td>0.07</td><td>A (chunks)</td></tr>
+<tr><td>Evidence Recall@4</td><td class='a'>0.495</td><td class='b'>0.471</td><td class='bad'>-0.024</td><td>0.39</td><td>A (chunks)</td></tr>
+<tr><td>Evidence Recall@5</td><td class='a'>0.558</td><td class='b'>0.554</td><td class='bad'>-0.005</td><td>0.87</td><td>A (chunks)</td></tr>
+<tr><td>Evidence Recall@10</td><td class='a'>0.717</td><td class='b'>0.705</td><td class='bad'>-0.012</td><td>0.72</td><td>A (chunks)</td></tr>
+</tbody></table>
+<p class=note>Query-by-query at k=5: 16 improved with B · 51 unchanged · 17 worse — symmetric, i.e. a wash.</p>
+
+<div class=verdict><b>Verdict:</b> On the fair metric, the two are a <b>statistical tie</b>
+(Evidence Recall@5 0.558 vs 0.554, p=0.87).
+Generating 10 questions per chunk does <b>not</b> improve gold-evidence retrieval here — and it
+costs 10.0× more vectors plus offline LLM generation. Not worth it on this pilot.</div>
+<p class=note>Selected 15-article pilot (n=84), not the full MultiHop-RAG benchmark — small sample, read the significance not the point estimates. Full metric sweep: <a href="multihoprag_vectoronly_results.html">multihoprag_vectoronly_results.html</a></p>
+</div></body></html>

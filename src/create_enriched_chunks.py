@@ -38,10 +38,17 @@ MODULES = {
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--datasets", nargs="*", default=config.ALL_DATASETS,
-                    choices=config.ALL_DATASETS)
-    ap.add_argument("--use-llm", action="store_true",
-                    help="Generate enrichment summaries with the OpenAI chat model.")
+    ap.add_argument(
+        "--datasets",
+        nargs="*",
+        default=config.ALL_DATASETS,
+        choices=config.ALL_DATASETS,
+    )
+    ap.add_argument(
+        "--use-llm",
+        action="store_true",
+        help="Generate enrichment summaries with the OpenAI chat model.",
+    )
     ap.add_argument("--max-samples", type=int, default=config.MAX_DATASET_SAMPLES)
     args = ap.parse_args()
 
@@ -50,8 +57,9 @@ def main() -> None:
         mod = MODULES[name]
         print(f"\n[{name}] building enriched chunks (use_llm={args.use_llm})...")
         try:
-            docs = mod.build_documents(use_llm=args.use_llm,
-                                       max_samples=args.max_samples)
+            docs = mod.build_documents(
+                use_llm=args.use_llm, max_samples=args.max_samples
+            )
         except FileNotFoundError as e:
             print(f"  skipped: {e}")
             continue

@@ -1,0 +1,10 @@
+{
+  "total_gold_evidence_facts": 187,
+  "exact_matched": 187,
+  "fuzzy_matched": 0,
+  "unresolved": 0,
+  "facts_crossing_chunk_boundaries": 23,
+  "avg_gold_chunks_per_query": 2.986,
+  "avg_evidence_facts_per_query": 2.71,
+  "fuzzy_matches": []
+}

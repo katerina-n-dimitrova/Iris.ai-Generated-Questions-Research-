@@ -34,8 +34,12 @@ MODULES = {
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--datasets", nargs="*", default=config.ALL_DATASETS,
-                    choices=config.ALL_DATASETS)
+    ap.add_argument(
+        "--datasets",
+        nargs="*",
+        default=config.ALL_DATASETS,
+        choices=config.ALL_DATASETS,
+    )
     ap.add_argument("--max-samples", type=int, default=config.MAX_DATASET_SAMPLES)
     args = ap.parse_args()
 

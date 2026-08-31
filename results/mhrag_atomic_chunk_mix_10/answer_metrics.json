@@ -1,0 +1,59 @@
+{
+  "top_k": 5,
+  "by_condition": {
+    "baseline": {
+      "n": 69,
+      "exact_match": 0.8986,
+      "token_f1": 0.8986,
+      "yesno_accuracy": 0.8158
+    },
+    "generated": {
+      "n": 69,
+      "exact_match": 0.8986,
+      "token_f1": 0.8986,
+      "yesno_accuracy": 0.8158
+    }
+  },
+  "by_condition_bucket": {
+    "baseline": {
+      "all": {
+        "n": 8,
+        "exact_match": 0.875,
+        "token_f1": 0.875,
+        "yesno_accuracy": 0.8333
+      },
+      "partial": {
+        "n": 59,
+        "exact_match": 0.9153,
+        "token_f1": 0.9153,
+        "yesno_accuracy": 0.8333
+      },
+      "none": {
+        "n": 2,
+        "exact_match": 0.5,
+        "token_f1": 0.5,
+        "yesno_accuracy": 0.5
+      }
+    },
+    "generated": {
+      "all": {
+        "n": 13,
+        "exact_match": 0.9231,
+        "token_f1": 0.9231,
+        "yesno_accuracy": 0.8333
+      },
+      "partial": {
+        "n": 47,
+        "exact_match": 0.8936,
+        "token_f1": 0.8936,
+        "yesno_accuracy": 0.8148
+      },
+      "none": {
+        "n": 9,
+        "exact_match": 0.8889,
+        "token_f1": 0.8889,
+        "yesno_accuracy": 0.8
+      }
+    }
+  }
+}

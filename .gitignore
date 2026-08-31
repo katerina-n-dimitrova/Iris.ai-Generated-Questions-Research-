@@ -1,5 +1,7 @@
 # ---- Secrets ----
 .env
+.env.*
+!.env.example
 
 # ---- Python ----
 __pycache__/
@@ -21,6 +23,8 @@ results/latency_logs/*
 results/retrieval_metrics/*
 results/answer_metrics/*
 results/*.log
+results/**/*vector*.json
+results/**/*.pkl
 
 # keep the empty dirs tracked
 !**/.gitkeep
@@ -29,3 +33,6 @@ results/*.log
 .DS_Store
 .idea/
 .vscode/
+
+.dspy_cache/
+.ruff_cache/

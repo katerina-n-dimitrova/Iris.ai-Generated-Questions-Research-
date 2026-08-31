@@ -1,0 +1,7 @@
+{
+  "questions_with_anchor": 4291,
+  "questions_without_anchor": 620,
+  "roundtrip_pass_rate_with_anchor": 0.682,
+  "roundtrip_pass_rate_without_anchor": 0.637,
+  "anchor_helps": true
+}

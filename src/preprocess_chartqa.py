@@ -44,8 +44,9 @@ def extract_chart_text(row: Dict[str, Any]) -> Dict[str, Optional[str]]:
     }
 
 
-def build_documents(use_llm: bool = False, max_samples: int = config.MAX_DATASET_SAMPLES
-                    ) -> Dict[str, List[Dict[str, Any]]]:
+def build_documents(
+    use_llm: bool = False, max_samples: int = config.MAX_DATASET_SAMPLES
+) -> Dict[str, List[Dict[str, Any]]]:
     client = config.get_openai_client() if use_llm else None
     test_path = SPEC.raw_dir / "test.jsonl"
     if not test_path.exists():
@@ -61,47 +62,58 @@ def build_documents(use_llm: bool = False, max_samples: int = config.MAX_DATASET
         base_text = (fields["title"] or "") + (" " if fields["title"] else "") + ocr
         base_text = base_text.strip() or ocr or "(no extractable chart text)"
 
-        baseline.append(make_record(
-            chunk_id=f"{chart_id}_baseline",
-            dataset="chartqa",
-            input_type=SPEC.input_type,
-            condition="baseline",
-            text_for_embedding=base_text,
-            original_text=base_text,
-            source_id=chart_id,
-            title=fields["title"],
-            chart_id=chart_id,
-        ))
+        baseline.append(
+            make_record(
+                chunk_id=f"{chart_id}_baseline",
+                dataset="chartqa",
+                input_type=SPEC.input_type,
+                condition="baseline",
+                text_for_embedding=base_text,
+                original_text=base_text,
+                source_id=chart_id,
+                title=fields["title"],
+                chart_id=chart_id,
+            )
+        )
 
-        summary = common.llm_summary(client, base_text, kind="chart") \
-            if use_llm else common.cheap_summary(base_text)
-        enriched_text = render_enriched({
-            "Dataset": "ChartQA",
-            "Document type": "chart",
-            "Chart title": fields["title"],
-            "Chart type if available": fields["chart_type"],
-            "X-axis label if available": fields["x_axis"],
-            "Y-axis label if available": fields["y_axis"],
-            "Legend if available": fields["legend"],
-            "Generated chart summary": summary,
-            "Original chart text/caption/OCR": base_text,
-        })
-        enriched.append(make_record(
-            chunk_id=f"{chart_id}_enriched",
-            dataset="chartqa",
-            input_type=SPEC.input_type,
-            condition="enriched",
-            text_for_embedding=enriched_text,
-            original_text=base_text,
-            source_id=chart_id,
-            title=fields["title"],
-            chart_id=chart_id,
-        ))
+        summary = (
+            common.llm_summary(client, base_text, kind="chart")
+            if use_llm
+            else common.cheap_summary(base_text)
+        )
+        enriched_text = render_enriched(
+            {
+                "Dataset": "ChartQA",
+                "Document type": "chart",
+                "Chart title": fields["title"],
+                "Chart type if available": fields["chart_type"],
+                "X-axis label if available": fields["x_axis"],
+                "Y-axis label if available": fields["y_axis"],
+                "Legend if available": fields["legend"],
+                "Generated chart summary": summary,
+                "Original chart text/caption/OCR": base_text,
+            }
+        )
+        enriched.append(
+            make_record(
+                chunk_id=f"{chart_id}_enriched",
+                dataset="chartqa",
+                input_type=SPEC.input_type,
+                condition="enriched",
+                text_for_embedding=enriched_text,
+                original_text=base_text,
+                source_id=chart_id,
+                title=fields["title"],
+                chart_id=chart_id,
+            )
+        )
 
     return {"baseline": baseline, "enriched": enriched}
 
 
-def build_queries(max_samples: int = config.MAX_DATASET_SAMPLES) -> List[Dict[str, Any]]:
+def build_queries(
+    max_samples: int = config.MAX_DATASET_SAMPLES,
+) -> List[Dict[str, Any]]:
     test_path = SPEC.raw_dir / "test.jsonl"
     if not test_path.exists():
         return []
@@ -111,13 +123,15 @@ def build_queries(max_samples: int = config.MAX_DATASET_SAMPLES) -> List[Dict[st
         question = str(row.get("query") or row.get("question") or "").strip()
         if not question:
             continue
-        queries.append({
-            "query_id": f"chartqa_q{idx}",
-            "dataset": "chartqa",
-            "text": question,
-            "gold_source_ids": [chart_id],
-            "gold_answer": str(row.get("label") or ""),
-        })
+        queries.append(
+            {
+                "query_id": f"chartqa_q{idx}",
+                "dataset": "chartqa",
+                "text": question,
+                "gold_source_ids": [chart_id],
+                "gold_answer": str(row.get("label") or ""),
+            }
+        )
     return queries
 
 
@@ -130,7 +144,9 @@ def main() -> None:
     docs = build_documents(args.use_llm, args.max_samples)
     for condition in config.CONDITIONS:
         n = common.write_jsonl(SPEC.processed_path(condition), docs[condition])
-        print(f"chartqa {condition}: {n} chunks -> {SPEC.processed_path(condition).name}")
+        print(
+            f"chartqa {condition}: {n} chunks -> {SPEC.processed_path(condition).name}"
+        )
 
     queries = build_queries(args.max_samples)
     qpath = config.PROCESSED_DIR / "chartqa_queries.jsonl"

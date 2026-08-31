@@ -1,0 +1,208 @@
+{
+  "vs_condition": "q10_statement_score_fusion",
+  "count": 4,
+  "queries": [
+    {
+      "eval_query": "What are the two place recognition benchmarks used by the authors?",
+      "gold_chunk_ids": [
+        "test-B::1511.07247::text::54",
+        "test-B::1511.07247::fig::4"
+      ],
+      "gold_paper_id": "1511.07247",
+      "baseline_top_chunks": [
+        "test-B::1511.07247::text::41",
+        "test-B::1511.07247::text::59",
+        "test-B::1511.07247::text::58",
+        "test-B::1511.07247::text::51",
+        "test-B::1511.07247::text::1"
+      ],
+      "generated_method_top_chunks": [
+        "test-B::1511.07247::fig::4",
+        "test-B::1511.07247::text::58",
+        "test-B::1511.07247::text::54",
+        "test-B::1511.07247::text::3",
+        "test-B::1511.07247::text::59"
+      ],
+      "was_correct_paper_retrieved": true,
+      "was_correct_chunk_retrieved": true,
+      "retrieved_correct_paper_wrong_chunk": false,
+      "retrieval_source": "original_chunk",
+      "top_matching_generated_questions": [
+        {
+          "question": "What does Figure 5 compare regarding place recognition performance?",
+          "type": "result",
+          "anchors": [
+            "Figure 5",
+            "Pittsburgh",
+            "Tokyo 24/7"
+          ],
+          "sim": 0.723
+        },
+        {
+          "question": "Which dataset was evaluated by [79] and why?",
+          "type": "limitation",
+          "anchors": [
+            "Tokyo 24/7",
+            "depth data"
+          ],
+          "sim": 0.485
+        },
+        {
+          "question": "How do trained representations compare to off-the-shelf ones in Figure 5?",
+          "type": "comparison",
+          "anchors": [
+            "trained representations"
+          ],
+          "sim": 0.453
+        }
+      ]
+    },
+    {
+      "eval_query": "The authors claims that the LSTM networks systems allow the flow of information across many layers without attenuation, is that true?",
+      "gold_chunk_ids": [
+        "test-B::1507.06228::text::2",
+        "test-B::1507.06228::fig::4"
+      ],
+      "gold_paper_id": "1507.06228",
+      "baseline_top_chunks": [
+        "test-B::1609.08144::text::23",
+        "test-B::1609.08144::text::18",
+        "test-B::1609.08144::fig::13",
+        "test-B::1609.08144::text::27",
+        "test-B::1502.04681::text::12"
+      ],
+      "generated_method_top_chunks": [
+        "test-B::1609.08144::text::23",
+        "test-B::1609.08144::fig::13",
+        "test-B::1609.08144::text::18",
+        "test-B::1609.08144::fig::14",
+        "test-B::1609.08144::text::27"
+      ],
+      "was_correct_paper_retrieved": true,
+      "was_correct_chunk_retrieved": true,
+      "retrieved_correct_paper_wrong_chunk": false,
+      "retrieval_source": "original_chunk",
+      "top_matching_generated_questions": [
+        {
+          "question": "What happens to the above equations with residual connections between LSTMi and LSTMi+1?",
+          "type": "definition",
+          "anchors": [
+            "LSTMi",
+            "LSTMi+1"
+          ],
+          "sim": 0.649
+        }
+      ]
+    },
+    {
+      "eval_query": "Is the \\delta a hyper-parameter?",
+      "gold_chunk_ids": [
+        "test-B::1609.08144::text::46",
+        "test-B::1609.08144::fig::0",
+        "test-B::1609.08144::text::64",
+        "test-B::1609.08144::text::65"
+      ],
+      "gold_paper_id": "1609.08144",
+      "baseline_top_chunks": [
+        "test-B::2204.03458::text::10",
+        "test-B::1603.05959::text::25",
+        "test-B::2210.15541::text::33",
+        "test-B::1609.08144::text::44",
+        "test-B::2204.03458::text::16"
+      ],
+      "generated_method_top_chunks": [
+        "test-B::2210.15541::text::33",
+        "test-B::1609.08144::text::44",
+        "test-B::1609.08144::fig::0",
+        "test-B::1609.08144::text::64",
+        "test-B::1506.06579::text::16"
+      ],
+      "was_correct_paper_retrieved": true,
+      "was_correct_chunk_retrieved": true,
+      "retrieved_correct_paper_wrong_chunk": false,
+      "retrieval_source": "original_chunk",
+      "top_matching_generated_questions": [
+        {
+          "question": "What is the smallest value of δ that significantly helps in practice?",
+          "type": "numeric_detail",
+          "anchors": [
+            "0.01"
+          ],
+          "sim": 0.659
+        },
+        {
+          "question": "What cost does the approach enable backpropagation in?",
+          "type": "metric",
+          "anchors": [
+            "𝒪(m)"
+          ],
+          "sim": 0.408
+        },
+        {
+          "question": "What perturbation do we add to each edge probability pij?",
+          "type": "definition",
+          "anchors": [
+            "δ>0"
+          ],
+          "sim": 0.394
+        }
+      ]
+    },
+    {
+      "eval_query": "The paper's algorithm yields very small perturbations which are believed to be good approximations of the minimal perturbation. Quantitatively, how far is the paper's approximation from the minimal perturbation?",
+      "gold_chunk_ids": [
+        "test-B::1511.04599::fig::6",
+        "test-B::1511.04599::text::45",
+        "test-B::1511.04599::text::46",
+        "test-B::1511.04599::text::5",
+        "test-B::1511.04599::text::4",
+        "test-B::1511.04599::text::32"
+      ],
+      "gold_paper_id": "1511.04599",
+      "baseline_top_chunks": [
+        "test-B::1511.04599::text::31",
+        "test-B::1511.04599::text::24",
+        "test-B::1511.04599::text::30",
+        "test-B::1511.04599::text::33",
+        "test-B::1511.04599::text::52"
+      ],
+      "generated_method_top_chunks": [
+        "test-B::1511.04599::text::31",
+        "test-B::1511.04599::text::24",
+        "test-B::1511.04599::text::42",
+        "test-B::1511.04599::text::33",
+        "test-B::1511.04599::text::40"
+      ],
+      "was_correct_paper_retrieved": true,
+      "was_correct_chunk_retrieved": true,
+      "retrieved_correct_paper_wrong_chunk": true,
+      "retrieval_source": "original_chunk",
+      "top_matching_generated_questions": [
+        {
+          "question": "What does the algorithm yield that is believed to be good approximations of the minimal perturbation?",
+          "type": "result",
+          "anchors": [
+            "very small perturbations"
+          ],
+          "sim": 0.927
+        },
+        {
+          "question": "Is the algorithm guaranteed to converge to the optimal perturbation?",
+          "type": "limitation",
+          "anchors": [
+            "not guaranteed"
+          ],
+          "sim": 0.738
+        },
+        {
+          "question": "What type of approach does the proposed algorithm use?",
+          "type": "definition",
+          "anchors": [
+            "greedy way"
+          ],
+          "sim": 0.57
+        }
+      ]
+    }
+  ]
+}

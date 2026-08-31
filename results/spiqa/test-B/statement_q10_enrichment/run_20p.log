@@ -1,0 +1,27 @@
+=== statement-level q10 experiment | split=test-B ===
+chunks=1026 queries=74
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[embeddings] backend=huggingface model=Octen/Octen-Embedding-0.6B
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 5918.85it/s]
+/Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/src/embeddings.py:59: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  self.dim = int(self.model.get_sentence_embedding_dimension())
+  embedded 1026 original chunks in 119s
+  embedded 4911 generated questions in 29s
+round-trip filter: kept 2928/4911 (40.4% filtered)
+  baseline                                 Hit@1=0.446 Hit@5=0.757 Hit@10=0.811 MRR=0.570 nDCG@10=0.613 p95=0.091ms
+  q10_statement_raw_append                 Hit@1=0.500 Hit@5=0.770 Hit@10=0.851 MRR=0.617 nDCG@10=0.644 p95=0.138ms
+  q10_statement_roundtrip_filter_append    Hit@1=0.460 Hit@5=0.770 Hit@10=0.824 MRR=0.595 nDCG@10=0.634 p95=0.141ms
+  q10_statement_score_fusion               Hit@1=0.581 Hit@5=0.757 Hit@10=0.851 MRR=0.665 nDCG@10=0.675 p95=0.521ms
+  q10_statement_filtered_score_fusion      Hit@1=0.527 Hit@5=0.770 Hit@10=0.838 MRR=0.628 nDCG@10=0.653 p95=0.537ms
+  q10_statement_filtered_fusion_rerank     Hit@1=0.500 Hit@5=0.743 Hit@10=0.851 MRR=0.600 nDCG@10=0.638 p95=0.374ms
+| condition | hit@1 | hit@5 | hit@10 | mrr | ndcg@10 | generated_questions | kept_questions | filtered_pct | embeddings | index_mb | storage_x | search_p95_ms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| baseline | 0.4459 | 0.7568 | 0.8108 | 0.5696 | 0.6128 | 0 | 0 | 0.0 | 1026 | 9.328 | 1.0 | 0.091 |
+| q10_statement_raw_append | 0.5 | 0.7703 | 0.8514 | 0.6169 | 0.6437 | 4911 | 4911 | 0.0 | 1026 | 9.352 | 1.0 | 0.138 |
+| q10_statement_roundtrip_filter_append | 0.4595 | 0.7703 | 0.8243 | 0.5947 | 0.6344 | 4911 | 2928 | 40.4 | 1026 | 9.352 | 1.0 | 0.141 |
+| q10_statement_score_fusion | 0.5811 | 0.7568 | 0.8514 | 0.6647 | 0.6748 | 4911 | 4911 | 0.0 | 5937 | 35.826 | 3.84 | 0.521 |
+| q10_statement_filtered_score_fusion | 0.527 | 0.7703 | 0.8378 | 0.6281 | 0.6534 | 4911 | 2928 | 40.4 | 3954 | 26.815 | 2.87 | 0.537 |
+| q10_statement_filtered_fusion_rerank | 0.5 | 0.7432 | 0.8514 | 0.5998 | 0.638 | 4911 | 2928 | 40.4 | 3954 | 26.815 | 2.87 | 0.374 |
+failure analysis vs 'q10_statement_score_fusion': +4/-1/=69
+
+All outputs under /Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/results/spiqa/test-B/statement_q10_enrichment

@@ -1,0 +1,49 @@
+{
+  "vs_condition": "q10_raw_append",
+  "count": 2,
+  "queries": [
+    {
+      "query_id": "1804.02767::1",
+      "query": "How does YOLOv3 improve upon previous versions of the YOLO object detection algorithm?",
+      "gold_chunk_ids": [
+        "test-B::1804.02767::fig::7",
+        "test-B::1804.02767::text::7",
+        "test-B::1804.02767::text::1",
+        "test-B::1804.02767::text::0"
+      ],
+      "top_retrieved_chunk_id": "test-B::1804.02767::fig::2",
+      "retrieved_paper_id": "1804.02767",
+      "gold_paper_id": "1804.02767",
+      "same_paper": true,
+      "baseline_top1": "test-B::1804.02767::fig::0",
+      "top_generated_questions": [
+        "What is the title of the paper mentioned in the passage?",
+        "What is the name of the architecture discussed in the passage?",
+        "What is the specific version of YOLO mentioned in the passage?",
+        "What type of improvement does the paper YOLOv3 focus on?",
+        "What is the identifier associated with the table in the passage?"
+      ],
+      "explanation": "Same paper but a non-evidence chunk outranked the gold chunk after enrichment."
+    },
+    {
+      "query_id": "2301.00122::5",
+      "query": "What were the various hyperparameter used in 'grid search'?",
+      "gold_chunk_ids": [
+        "test-B::2301.00122::fig::6"
+      ],
+      "top_retrieved_chunk_id": "test-B::1506.06579::fig::5",
+      "retrieved_paper_id": "1506.06579",
+      "gold_paper_id": "2301.00122",
+      "same_paper": false,
+      "baseline_top1": "test-B::1506.06579::fig::5",
+      "top_generated_questions": [
+        "What is the title of the paper discussed in the passage?",
+        "How many hyperparameter combinations were reviewed to identify the four that produce different styles of recognizable images?",
+        "What is the purpose of the hyperparameter combinations mentioned in the passage?",
+        "Which class visualizations are referenced in relation to the hyperparameter combinations?",
+        "How are the hyperparameter combinations arranged in Table 1?"
+      ],
+      "explanation": "Enriched retrieval pulled a chunk from the WRONG paper to the top."
+    }
+  ]
+}

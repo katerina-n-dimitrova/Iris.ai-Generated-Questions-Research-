@@ -1,0 +1,23 @@
+{
+  "condition": "q10_roundtrip_filter_append",
+  "metrics": {
+    "hit@1": 0.4324,
+    "hit@5": 0.7838,
+    "hit@10": 0.8243,
+    "recall@1": 0.1333,
+    "recall@5": 0.4134,
+    "recall@10": 0.5542,
+    "mrr": 0.5824,
+    "ndcg@10": 0.6315
+  },
+  "questions_generated": 10191,
+  "questions_kept": 7135,
+  "filtered_pct": 30.0,
+  "n_embeddings": 1026,
+  "index_size_mb": 9.328,
+  "search_p95_ms": 0.1,
+  "search_mean_ms": 0.081,
+  "query_embed_mean_ms": 30.254,
+  "encode_seconds": 230.2,
+  "build_seconds": 302.7
+}

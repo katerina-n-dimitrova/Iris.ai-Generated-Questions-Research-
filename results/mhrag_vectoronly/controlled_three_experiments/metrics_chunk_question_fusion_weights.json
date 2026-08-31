@@ -1,0 +1,138 @@
+{
+  "experiment": "Chunk\u2013Question Fusion Weight Analysis",
+  "representation": "existing 44 1024-token chunk vectors and 239 adaptive article-question vectors",
+  "embedding": "existing Iris dim384 caches (not Qwen)",
+  "score_normalization": "per-query min-max, independently for chunk and question scores; chunks without mapped questions receive normalized question score 0",
+  "disabled": [
+    "BM25",
+    "RRF",
+    "geometry reranking",
+    "thresholds"
+  ],
+  "candidate_pool": 44,
+  "final_rank_depth": 10,
+  "selection": {
+    "split": "development only",
+    "primary": "all_evidence_hit@5",
+    "tie_breakers": [
+      "evidence_recall@5",
+      "mrr@10"
+    ],
+    "final_exact_tie": "closest to W50",
+    "winner": "W50",
+    "alpha": 0.5
+  },
+  "development_conditions": [
+    {
+      "condition": "W0",
+      "alpha": 0.0,
+      "chunk_weight": 0.0,
+      "question_weight": 1.0,
+      "metrics": {
+        "evidence_recall@1": 0.28431372549019607,
+        "evidence_recall@5": 0.7549019607843137,
+        "evidence_recall@10": 0.980392156862745,
+        "all_evidence_hit@5": 0.47058823529411764,
+        "mrr@10": 0.7931372549019609
+      },
+      "delta_vs_w50": {
+        "evidence_recall@1": 0.0784313725490196,
+        "evidence_recall@5": -0.019607843137254832,
+        "evidence_recall@10": 0.019607843137254832,
+        "all_evidence_hit@5": 0.0,
+        "mrr@10": 0.11274509803921573
+      }
+    },
+    {
+      "condition": "W25",
+      "alpha": 0.25,
+      "chunk_weight": 0.25,
+      "question_weight": 0.75,
+      "metrics": {
+        "evidence_recall@1": 0.28431372549019607,
+        "evidence_recall@5": 0.7450980392156863,
+        "evidence_recall@10": 0.980392156862745,
+        "all_evidence_hit@5": 0.47058823529411764,
+        "mrr@10": 0.7833333333333333
+      },
+      "delta_vs_w50": {
+        "evidence_recall@1": 0.0784313725490196,
+        "evidence_recall@5": -0.02941176470588225,
+        "evidence_recall@10": 0.019607843137254832,
+        "all_evidence_hit@5": 0.0,
+        "mrr@10": 0.1029411764705882
+      }
+    },
+    {
+      "condition": "W50",
+      "alpha": 0.5,
+      "chunk_weight": 0.5,
+      "question_weight": 0.5,
+      "metrics": {
+        "evidence_recall@1": 0.20588235294117646,
+        "evidence_recall@5": 0.7745098039215685,
+        "evidence_recall@10": 0.9607843137254901,
+        "all_evidence_hit@5": 0.47058823529411764,
+        "mrr@10": 0.6803921568627451
+      },
+      "delta_vs_w50": {
+        "evidence_recall@1": 0.0,
+        "evidence_recall@5": 0.0,
+        "evidence_recall@10": 0.0,
+        "all_evidence_hit@5": 0.0,
+        "mrr@10": 0.0
+      }
+    },
+    {
+      "condition": "W75",
+      "alpha": 0.75,
+      "chunk_weight": 0.75,
+      "question_weight": 0.25,
+      "metrics": {
+        "evidence_recall@1": 0.16666666666666666,
+        "evidence_recall@5": 0.7352941176470589,
+        "evidence_recall@10": 0.9313725490196078,
+        "all_evidence_hit@5": 0.4117647058823529,
+        "mrr@10": 0.6264705882352941
+      },
+      "delta_vs_w50": {
+        "evidence_recall@1": -0.0392156862745098,
+        "evidence_recall@5": -0.039215686274509665,
+        "evidence_recall@10": -0.02941176470588236,
+        "all_evidence_hit@5": -0.05882352941176472,
+        "mrr@10": -0.05392156862745101
+      }
+    },
+    {
+      "condition": "W100",
+      "alpha": 1.0,
+      "chunk_weight": 1.0,
+      "question_weight": 0.0,
+      "metrics": {
+        "evidence_recall@1": 0.14705882352941177,
+        "evidence_recall@5": 0.5392156862745098,
+        "evidence_recall@10": 0.9509803921568626,
+        "all_evidence_hit@5": 0.17647058823529413,
+        "mrr@10": 0.5682072829131652
+      },
+      "delta_vs_w50": {
+        "evidence_recall@1": -0.05882352941176469,
+        "evidence_recall@5": -0.23529411764705876,
+        "evidence_recall@10": -0.009803921568627527,
+        "all_evidence_hit@5": -0.2941176470588235,
+        "mrr@10": -0.11218487394957988
+      }
+    }
+  ],
+  "untouched_test_winner": {
+    "condition": "W50",
+    "alpha": 0.5,
+    "metrics": {
+      "evidence_recall@1": 0.2892156862745098,
+      "evidence_recall@5": 0.8235294117647058,
+      "evidence_recall@10": 0.9411764705882352,
+      "all_evidence_hit@5": 0.5882352941176471,
+      "mrr@10": 0.8529411764705882
+    }
+  }
+}

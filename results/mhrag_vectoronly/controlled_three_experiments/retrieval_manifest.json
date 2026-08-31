@@ -1,0 +1,62 @@
+{
+  "general512": {
+    "chunks": 93,
+    "questions": 900,
+    "chunk_collection": "mhrag_ctl_general512_chunks",
+    "question_collection": "mhrag_ctl_general512_questions"
+  },
+  "general1024": {
+    "chunks": 44,
+    "questions": 430,
+    "chunk_collection": "mhrag_ctl_general1024_chunks",
+    "question_collection": "mhrag_ctl_general1024_questions"
+  },
+  "adaptive512": {
+    "chunks": 93,
+    "questions": 1295,
+    "chunk_collection": "mhrag_ctl_adaptive512_chunks",
+    "question_collection": "mhrag_ctl_adaptive512_questions"
+  },
+  "atomic512": {
+    "chunks": 93,
+    "questions": 4092,
+    "chunk_collection": "mhrag_ctl_atomic512_chunks",
+    "question_collection": "mhrag_ctl_atomic512_questions"
+  },
+  "atomic1024": {
+    "chunks": 44,
+    "questions": 2781,
+    "chunk_collection": "mhrag_ctl_atomic1024_chunks",
+    "question_collection": "mhrag_ctl_atomic1024_questions"
+  },
+  "atomic_adaptive512": {
+    "chunks": 93,
+    "questions": 2278,
+    "chunk_collection": "mhrag_ctl_atomic_adaptive512_chunks",
+    "question_collection": "mhrag_ctl_atomic_adaptive512_questions"
+  },
+  "gepa_general512": {
+    "chunks": 93,
+    "questions": 920,
+    "chunk_collection": "mhrag_ctl_gepa_general512_chunks",
+    "question_collection": "mhrag_ctl_gepa_general512_questions"
+  },
+  "mipro_general512": {
+    "chunks": 93,
+    "questions": 929,
+    "chunk_collection": "mhrag_ctl_mipro_general512_chunks",
+    "question_collection": "mhrag_ctl_mipro_general512_questions"
+  },
+  "gepa_atomic512": {
+    "chunks": 93,
+    "questions": 7497,
+    "chunk_collection": "mhrag_ctl_gepa_atomic512_chunks",
+    "question_collection": "mhrag_ctl_gepa_atomic512_questions"
+  },
+  "mipro_atomic512": {
+    "chunks": 93,
+    "questions": 1218,
+    "chunk_collection": "mhrag_ctl_mipro_atomic512_chunks",
+    "question_collection": "mhrag_ctl_mipro_atomic512_questions"
+  }
+}

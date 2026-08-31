@@ -58,8 +58,10 @@ def _generate(client, question: str, context: str) -> str:
         model=config.OPENAI_CHAT_MODEL,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user",
-             "content": f"Context:\n{context}\n\nQuestion: {question}\n\nAnswer:"},
+            {
+                "role": "user",
+                "content": f"Context:\n{context}\n\nQuestion: {question}\n\nAnswer:",
+            },
         ],
         temperature=0.0,
         max_tokens=256,
@@ -67,9 +69,14 @@ def _generate(client, question: str, context: str) -> str:
     return resp.choices[0].message.content.strip()
 
 
-def run_one(dataset: str, condition: str, dry_run: bool, max_samples: int,
-            retr_latency: Dict[str, float], concurrency: int = DEFAULT_CONCURRENCY
-            ) -> int:
+def run_one(
+    dataset: str,
+    condition: str,
+    dry_run: bool,
+    max_samples: int,
+    retr_latency: Dict[str, float],
+    concurrency: int = DEFAULT_CONCURRENCY,
+) -> int:
     in_path = config.RETRIEVAL_METRICS_DIR / f"retrieved_{dataset}_{condition}.jsonl"
     if not in_path.exists():
         print(f"  {in_path.name} not found; run retrieval first")
@@ -116,22 +123,43 @@ def run_one(dataset: str, condition: str, dry_run: bool, max_samples: int,
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--datasets", nargs="*", default=config.ALL_DATASETS,
-                    choices=config.ALL_DATASETS)
-    ap.add_argument("--conditions", nargs="*", default=list(config.CONDITIONS),
-                    choices=config.CONDITIONS)
+    ap.add_argument(
+        "--datasets",
+        nargs="*",
+        default=config.ALL_DATASETS,
+        choices=config.ALL_DATASETS,
+    )
+    ap.add_argument(
+        "--conditions",
+        nargs="*",
+        default=list(config.CONDITIONS),
+        choices=config.CONDITIONS,
+    )
     ap.add_argument("--max-samples", type=int, default=config.MAX_DATASET_SAMPLES)
-    ap.add_argument("--dry-run", action="store_true",
-                    help="Skip API calls; write empty answers (pipeline test).")
-    ap.add_argument("--concurrency", type=int, default=DEFAULT_CONCURRENCY,
-                    help="Parallel API calls (latency-bound; default 8).")
+    ap.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Skip API calls; write empty answers (pipeline test).",
+    )
+    ap.add_argument(
+        "--concurrency",
+        type=int,
+        default=DEFAULT_CONCURRENCY,
+        help="Parallel API calls (latency-bound; default 8).",
+    )
     args = ap.parse_args()
 
     retr_latency = _retrieval_latency_lookup()
     for dataset in args.datasets:
         for condition in args.conditions:
-            run_one(dataset, condition, args.dry_run, args.max_samples,
-                    retr_latency, args.concurrency)
+            run_one(
+                dataset,
+                condition,
+                args.dry_run,
+                args.max_samples,
+                retr_latency,
+                args.concurrency,
+            )
 
 
 if __name__ == "__main__":

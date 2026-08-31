@@ -10,6 +10,8 @@ python-dotenv>=1.0.0
 
 # Hugging Face embedding backend (default: Octen/Octen-Embedding-0.6B)
 sentence-transformers>=3.0.0
+bertopic>=0.17.0
+keybert>=0.9.0
 # torch is pulled in by sentence-transformers; pin/let pip resolve per platform
 torch>=2.2.0
 
@@ -21,3 +23,7 @@ nltk>=3.8.1
 
 # UX
 tqdm>=4.66.0
+requests>=2.31
+gepa==0.1.4
+dspy==2.6.27
+FlagEmbedding>=1.4.0

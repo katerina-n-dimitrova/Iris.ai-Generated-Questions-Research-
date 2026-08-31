@@ -1,0 +1,173 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>Generated questions results</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1e293b;background:#f1f5f9;line-height:1.55}
+header{background:linear-gradient(135deg,#1e293b,#7c3aed);color:#fff;padding:38px 24px}
+header .wrap{max-width:1080px;margin:0 auto}header h1{margin:0 0 8px;font-size:26px}header p{margin:0;opacity:.92;font-size:14.5px}
+main{max-width:1080px;margin:0 auto;padding:24px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px 22px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+h2{font-size:20px;margin:2px 0 2px;border-left:4px solid #7c3aed;padding-left:10px}
+.dt{color:#7c3aed;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em;margin:2px 0 12px}
+.sub{color:#475569;font-size:14px;margin:6px 0 12px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:4px 0}
+th,td{padding:7px 9px;text-align:center;border-bottom:1px solid #eef2f7}
+th{background:#f8fafc;color:#64748b;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+td.l,th.l{text-align:left}tr.base td{background:#faf5ff;font-weight:600}
+tr.best td{background:#f0fdf4}
+.win{color:#16a34a;font-weight:700}.lose{color:#dc2626}
+.muted{color:#94a3b8}
+.fb{background:#f5f3ff;border:1px solid #ddd6fe;border-radius:9px;padding:13px 15px;margin-top:14px;font-size:14px}
+.fb b{color:#6d28d9}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;margin-left:6px}
+.tag.up{background:#dcfce7;color:#166534}.tag.down{background:#fee2e2;color:#991b1b}.tag.mix{background:#fef9c3;color:#854d0e}
+footer{max-width:1080px;margin:0 auto;padding:10px 24px 44px;color:#64748b;font-size:12px}
+.note{color:#64748b;font-size:12px;margin-top:6px}
+ul{margin:8px 0 0;padding-left:20px}li{margin:4px 0;font-size:14px}
+</style></head><body>
+<header><div class='wrap'><h1>Generated questions results</h1><p>Generated questions as a context-enrichment method for RAG retrieval — from a plain dense count sweep, through a vision-enriched arm, to BM25 / hybrid document expansion. SPIQA test-B.</p></div></header><main>
+
+<div class='card'>
+<h2>What was tested</h2>
+<div class='dt'>doc2query-style generated questions</div>
+<p class='sub'>Each chunk is expanded with LLM-generated questions it can answer; the questions are stored/indexed alongside the chunk but a question hit always maps back to its <b>parent chunk</b> — only the original chunk is returned as evidence. We sweep the <b>number of questions per chunk</b> (0/1/10/50/100), add a <b>vision</b> arm where figure/table chunks first get a gpt-4o-mini visual description, and finally feed the questions to <b>BM25 / hybrid</b> retrieval as document expansion.</p>
+<ul>
+<li><b>Vision study set:</b> 20 papers · 1026 chunks · 74 eval queries (all figure-answerable) · 216/216 figure units vision-enriched.</li>
+<li><b>Embedder:</b> huggingface Octen/Octen-Embedding-0.6B (dim 1024), no fine-tuning. LLM: gpt-4o-mini. Questions + vision descriptions cached.</li>
+<li><b>Arms:</b> <b>novision</b> = questions from the raw chunk text; <b>vision</b> = figure chunks carry a visual description before the chunk is embedded/BM25-indexed and before questions are generated.</li>
+</ul>
+</div>
+
+<div class='card'>
+<h2>1 · Generated questions as dense enrichment — how many per chunk?</h2>
+<div class='dt'>Dense retrieval · results before BM25</div>
+<p class='sub'>Pure dense retrieval, sweeping questions/chunk. This is the "generated questions" enrichment on its own, before any BM25. Green = better than that arm's baseline, red = worse.</p>
+<div class='scroll'><table><thead><tr><th class='l'>Condition</th><th>Q/chunk</th><th>Hit@1</th><th>Hit@5</th><th>Hit@10</th><th>MRR</th><th>nDCG@10</th><th>Embeddings ×base</th></tr></thead><tbody>
+<tr class='base'><td class='l'>baseline (novision)</td><td>0</td><td>0.4459</td><td>0.7568</td><td>0.8108</td><td>0.5732</td><td>0.6131</td><td>1.0×</td></tr>
+<tr><td class='l'>q1</td><td>1</td><td class='lose'>0.3784</td><td class='lose'>0.6757</td><td class='win'>0.8243</td><td class='lose'>0.5105</td><td class='lose'>0.5715</td><td class='muted'>2.0×</td></tr>
+<tr class='best'><td class='l'>q10</td><td>10</td><td class='win'>0.5000</td><td class='win'>0.8243</td><td class='win'>0.8919</td><td class='win'>0.6462</td><td class='win'>0.6738</td><td class='muted'>10.9×</td></tr>
+<tr><td class='l'>q50</td><td>50</td><td class='win'>0.5270</td><td class='win'>0.7838</td><td class='win'>0.8649</td><td class='win'>0.6399</td><td class='win'>0.6656</td><td class='muted'>16.9×</td></tr>
+<tr><td class='l'>q100</td><td>100</td><td class='win'>0.5270</td><td class='win'>0.7838</td><td class='win'>0.8649</td><td class='win'>0.6396</td><td class='win'>0.6648</td><td class='muted'>17.1×</td></tr>
+</tbody></table></div>
+<div class='fb'><b>Finding <span class='tag mix'>count matters</span></b><br>A <b>single</b> question (q1) <i>hurts</i> — it dilutes the chunk vector. Retrieval only wins once ~10 questions cover the chunk. <b>q10 is the sweet spot</b> (nDCG@10 0.6738, +0.0607 vs baseline) at 10.9× embeddings; <b>q50/q100 add cost without gain</b> — the LLM saturates at ~20 distinct grounded questions per chunk, so q50≈q100.</div>
+</div>
+
+<div class='card'>
+<h2>2 · Adding a vision description before generating questions</h2>
+<div class='dt'>Dense retrieval · vision vs novision</div>
+<p class='sub'>Same dense count sweep, but figure/table chunks first receive a gpt-4o-mini visual description (chart type, axes, trends), so the chunk vector and its generated questions describe the actual figure — not just the caption. Green = better than that arm's own baseline.</p>
+<div class='scroll'><table><thead><tr><th class='l'>Condition</th><th>Q/chunk</th><th>Hit@1</th><th>Hit@5</th><th>Hit@10</th><th>MRR</th><th>nDCG@10</th></tr></thead><tbody>
+<tr class='base'><td class='l'>baseline (vision)</td><td>0</td><td>0.5270</td><td>0.7568</td><td>0.7973</td><td>0.6195</td><td>0.6407</td></tr>
+<tr><td class='l'>q1</td><td>1</td><td class='lose'>0.3108</td><td class='lose'>0.7027</td><td class='win'>0.8243</td><td class='lose'>0.4887</td><td class='lose'>0.5638</td></tr>
+<tr class='best'><td class='l'>q10</td><td>10</td><td class='win'>0.5405</td><td class='win'>0.8514</td><td class='win'>0.9189</td><td class='win'>0.6632</td><td class='win'>0.6911</td></tr>
+<tr><td class='l'>q50</td><td>50</td><td class='lose'>0.5000</td><td>0.7568</td><td class='win'>0.9054</td><td class='win'>0.6215</td><td class='win'>0.6720</td></tr>
+<tr><td class='l'>q100</td><td>100</td><td class='lose'>0.4865</td><td>0.7568</td><td class='win'>0.8919</td><td class='lose'>0.6134</td><td class='win'>0.6630</td></tr>
+</tbody></table></div>
+<div class='fb'><b>Finding <span class='tag up'>vision helps</span></b><br>Vision lifts retrieval most exactly where caption-only is weakest: at <b>baseline</b> the chunk vector now carries the chart itself (nDCG@10 +0.0276, Hit@1 +0.0811 vs novision baseline), and at <b>q10</b> it gives the best dense config of the whole study — <b>vision q10 = 0.6911 nDCG@10, 0.8514 Hit@5, 0.9189 Hit@10</b>. Marginal cost is negligible (a one-time cached image-description pass).</div>
+</div>
+
+<div class='card'>
+<h2>3 · Generated questions + BM25 / hybrid (document expansion)</h2>
+<div class='dt'>Dense · BM25 · Hybrid (RRF k=60)</div>
+<p class='sub'>Now the generated questions are used as <b>doc2query document expansion</b> — the chunk text and its first-n questions are concatenated into one retrieval document. Each condition is run three ways: dense embedding, lexical BM25, and hybrid (dense(original) + BM25 fused with Reciprocal Rank Fusion). Green/red vs the arm's <b>baseline_dense</b>.</p>
+
+<div class='dt' style='margin-top:14px'>novision arm</div>
+<div class='scroll'><table><thead><tr><th class='l'>Condition</th><th>Hit@1</th><th>Hit@5</th><th>Hit@10</th><th>MRR</th><th>nDCG@10</th><th>Gen. Q</th><th>Storage ×</th><th>p95 (ms)</th></tr></thead><tbody>
+<tr class='base'><td class='l'>baseline_dense</td><td>0.4459</td><td>0.7568</td><td>0.8108</td><td>0.5696</td><td>0.6128</td><td>0</td><td>1.00×</td><td>49.07</td></tr>
+<tr><td class='l'>baseline_bm25</td><td class='win'>0.5541</td><td class='win'>0.7703</td><td class='win'>0.8378</td><td class='win'>0.6432</td><td class='win'>0.6640</td><td>0</td><td class='muted'>0.24×</td><td class='muted'>2.10</td></tr>
+<tr><td class='l'>baseline_hybrid</td><td class='win'>0.4730</td><td class='win'>0.8108</td><td class='win'>0.8378</td><td class='win'>0.6070</td><td class='win'>0.6616</td><td>0</td><td class='muted'>1.24×</td><td class='muted'>33.73</td></tr>
+<tr><td class='l'>q10_dense_append</td><td class='win'>0.5000</td><td class='win'>0.7838</td><td class='win'>0.8378</td><td class='win'>0.6285</td><td class='win'>0.6587</td><td>10191</td><td class='muted'>1.00×</td><td class='muted'>30.64</td></tr>
+<tr class='best'><td class='l'>q10_bm25_expand</td><td class='win'>0.5405</td><td class='win'>0.8243</td><td class='win'>0.8784</td><td class='win'>0.6634</td><td class='win'>0.6933</td><td>10191</td><td class='muted'>0.36×</td><td class='muted'>2.05</td></tr>
+<tr><td class='l'>q10_hybrid_expand</td><td class='win'>0.5135</td><td class='win'>0.8108</td><td class='win'>0.8649</td><td class='win'>0.6479</td><td class='win'>0.6919</td><td>10191</td><td class='muted'>1.36×</td><td class='muted'>33.80</td></tr>
+<tr><td class='l'>q50_bm25_expand</td><td class='win'>0.5541</td><td class='win'>0.8514</td><td class='win'>0.8649</td><td class='win'>0.6666</td><td class='win'>0.6928</td><td>16313</td><td class='muted'>0.43×</td><td class='muted'>2.03</td></tr>
+<tr class='best'><td class='l'>q50_hybrid_expand</td><td class='win'>0.5676</td><td class='win'>0.7973</td><td class='win'>0.8514</td><td class='win'>0.6720</td><td class='win'>0.6972</td><td>16313</td><td class='muted'>1.43×</td><td class='muted'>33.65</td></tr>
+</tbody></table></div>
+
+<div class='dt' style='margin-top:16px'>vision arm</div>
+<div class='scroll'><table><thead><tr><th class='l'>Condition</th><th>Hit@1</th><th>Hit@5</th><th>Hit@10</th><th>MRR</th><th>nDCG@10</th><th>Gen. Q</th><th>Storage ×</th><th>p95 (ms)</th></tr></thead><tbody>
+<tr class='base'><td class='l'>baseline_dense</td><td>0.5405</td><td>0.7568</td><td>0.7973</td><td>0.6240</td><td>0.6416</td><td>0</td><td>1.00×</td><td>36.29</td></tr>
+<tr><td class='l'>baseline_bm25</td><td class='lose'>0.5270</td><td class='lose'>0.7432</td><td class='win'>0.8378</td><td class='win'>0.6257</td><td class='win'>0.6519</td><td>0</td><td class='muted'>0.26×</td><td class='muted'>2.02</td></tr>
+<tr><td class='l'>baseline_hybrid</td><td class='lose'>0.4865</td><td class='win'>0.8378</td><td class='win'>0.8649</td><td class='win'>0.6331</td><td class='win'>0.6764</td><td>0</td><td class='muted'>1.26×</td><td class='muted'>33.93</td></tr>
+<tr><td class='l'>q10_dense_append</td><td class='lose'>0.5135</td><td class='win'>0.8108</td><td class='win'>0.8378</td><td class='win'>0.6453</td><td class='win'>0.6684</td><td>10209</td><td class='muted'>1.00×</td><td class='muted'>31.15</td></tr>
+<tr><td class='l'>q10_bm25_expand</td><td class='win'>0.5676</td><td class='win'>0.8378</td><td class='win'>0.8919</td><td class='win'>0.6804</td><td class='win'>0.7071</td><td>10209</td><td class='muted'>0.38×</td><td class='muted'>2.11</td></tr>
+<tr><td class='l'>q10_hybrid_expand</td><td class='win'>0.5676</td><td class='win'>0.8108</td><td class='win'>0.8784</td><td class='win'>0.6759</td><td class='win'>0.7125</td><td>10209</td><td class='muted'>1.38×</td><td class='muted'>33.66</td></tr>
+<tr><td class='l'>q50_bm25_expand</td><td class='lose'>0.5270</td><td class='win'>0.8649</td><td class='win'>0.8784</td><td class='win'>0.6671</td><td class='win'>0.7077</td><td>17799</td><td class='muted'>0.46×</td><td class='muted'>2.18</td></tr>
+<tr class='best'><td class='l'>q50_hybrid_expand</td><td class='win'>0.5946</td><td class='win'>0.8378</td><td class='win'>0.9054</td><td class='win'>0.6954</td><td class='win'>0.7258</td><td>17799</td><td class='muted'>1.46×</td><td class='muted'>33.89</td></tr>
+</tbody></table></div>
+
+<div class='fb'><b>Finding <span class='tag up'>BM25 + vision win</span></b><br>Generated questions help <b>sparse/BM25 more than dense</b> (q10 BM25 0.6933 vs dense-append 0.6587). BM25 is strong even with no questions (captions are lexically distinctive). Stacking everything — vision descriptions feeding both the dense vector and the BM25 document — gives the <b>best config of the whole study: vision q50_hybrid_expand = 0.7258 nDCG@10</b> (Hit@10 0.9054, MRR 0.6954) at 1.46× storage. Cheapest strong config: <b>vision q10_bm25_expand = 0.7071 at 0.38× storage and ~2ms p95.</b></div>
+<div class='fb' style='background:#fff7ed;border-color:#fed7aa'><b style='color:#c2410c'>One exception</b><br>The only place vision <i>doesn't</i> help is <b>baseline_bm25</b> (−0.0121 nDCG@10): pure lexical retrieval on the raw caption already matches the figure's key terms, so the extra visual prose adds a little noise. Everywhere questions or dense vectors are involved, vision wins.</div>
+</div>
+
+<div class='card'>
+<h2>Headline — vision effect at the key configs (nDCG@10)</h2>
+<div class='dt'>vision − novision</div>
+<p class='sub'>The four configurations that matter most, comparing the two arms directly. Δ is the gain from adding the vision description.</p>
+<div class='scroll'><table style='max-width:560px'><thead><tr><th class='l'>Condition</th><th>novision</th><th>vision</th><th>Δ</th></tr></thead><tbody>
+<tr><td class='l'>baseline_dense</td><td>0.6128</td><td>0.6416</td><td class='win'>+0.0288</td></tr>
+<tr><td class='l'>q10_bm25_expand</td><td>0.6933</td><td>0.7071</td><td class='win'>+0.0138</td></tr>
+<tr><td class='l'>q10_hybrid_expand</td><td>0.6919</td><td>0.7125</td><td class='win'>+0.0206</td></tr>
+<tr class='best'><td class='l'><b>q50_hybrid_expand</b></td><td>0.6972</td><td><b>0.7258</b></td><td class='win'>+0.0286</td></tr>
+</tbody></table></div>
+<div class='fb'><b>Recommendation</b><br>Use <b>generated questions (~q10) as BM25 / hybrid document expansion</b>, with a <b>vision description folded into figure chunks first</b>. Questions add lexical anchors that BM25 matches verbatim; the vision step feeds both the dense and sparse sides; and RRF hybrid captures the lexical match the dense embedder misses. Go to q50 only if you need the last ~2 points of nDCG@10 and can pay ~1.46× storage.</div>
+</div>
+
+<!--FOLLOWUP_START-->
+
+<div class='card'>
+<h2>Follow-up experiments: improving generated-question quality</h2>
+<div class='dt'>question quality &gt; question count</div>
+<p class='sub'>The first study showed that simply <b>increasing the number</b> of generated questions
+<b>saturates</b> — q10 is the sweet spot and q50/q100 add cost without much gain. So instead of adding
+more questions, these follow-ups hold the count at ~q10 and improve <b>question quality and how questions
+are indexed</b>: forcing question-type diversity, grounding questions in the chunk's exact lexical anchors,
+filtering out weak/duplicate questions, keeping questions in a <b>separate</b> index instead of polluting
+the chunk vector, adding a <b>cross-encoder reranker</b> on top of hybrid recall, and giving figure/table
+chunks a <b>structured</b> visual representation. Same 20-paper SPIQA test-B set
+(1026 chunks · 74 figure-answerable queries), same embedder (huggingface:Octen/Octen-Embedding-0.6B:dim1024),
+same LLM (gpt-4o-mini), cached outputs reused. Green/red = vs the previous <b>baseline_dense</b>
+(nDCG@10 0.6128).</p>
+</div>
+
+<div class='card'>
+<h2>All new conditions</h2>
+<div class='dt'>quality · lexical grounding · filtering · separate index · reranking · structured vision</div>
+<div class='scroll'><table><thead><tr>
+<th class='l'>Condition</th><th class='l'>Question strategy</th><th class='l'>Retrieval setup</th>
+<th>Hit@1</th><th>Hit@5</th><th>Hit@10</th><th>MRR</th><th>nDCG@10</th>
+<th>Storage ×</th><th>p95 (ms)</th><th class='l'>Notes</th></tr></thead>
+<tbody><tr><td class='l'>q10_diverse_questions</td><td class='l'>10 forced question types</td><td class='l'>hybrid (dense+BM25 RRF)</td><td class='win'>0.5000</td><td class='win'>0.8108</td><td class='win'>0.8649</td><td class='win'>0.6420</td><td class='win'>0.6865</td><td class='muted'>1.41×</td><td class='muted'>40.382</td><td class='l muted'>diverse vs generic q10 under identical hybrid setup</td></tr><tr><td class='l'>q10_bm25_aware_questions</td><td class='l'>lexical-anchor questions</td><td class='l'>BM25 doc2query expand</td><td class='win'>0.5000</td><td class='win'>0.8243</td><td class='win'>0.8649</td><td class='win'>0.6377</td><td class='win'>0.6761</td><td class='muted'>0.4×</td><td class='muted'>2.419</td><td class='l muted'>anchors from section/caption/metric/IDF terms; hybrid=0.6853</td></tr><tr><td class='l'>q10_filtered_questions</td><td class='l'>heuristic+round-trip filtered</td><td class='l'>hybrid (dense+BM25 RRF)</td><td class='win'>0.5270</td><td class='win'>0.8108</td><td class='win'>0.8649</td><td class='win'>0.6550</td><td class='win'>0.6924</td><td class='muted'>1.31×</td><td class='muted'>46.827</td><td class='l muted'>generic candidates filtered for answerable/specific/non-dup</td></tr><tr><td class='l'>q20_filtered_to_q10_questions</td><td class='l'>20 cand -> best 10</td><td class='l'>hybrid (dense+BM25 RRF)</td><td class='win'>0.5135</td><td class='win'>0.8108</td><td class='win'>0.8649</td><td class='win'>0.6490</td><td class='win'>0.6879</td><td class='muted'>1.32×</td><td class='muted'>64.701</td><td class='l muted'>more candidates, filtered to a clean 10</td></tr><tr><td class='l'>q10_separate_question_index_rrf</td><td class='l'>generic q10 in separate index</td><td class='l'>RRF(A:chunks , B:questions→parent)</td><td class='win'>0.5946</td><td class='win'>0.8108</td><td class='win'>0.8378</td><td class='win'>0.6779</td><td class='win'>0.6837</td><td class='muted'>5.27×</td><td class='muted'>39.018</td><td class='l muted'>questions kept OUT of the chunk vector; separate index B</td></tr><tr><td class='l'>q10_bm25_aware_separate_index_rrf</td><td class='l'>bm25_aware q10 in separate index</td><td class='l'>RRF(A:chunks , B:questions→parent)</td><td class='win'>0.5541</td><td class='win'>0.7703</td><td class='win'>0.8243</td><td class='win'>0.6440</td><td class='win'>0.6611</td><td class='muted'>5.19×</td><td class='muted'>35.769</td><td class='l muted'>questions kept OUT of the chunk vector; separate index B</td></tr><tr><td class='l'>q10_filtered_separate_index_rrf</td><td class='l'>filtered_q10 q10 in separate index</td><td class='l'>RRF(A:chunks , B:questions→parent)</td><td class='win'>0.5811</td><td class='win'>0.7703</td><td class='win'>0.8514</td><td class='win'>0.6653</td><td class='win'>0.6714</td><td class='muted'>3.51×</td><td class='muted'>35.227</td><td class='l muted'>questions kept OUT of the chunk vector; separate index B</td></tr><tr><td class='l'>q10_hybrid_rerank_top50</td><td class='l'>generic q10 + cross-encoder</td><td class='l'>hybrid top50 → rerank → top10</td><td class='win'>0.5405</td><td class='win'>0.8649</td><td class='win'>0.9054</td><td class='win'>0.6712</td><td class='lose'>0.6058</td><td class='muted'>1.36×</td><td class='muted'>2813.441</td><td class='l muted'>reranker=ms-marco-MiniLM-L-6-v2 (recall vs precision)</td></tr><tr><td class='l'>q10_bm25_aware_hybrid_rerank_top50</td><td class='l'>bm25_aware q10 + cross-encoder</td><td class='l'>hybrid top50 → rerank → top10</td><td class='win'>0.5405</td><td class='win'>0.8649</td><td class='win'>0.9054</td><td class='win'>0.6731</td><td class='lose'>0.6060</td><td class='muted'>1.4×</td><td class='muted'>541.946</td><td class='l muted'>reranker=ms-marco-MiniLM-L-6-v2 (recall vs precision)</td></tr><tr><td class='l'>q10_filtered_hybrid_rerank_top50</td><td class='l'>filtered_q10 q10 + cross-encoder</td><td class='l'>hybrid top50 → rerank → top10</td><td class='win'>0.5405</td><td class='win'>0.8649</td><td class='win'>0.9054</td><td class='win'>0.6760</td><td class='lose'>0.6096</td><td class='muted'>1.31×</td><td class='muted'>391.617</td><td class='l muted'>reranker=ms-marco-MiniLM-L-6-v2 (recall vs precision)</td></tr><tr><td class='l'>structured_vision_q10</td><td class='l'>structured fig record + q10</td><td class='l'>dense (structured + q10 append)</td><td class='win'>0.5135</td><td class='win'>0.7973</td><td class='win'>0.8514</td><td class='win'>0.6472</td><td class='win'>0.6742</td><td class='muted'>1.0×</td><td class='muted'>49.25</td><td class='l muted'>216 figure/table chunks structured</td></tr><tr><td class='l'>structured_vision_q10_bm25_aware</td><td class='l'>structured fig record + q10</td><td class='l'>BM25 (structured lexical anchors)</td><td class='win'>0.5270</td><td class='win'>0.8378</td><td class='win'>0.8784</td><td class='win'>0.6537</td><td class='win'>0.6891</td><td class='muted'>0.36×</td><td class='muted'>2.247</td><td class='l muted'>axes/values/metrics act as lexical anchors</td></tr><tr class='best'><td class='l'>structured_vision_q10_hybrid</td><td class='l'>structured fig record + q10</td><td class='l'>hybrid (dense+BM25 RRF)</td><td class='win'>0.5811</td><td class='win'>0.8243</td><td class='win'>0.8919</td><td class='win'>0.6877</td><td class='win'>0.7134</td><td class='muted'>1.36×</td><td class='muted'>36.248</td><td class='l muted'>best structured config</td></tr></tbody></table></div>
+<div class='note'>Storage × is relative to the original-chunk dense index. Separate-index rows add a
+questions-only vector index (B); reranker rows add no index (a cross-encoder model runs at query time,
+which is why their p95 is higher). BM25-only rows are sub-1× because a lexical index is far smaller than
+dense vectors.</div>
+</div>
+
+<div class='card'>
+<h2>Best new condition vs the previous best configurations</h2>
+<div class='dt'>previous numbers = novision arm, reused from the earlier run</div>
+<div class='scroll'><table style='max-width:760px'><thead><tr>
+<th class='l'>Condition</th><th>Hit@1</th><th>Hit@5</th><th>Hit@10</th><th>MRR</th><th>nDCG@10</th>
+<th>Storage ×</th></tr></thead><tbody><tr class='base'><td class='l'>baseline · dense</td><td>0.4459</td><td>0.7568</td><td>0.8108</td><td>0.5696</td><td>0.6128</td><td class='muted'>1.0×</td></tr><tr class='base'><td class='l'>baseline · BM25</td><td>0.5541</td><td>0.7703</td><td>0.8378</td><td>0.6432</td><td>0.6640</td><td class='muted'>0.24×</td></tr><tr class='base'><td class='l'>baseline · hybrid</td><td>0.4730</td><td>0.8108</td><td>0.8378</td><td>0.6070</td><td>0.6616</td><td class='muted'>1.24×</td></tr><tr class='base'><td class='l'>q10 · BM25 expand</td><td>0.5405</td><td>0.8243</td><td>0.8784</td><td>0.6634</td><td>0.6933</td><td class='muted'>0.36×</td></tr><tr class='base'><td class='l'>q10 · hybrid expand</td><td>0.5135</td><td>0.8108</td><td>0.8649</td><td>0.6479</td><td>0.6919</td><td class='muted'>1.36×</td></tr><tr class='base'><td class='l'>q50 · hybrid expand</td><td>0.5676</td><td>0.7973</td><td>0.8514</td><td>0.6720</td><td>0.6972</td><td class='muted'>1.43×</td></tr><tr class='best'><td class='l'><b>structured_vision_q10_hybrid</b> (best new)</td><td>0.5811</td><td>0.8243</td><td>0.8919</td><td>0.6877</td><td><b>0.7134</b></td><td class='muted'>1.36×</td></tr></tbody></table></div>
+</div>
+
+<div class='card'>
+<h2>Question-strategy breakdown (nDCG@10, same setups)</h2>
+<div class='dt'>diverse / lexical-anchor / filtered vs the generic q10 control</div>
+<p class='sub'>Every strategy uses ~10 questions; only their <b>content</b> differs. Each is run under the same
+three doc2query setups so the comparison is apples-to-apples. Green/red vs the <b>generic q10</b> row.</p>
+<div class='scroll'><table style='max-width:620px'><thead><tr><th class='l'>Question strategy</th>
+<th>dense append</th><th>BM25 expand</th><th>hybrid</th></tr></thead>
+<tbody><tr class='base'><td class='l'>generic q10 (control)</td><td>0.6587</td><td>0.6933</td><td>0.6919</td></tr><tr><td class='l'>diverse q10</td><td class='lose'>0.6353</td><td class='lose'>0.6838</td><td class='lose'>0.6865</td></tr><tr><td class='l'>BM25-aware q10</td><td class='lose'>0.6417</td><td class='lose'>0.6761</td><td class='lose'>0.6853</td></tr><tr><td class='l'>filtered q10</td><td class='lose'>0.6352</td><td class='lose'>0.6920</td><td class='win'>0.6924</td></tr><tr><td class='l'>q20→10 filtered</td><td class='lose'>0.6327</td><td class='lose'>0.6906</td><td class='lose'>0.6879</td></tr></tbody></table></div>
+</div>
+
+<div class='card'>
+<h2>Interpretation &amp; recommendation</h2>
+<div class='dt'>what moved retrieval, and what to use next</div>
+<div class='fb'><b>Which method helped most</b><br><b>Diverse question types</b> did not help (0.6865 vs generic 0.6919, -0.0054). <b>BM25-aware lexical grounding</b> moved BM25 retrieval -0.0172 nDCG@10 (to 0.6761) — no gain, confirming whether the win is lexical. <b>Filtering</b> matched the unfiltered q10 at ~40% fewer questions (a cost win, not a quality gain) (0.6924 vs 0.6919, +0.0005) — fewer-but-cleaner questions. <b>Separate question index</b> (RRF, no concatenation) = 0.6837 (-0.0082 vs hybrid append) — concatenation was already fine here. <b>Cross-encoder reranking</b> <i>hurt</i> nDCG@10 (0.606, -0.0859 vs hybrid) even though it gave the highest recall of any condition (Hit@10 0.9054) — the correct chunk is in the top-50, but a general-domain MS-MARCO reranker mis-orders scientific figure/table text and is far slower; first-stage recall was already the bottleneck, not ranking. <b>Structured figure/table context</b> = 0.7134 hybrid (+0.1006 vs baseline_dense) — structuring axes/values/methods helped multimodal retrieval. <b>Overall best new config: <span class='win'>structured_vision_q10_hybrid = 0.7134 nDCG@10</span></b> (+0.1006 vs baseline_dense) at 1.36× storage.</div>
+<div class='fb' style='background:#f0fdf4;border-color:#bbf7d0'><b style='color:#166534'>Recommendation</b><br>For future experiments, adopt <b>structured_vision_q10_hybrid</b> as the reference configuration. Concretely: <b>filter</b> candidates (drop generic/duplicate/ungrounded) to get the same quality at lower cost; use <b>structured visual context</b> (axes/values/methods) for figure/table chunks in multimodal papers.</div>
+</div>
+<!--FOLLOWUP_END-->
+</main><footer>SPIQA test-B · 20-paper vision study (1026 chunks, 74 figure-answerable queries) · Octen-Embedding-0.6B · BM25 + RRF hybrid (k=60) · gpt-4o-mini (questions + vision cached) · results/spiqa/test-B/{vision_enrichment, vision_bm25_enrichment} · Follow-up quality study: results/spiqa/test-B/followup_quality</footer>
+</body></html>

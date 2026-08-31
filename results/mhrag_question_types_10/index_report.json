@@ -1,0 +1,14 @@
+{
+  "counts": {
+    "baseline": 96,
+    "atomic": 410,
+    "relation": 436,
+    "causal": 420,
+    "temporal": 358,
+    "comparison": 385,
+    "compositional": 307,
+    "broad": 188
+  },
+  "embedding_model": "huggingface:Octen/Octen-Embedding-0.6B:dim1024",
+  "vector_dim": 1024
+}

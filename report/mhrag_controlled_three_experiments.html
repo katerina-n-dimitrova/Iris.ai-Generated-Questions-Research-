@@ -1,0 +1,373 @@
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Controlled MultiHop-RAG retrieval experiments</title><style>
+:root{--bg:#fff;--fg:#161a21;--muted:#5b6572;--line:#dce2ea;--card:#f6f8fb;--good:#08783d;--bad:#bf3b30;--flat:#7c8795}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1319;--fg:#e6eaf0;--muted:#9aa5b3;--line:#29313d;--card:#161c25;--good:#38d17a;--bad:#ff6b5e;--flat:#8792a1}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:1800px;margin:auto;padding:30px 18px 70px}h1{font-size:25px;margin:0}h2{font-size:19px;margin:34px 0 8px}h3{font-size:17px;margin:28px 0 8px}.cap,.small{color:var(--muted);font-size:11px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid var(--line);padding:7px;text-align:center;vertical-align:top}th{background:var(--card)}.left{text-align:left}.v{font-weight:700;font-size:13px}.d{font-size:10px}.good{color:var(--good)}.bad{color:var(--bad)}.flat{color:var(--flat)}.conclusion{background:var(--card);padding:10px 12px;margin:0;border:1px solid var(--line);border-top:0}
+</style></head><body><div class="wrap">
+<h1>MultiHop-RAG — three controlled retrieval experiments</h1>
+<p class="cap">Final metrics are on the untouched 17-query test split.
+Train/development/test = 50/17/17, seed 42, stratified by inference,
+temporal, and comparison. Iris dim-384 embeds all chunks, questions, and user
+queries. Rank depth=10; RRF k=60.
+Experiment 2 thresholds 0.695022 (vector fallback) and
+0.695022 (hybrid fallback) were selected only on
+development Evidence Recall@5. Every metric cell shows value and change from
+that experiment’s base.</p>
+<h2>Experiment 1</h2>
+<table><thead><tr><th>Condition</th><th>Question generation</th>
+<th>Generated questions</th><th>Chunk / overlap</th><th>Indexes used</th><th>Retrieval</th>
+<th>Generator</th>
+<th>Evidence Recall@1</th><th>Evidence Recall@5</th><th>Evidence Recall@10</th><th>Full-evidence@5</th><th>MRR@10</th></tr></thead><tbody><tr>
+<td class="left"><b>E1-ManualPrompt</b></td>
+<td class="left">10 general questions per chunk</td>
+<td>900</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_general512_chunks + mhrag_ctl_general512_questions</td>
+<td class="left">Separate chunk + question vectors; 0.5/0.5 score fusion</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.103</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.480</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.804</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.487</div><div class="d flat">(+0.000)</div></td></tr><tr>
+<td class="left"><b>E1-BM25</b></td>
+<td class="left">10 general questions per chunk</td>
+<td>900</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_general512_chunks + mhrag_ctl_general512_questions</td>
+<td class="left">Dual-index vector fusion + BM25 chunk RRF</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.167</div><div class="d good">(+0.064)</div></td><td><div class="v">0.652</div><div class="d good">(+0.172)</div></td><td><div class="v">0.902</div><div class="d good">(+0.098)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.612</div><div class="d good">(+0.125)</div></td></tr><tr>
+<td class="left"><b>E1-LargeChunk</b></td>
+<td class="left">10 general questions per chunk</td>
+<td>430</td>
+<td>1024 / 128</td>
+<td class="left small">mhrag_ctl_general1024_chunks + mhrag_ctl_general1024_questions</td>
+<td class="left">Separate chunk + question vectors; 0.5/0.5 score fusion</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.176</div><div class="d good">(+0.074)</div></td><td><div class="v">0.672</div><div class="d good">(+0.191)</div></td><td><div class="v">0.941</div><div class="d good">(+0.137)</div></td><td><div class="v">0.412</div><div class="d good">(+0.176)</div></td><td><div class="v">0.666</div><div class="d good">(+0.179)</div></td></tr><tr>
+<td class="left"><b>E1-GEPA</b></td>
+<td class="left">10 general questions per chunk</td>
+<td>920</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_gepa_general512_chunks + mhrag_ctl_gepa_general512_questions</td>
+<td class="left">Separate chunk + question vectors; 0.5/0.5 score fusion</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.147</div><div class="d good">(+0.044)</div></td><td><div class="v">0.505</div><div class="d good">(+0.025)</div></td><td><div class="v">0.843</div><div class="d good">(+0.039)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.617</div><div class="d good">(+0.130)</div></td></tr><tr>
+<td class="left"><b>E1-MIPROv2</b></td>
+<td class="left">10 general questions per chunk</td>
+<td>929</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_mipro_general512_chunks + mhrag_ctl_mipro_general512_questions</td>
+<td class="left">Separate chunk + question vectors; 0.5/0.5 score fusion</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.172</div><div class="d good">(+0.069)</div></td><td><div class="v">0.637</div><div class="d good">(+0.157)</div></td><td><div class="v">0.887</div><div class="d good">(+0.083)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.626</div><div class="d good">(+0.140)</div></td></tr><tr>
+<td class="left"><b>E1-Adaptive</b></td>
+<td class="left">5/10/15 by distinct-information level</td>
+<td>1,295</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_adaptive512_chunks + mhrag_ctl_adaptive512_questions</td>
+<td class="left">Separate chunk + question vectors; 0.5/0.5 score fusion</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.211</div><div class="d good">(+0.108)</div></td><td><div class="v">0.618</div><div class="d good">(+0.137)</div></td><td><div class="v">0.887</div><div class="d good">(+0.083)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.730</div><div class="d good">(+0.244)</div></td></tr><tr>
+<td class="left"><b>E1-QueStER</b></td>
+<td class="left">None; query-side keyword rewriting</td>
+<td>0</td>
+<td>512 / 128</td>
+<td class="left small">BM25 over original chunks</td>
+<td class="left">Qwen keyword rewrite sent directly to BM25</td>
+<td>Qwen/Qwen2.5-3B-Instruct<br><span class="small">T=0 · deterministic JSON</span></td>
+<td><div class="v">0.186</div><div class="d good">(+0.083)</div></td><td><div class="v">0.583</div><div class="d good">(+0.103)</div></td><td><div class="v">0.794</div><div class="d bad">(-0.010)</div></td><td><div class="v">0.294</div><div class="d good">(+0.059)</div></td><td><div class="v">0.662</div><div class="d good">(+0.175)</div></td></tr></tbody></table>
+<p class="conclusion"><b>E1-LargeChunk</b> has the best test Evidence Recall@5 (0.672, +0.191 versus the experiment base). Generated questions complement original chunk vectors. The improvement came from the 1024-token chunk size while reducing stored vectors from 993 to 474, so the extra-cost tradeoff is justified on this test.</p><h3>Experiment 1B — Article-first question generation</h3>
+<p class="cap">For each complete article, 10 questions are generated before
+chunking. The article is then split, each question is linked to its supporting
+chunk ID(s), and question and original-chunk indexes are searched in parallel. This changes the question-generation unit and
+evidence-mapping order while preserving Experiment 1's retrieval
+policy.</p>
+<table><thead><tr><th>Condition</th><th>Question generation</th>
+<th>Generated questions</th><th>Chunk / overlap</th><th>Indexes used</th><th>Retrieval</th>
+<th>Generator</th>
+<th>Evidence Recall@1</th><th>Evidence Recall@5</th><th>Evidence Recall@10</th><th>Full-evidence@5</th><th>MRR@10</th></tr></thead><tbody><tr>
+<td class="left"><b>Article-E1-ManualPrompt</b></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_article_article_manual512_chunks + mhrag_ctl_article_article_manual512_questions</td>
+<td class="left">Separate chunk + mapped article-question vectors; 0.5/0.5 score fusion</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.211</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.583</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.828</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.294</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.716</div><div class="d flat">(+0.000)</div></td></tr><tr>
+<td class="left"><b>Article-E1-BM25</b></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_article_article_manual512_chunks + mhrag_ctl_article_article_manual512_questions</td>
+<td class="left">Article-question/chunk vector fusion + BM25 chunk RRF</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.191</div><div class="d bad">(-0.020)</div></td><td><div class="v">0.672</div><div class="d good">(+0.088)</div></td><td><div class="v">0.838</div><div class="d good">(+0.010)</div></td><td><div class="v">0.353</div><div class="d good">(+0.059)</div></td><td><div class="v">0.725</div><div class="d good">(+0.010)</div></td></tr><tr>
+<td class="left"><b>Article-E1-LargeChunk</b></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>1024 / 128</td>
+<td class="left small">mhrag_ctl_article_article_manual1024_chunks + mhrag_ctl_article_article_manual1024_questions</td>
+<td class="left">Separate chunk + mapped article-question vectors; 0.5/0.5 score fusion</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.289</div><div class="d good">(+0.078)</div></td><td><div class="v">0.725</div><div class="d good">(+0.142)</div></td><td><div class="v">0.897</div><div class="d good">(+0.069)</div></td><td><div class="v">0.412</div><div class="d good">(+0.118)</div></td><td><div class="v">0.863</div><div class="d good">(+0.147)</div></td></tr><tr>
+<td class="left"><b>Article-E1-LargeChunk-BM25</b></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>1024 / 128</td>
+<td class="left small">mhrag_ctl_article_article_manual1024_chunks + mhrag_ctl_article_article_manual1024_questions</td>
+<td class="left">Article-question/chunk vector fusion + BM25 chunk RRF</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.289</div><div class="d good">(+0.078)</div></td><td><div class="v">0.828</div><div class="d good">(+0.245)</div></td><td><div class="v">0.941</div><div class="d good">(+0.113)</div></td><td><div class="v">0.588</div><div class="d good">(+0.294)</div></td><td><div class="v">0.863</div><div class="d good">(+0.147)</div></td></tr><tr>
+<td class="left"><b>Article-E1-GEPA</b></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_article_article_gepa512_chunks + mhrag_ctl_article_article_gepa512_questions</td>
+<td class="left">Separate chunk + mapped article-question vectors; 0.5/0.5 score fusion</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.147</div><div class="d bad">(-0.064)</div></td><td><div class="v">0.564</div><div class="d bad">(-0.020)</div></td><td><div class="v">0.848</div><div class="d good">(+0.020)</div></td><td><div class="v">0.176</div><div class="d bad">(-0.118)</div></td><td><div class="v">0.593</div><div class="d bad">(-0.123)</div></td></tr><tr>
+<td class="left"><b>Article-E1-MIPROv2</b></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_article_article_mipro512_chunks + mhrag_ctl_article_article_mipro512_questions</td>
+<td class="left">Separate chunk + mapped article-question vectors; 0.5/0.5 score fusion</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.309</div><div class="d good">(+0.098)</div></td><td><div class="v">0.662</div><div class="d good">(+0.078)</div></td><td><div class="v">0.789</div><div class="d bad">(-0.039)</div></td><td><div class="v">0.353</div><div class="d good">(+0.059)</div></td><td><div class="v">0.865</div><div class="d good">(+0.149)</div></td></tr></tbody></table>
+<p class="conclusion"><b>Article-E1-LargeChunk-BM25</b> has the best
+Evidence Recall@5 (0.828,
++0.245 versus the article-first base), using
+194 stored vectors. Article-level generated questions complement the original chunk vectors.</p><h2>Experiment 2</h2>
+<table><thead><tr><th>Condition</th><th>Question generation</th>
+<th>Generated questions</th><th>Chunk / overlap</th><th>Indexes used</th><th>Retrieval</th>
+<th>Generator</th>
+<th>Evidence Recall@1</th><th>Evidence Recall@5</th><th>Evidence Recall@10</th><th>Full-evidence@5</th><th>MRR@10</th></tr></thead><tbody><tr>
+<td class="left"><b>E2-ManualPrompt</b><div class="small">question route 4/17; fallback 13/17; weak-match fallback ΔR@5 +0.122</div></td>
+<td class="left">10 general questions per chunk</td>
+<td>900</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_general512_chunks + mhrag_ctl_general512_questions</td>
+<td class="left">Question vectors first; chunk-vector fallback</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.157</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.534</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.745</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.614</div><div class="d flat">(+0.000)</div></td></tr><tr>
+<td class="left"><b>E2-BM25</b><div class="small">question route 4/17; fallback 13/17; weak-match fallback ΔR@5 +0.096</div></td>
+<td class="left">10 general questions per chunk</td>
+<td>900</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_general512_chunks + mhrag_ctl_general512_questions</td>
+<td class="left">Question vectors first; chunk vector + BM25 fallback</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.221</div><div class="d good">(+0.064)</div></td><td><div class="v">0.515</div><div class="d bad">(-0.020)</div></td><td><div class="v">0.863</div><div class="d good">(+0.118)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.731</div><div class="d good">(+0.118)</div></td></tr><tr>
+<td class="left"><b>E2-LargeChunk</b><div class="small">question route 5/17; fallback 12/17; weak-match fallback ΔR@5 +0.028</div></td>
+<td class="left">10 general questions per chunk</td>
+<td>430</td>
+<td>1024 / 128</td>
+<td class="left small">mhrag_ctl_general1024_chunks + mhrag_ctl_general1024_questions</td>
+<td class="left">Question vectors first; chunk-vector fallback</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.260</div><div class="d good">(+0.103)</div></td><td><div class="v">0.632</div><div class="d good">(+0.098)</div></td><td><div class="v">0.941</div><div class="d good">(+0.196)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.796</div><div class="d good">(+0.182)</div></td></tr><tr>
+<td class="left"><b>E2-GEPA</b><div class="small">question route 5/17; fallback 12/17; weak-match fallback ΔR@5 +0.083</div></td>
+<td class="left">10 general questions per chunk</td>
+<td>920</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_gepa_general512_chunks + mhrag_ctl_gepa_general512_questions</td>
+<td class="left">Question vectors first; chunk-vector fallback</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.176</div><div class="d good">(+0.020)</div></td><td><div class="v">0.554</div><div class="d good">(+0.020)</div></td><td><div class="v">0.706</div><div class="d bad">(-0.039)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.661</div><div class="d good">(+0.047)</div></td></tr><tr>
+<td class="left"><b>E2-MIPROv2</b><div class="small">question route 10/17; fallback 7/17; weak-match fallback ΔR@5 -0.179</div></td>
+<td class="left">10 general questions per chunk</td>
+<td>929</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_mipro_general512_chunks + mhrag_ctl_mipro_general512_questions</td>
+<td class="left">Question vectors first; chunk-vector fallback</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.225</div><div class="d good">(+0.069)</div></td><td><div class="v">0.603</div><div class="d good">(+0.069)</div></td><td><div class="v">0.833</div><div class="d good">(+0.088)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.700</div><div class="d good">(+0.086)</div></td></tr></tbody></table>
+<p class="conclusion"><b>E2-LargeChunk</b> has the best test Evidence Recall@5 (0.632, +0.098 versus the experiment base). Generated questions are the first layer; original chunks remain a fallback rather than being replaced. The improvement came from the 1024-token chunk size while reducing stored vectors from 993 to 474, so the extra-cost tradeoff is justified on this test.</p><h3>Experiment 2B — Article-first question generation</h3>
+<p class="cap">For each complete article, 10 questions are generated before
+chunking. The article is then split, each question is linked to its supporting
+chunk ID(s), and the question index is searched first and weak matches fall back to the original chunks. This changes the question-generation unit and
+evidence-mapping order while preserving Experiment 2's retrieval
+policy.</p>
+<table><thead><tr><th>Condition</th><th>Question generation</th>
+<th>Generated questions</th><th>Chunk / overlap</th><th>Indexes used</th><th>Retrieval</th>
+<th>Generator</th>
+<th>Evidence Recall@1</th><th>Evidence Recall@5</th><th>Evidence Recall@10</th><th>Full-evidence@5</th><th>MRR@10</th></tr></thead><tbody><tr>
+<td class="left"><b>Article-E2-ManualPrompt</b><div class="small">question route 2/17; fallback 15/17; weak-match fallback ΔR@5 +0.011</div></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_article_article_manual512_chunks + mhrag_ctl_article_article_manual512_questions</td>
+<td class="left">Mapped article-question vectors first; chunk-vector fallback</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.216</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.574</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.735</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.745</div><div class="d flat">(+0.000)</div></td></tr><tr>
+<td class="left"><b>Article-E2-BM25</b><div class="small">question route 2/17; fallback 15/17; weak-match fallback ΔR@5 +0.056</div></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_article_article_manual512_chunks + mhrag_ctl_article_article_manual512_questions</td>
+<td class="left">Mapped article-question vectors first; chunk vector + BM25 fallback</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.260</div><div class="d good">(+0.044)</div></td><td><div class="v">0.613</div><div class="d good">(+0.039)</div></td><td><div class="v">0.853</div><div class="d good">(+0.118)</div></td><td><div class="v">0.294</div><div class="d good">(+0.059)</div></td><td><div class="v">0.838</div><div class="d good">(+0.093)</div></td></tr><tr>
+<td class="left"><b>Article-E2-LargeChunk</b><div class="small">question route 12/17; fallback 5/17; weak-match fallback ΔR@5 -0.217</div></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>1024 / 128</td>
+<td class="left small">mhrag_ctl_article_article_manual1024_chunks + mhrag_ctl_article_article_manual1024_questions</td>
+<td class="left">Mapped article-question vectors first; chunk-vector fallback</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.348</div><div class="d good">(+0.132)</div></td><td><div class="v">0.652</div><div class="d good">(+0.078)</div></td><td><div class="v">0.946</div><div class="d good">(+0.211)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.961</div><div class="d good">(+0.216)</div></td></tr><tr>
+<td class="left"><b>Article-E2-GEPA</b><div class="small">question route 8/17; fallback 9/17; weak-match fallback ΔR@5 +0.259</div></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_article_article_gepa512_chunks + mhrag_ctl_article_article_gepa512_questions</td>
+<td class="left">Mapped article-question vectors first; chunk-vector fallback</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.157</div><div class="d bad">(-0.059)</div></td><td><div class="v">0.652</div><div class="d good">(+0.078)</div></td><td><div class="v">0.755</div><div class="d good">(+0.020)</div></td><td><div class="v">0.294</div><div class="d good">(+0.059)</div></td><td><div class="v">0.659</div><div class="d bad">(-0.086)</div></td></tr><tr>
+<td class="left"><b>Article-E2-MIPROv2</b><div class="small">question route 8/17; fallback 9/17; weak-match fallback ΔR@5 +0.028</div></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_article_article_mipro512_chunks + mhrag_ctl_article_article_mipro512_questions</td>
+<td class="left">Mapped article-question vectors first; chunk-vector fallback</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.245</div><div class="d good">(+0.029)</div></td><td><div class="v">0.593</div><div class="d good">(+0.020)</div></td><td><div class="v">0.716</div><div class="d bad">(-0.020)</div></td><td><div class="v">0.294</div><div class="d good">(+0.059)</div></td><td><div class="v">0.770</div><div class="d good">(+0.025)</div></td></tr></tbody></table>
+<p class="conclusion"><b>Article-E2-GEPA</b> has the best
+Evidence Recall@5 (0.652,
++0.078 versus the article-first base), using
+243 stored vectors. Article-level generated questions are searched first; original chunks remain a gated fallback.</p><h2>Experiment 3</h2>
+<table><thead><tr><th>Condition</th><th>Question generation</th>
+<th>Generated questions</th><th>Chunk / overlap</th><th>Indexes used</th><th>Retrieval</th>
+<th>Generator</th>
+<th>Evidence Recall@1</th><th>Evidence Recall@5</th><th>Evidence Recall@10</th><th>Full-evidence@5</th><th>MRR@10</th></tr></thead><tbody><tr>
+<td class="left"><b>E3-ManualPrompt</b></td>
+<td class="left">3 closed-answer questions per atomic fact</td>
+<td>4,092</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_atomic512_questions</td>
+<td class="left">Atomic-question vectors only; parent-chunk max score</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.186</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.529</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.681</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.626</div><div class="d flat">(+0.000)</div></td></tr><tr>
+<td class="left"><b>E3-BM25</b></td>
+<td class="left">3 closed-answer questions per atomic fact</td>
+<td>4,092</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_atomic512_questions</td>
+<td class="left">Atomic-question vectors + BM25 parent-chunk RRF</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.196</div><div class="d good">(+0.010)</div></td><td><div class="v">0.608</div><div class="d good">(+0.078)</div></td><td><div class="v">0.794</div><div class="d good">(+0.113)</div></td><td><div class="v">0.294</div><div class="d good">(+0.059)</div></td><td><div class="v">0.665</div><div class="d good">(+0.039)</div></td></tr><tr>
+<td class="left"><b>E3-LargeChunk</b></td>
+<td class="left">3 closed-answer questions per atomic fact</td>
+<td>2,781</td>
+<td>1024 / 128</td>
+<td class="left small">mhrag_ctl_atomic1024_questions</td>
+<td class="left">Atomic-question vectors only; parent-chunk max score</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.289</div><div class="d good">(+0.103)</div></td><td><div class="v">0.721</div><div class="d good">(+0.191)</div></td><td><div class="v">0.917</div><div class="d good">(+0.235)</div></td><td><div class="v">0.412</div><div class="d good">(+0.176)</div></td><td><div class="v">0.799</div><div class="d good">(+0.173)</div></td></tr><tr>
+<td class="left"><b>E3-GEPA</b></td>
+<td class="left">3 closed-answer questions per atomic fact</td>
+<td>7,497</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_gepa_atomic512_questions</td>
+<td class="left">Atomic-question vectors only; parent-chunk max score</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.216</div><div class="d good">(+0.029)</div></td><td><div class="v">0.618</div><div class="d good">(+0.088)</div></td><td><div class="v">0.789</div><div class="d good">(+0.108)</div></td><td><div class="v">0.294</div><div class="d good">(+0.059)</div></td><td><div class="v">0.687</div><div class="d good">(+0.061)</div></td></tr><tr>
+<td class="left"><b>E3-MIPROv2</b></td>
+<td class="left">3 closed-answer questions per atomic fact</td>
+<td>1,218</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_mipro_atomic512_questions</td>
+<td class="left">Atomic-question vectors only; parent-chunk max score</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.123</div><div class="d bad">(-0.064)</div></td><td><div class="v">0.515</div><div class="d bad">(-0.015)</div></td><td><div class="v">0.730</div><div class="d good">(+0.049)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.528</div><div class="d bad">(-0.099)</div></td></tr><tr>
+<td class="left"><b>E3-Adaptive</b></td>
+<td class="left">Atomic facts; 1/2/3 questions by fact complexity</td>
+<td>2,278</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_atomic_adaptive512_questions</td>
+<td class="left">Atomic-question vectors only; parent-chunk max score</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.240</div><div class="d good">(+0.054)</div></td><td><div class="v">0.559</div><div class="d good">(+0.029)</div></td><td><div class="v">0.775</div><div class="d good">(+0.093)</div></td><td><div class="v">0.294</div><div class="d good">(+0.059)</div></td><td><div class="v">0.679</div><div class="d good">(+0.053)</div></td></tr><tr>
+<td class="left"><b>E3-SPLADE</b></td>
+<td class="left">3 closed-answer questions per atomic fact</td>
+<td>4,092</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_atomic512_questions + SPLADE sparse chunks</td>
+<td class="left">Atomic Iris vectors + SPLADE sparse RRF</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.206</div><div class="d good">(+0.020)</div></td><td><div class="v">0.574</div><div class="d good">(+0.044)</div></td><td><div class="v">0.721</div><div class="d good">(+0.039)</div></td><td><div class="v">0.353</div><div class="d good">(+0.118)</div></td><td><div class="v">0.688</div><div class="d good">(+0.062)</div></td></tr><tr>
+<td class="left"><b>E3-BGE-M3-Sparse</b></td>
+<td class="left">3 closed-answer questions per atomic fact</td>
+<td>4,092</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_atomic512_questions + BGE-M3 sparse chunks</td>
+<td class="left">Atomic Iris vectors + BGE-M3 sparse RRF</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.206</div><div class="d good">(+0.020)</div></td><td><div class="v">0.588</div><div class="d good">(+0.059)</div></td><td><div class="v">0.848</div><div class="d good">(+0.167)</div></td><td><div class="v">0.294</div><div class="d good">(+0.059)</div></td><td><div class="v">0.691</div><div class="d good">(+0.065)</div></td></tr></tbody></table>
+<p class="conclusion"><b>E3-LargeChunk</b> has the best test Evidence Recall@5 (0.721, +0.191 versus the experiment base). Atomic questions replace original vectors in dense retrieval. The improvement came from the 1024-token chunk size while reducing stored vectors from 4,092 to 2,781, so the extra-cost tradeoff is justified on this test.</p><h3>Experiment 3B — Article-first question generation</h3>
+<p class="cap">For each complete article, 10 questions are generated before
+chunking. The article is then split, each question is linked to its supporting
+chunk ID(s), and only the mapped question index is used for dense retrieval. This changes the question-generation unit and
+evidence-mapping order while preserving Experiment 3's retrieval
+policy.</p>
+<table><thead><tr><th>Condition</th><th>Question generation</th>
+<th>Generated questions</th><th>Chunk / overlap</th><th>Indexes used</th><th>Retrieval</th>
+<th>Generator</th>
+<th>Evidence Recall@1</th><th>Evidence Recall@5</th><th>Evidence Recall@10</th><th>Full-evidence@5</th><th>MRR@10</th></tr></thead><tbody><tr>
+<td class="left"><b>Article-E3-ManualPrompt</b></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_article_article_manual512_questions</td>
+<td class="left">Mapped article-question vectors only; supporting-chunk max score</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.270</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.564</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.701</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.826</div><div class="d flat">(+0.000)</div></td></tr><tr>
+<td class="left"><b>Article-E3-BM25</b></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_article_article_manual512_questions</td>
+<td class="left">Mapped article-question vectors + BM25 supporting-chunk RRF</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.211</div><div class="d bad">(-0.059)</div></td><td><div class="v">0.603</div><div class="d good">(+0.039)</div></td><td><div class="v">0.838</div><div class="d good">(+0.137)</div></td><td><div class="v">0.235</div><div class="d flat">(+0.000)</div></td><td><div class="v">0.760</div><div class="d bad">(-0.066)</div></td></tr><tr>
+<td class="left"><b>Article-E3-LargeChunk</b></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>1024 / 128</td>
+<td class="left small">mhrag_ctl_article_article_manual1024_questions</td>
+<td class="left">Mapped article-question vectors only; supporting-chunk max score</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.348</div><div class="d good">(+0.078)</div></td><td><div class="v">0.716</div><div class="d good">(+0.152)</div></td><td><div class="v">0.897</div><div class="d good">(+0.196)</div></td><td><div class="v">0.353</div><div class="d good">(+0.118)</div></td><td><div class="v">0.971</div><div class="d good">(+0.145)</div></td></tr><tr>
+<td class="left"><b>Article-E3-LargeChunk-BM25</b></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>1024 / 128</td>
+<td class="left small">mhrag_ctl_article_article_manual1024_questions</td>
+<td class="left">Mapped article-question vectors + BM25 supporting-chunk RRF</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.338</div><div class="d good">(+0.069)</div></td><td><div class="v">0.828</div><div class="d good">(+0.265)</div></td><td><div class="v">0.961</div><div class="d good">(+0.260)</div></td><td><div class="v">0.529</div><div class="d good">(+0.294)</div></td><td><div class="v">0.941</div><div class="d good">(+0.115)</div></td></tr><tr>
+<td class="left"><b>Article-E3-GEPA</b></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_article_article_gepa512_questions</td>
+<td class="left">Mapped article-question vectors only; supporting-chunk max score</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.078</div><div class="d bad">(-0.191)</div></td><td><div class="v">0.515</div><div class="d bad">(-0.049)</div></td><td><div class="v">0.681</div><div class="d bad">(-0.020)</div></td><td><div class="v">0.176</div><div class="d bad">(-0.059)</div></td><td><div class="v">0.461</div><div class="d bad">(-0.365)</div></td></tr><tr>
+<td class="left"><b>Article-E3-MIPROv2</b></td>
+<td class="left">10 questions per complete article; evidence mapped to supporting chunk ID(s)</td>
+<td>150</td>
+<td>512 / 128</td>
+<td class="left small">mhrag_ctl_article_article_mipro512_questions</td>
+<td class="left">Mapped article-question vectors only; supporting-chunk max score</td>
+<td>gpt-5.4-mini<br><span class="small">T=0.3 · seed 42 · JSON</span></td>
+<td><div class="v">0.225</div><div class="d bad">(-0.044)</div></td><td><div class="v">0.578</div><div class="d good">(+0.015)</div></td><td><div class="v">0.706</div><div class="d good">(+0.005)</div></td><td><div class="v">0.294</div><div class="d good">(+0.059)</div></td><td><div class="v">0.716</div><div class="d bad">(-0.110)</div></td></tr></tbody></table>
+<p class="conclusion"><b>Article-E3-LargeChunk-BM25</b> has the best
+Evidence Recall@5 (0.828,
++0.265 versus the article-first base), using
+150 stored vectors. Article-level generated-question vectors replace original chunk vectors in dense retrieval.</p>
+<p class="cap">Question caches and manifests:
+<code>/Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/data/processed/mhrag_vectoronly/controlled_three_experiments</code>. Machine-readable metrics:
+<code>/Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/results/mhrag_vectoronly/controlled_three_experiments/metrics_manual_conditions.json</code>. This report is new and does not
+overwrite earlier reports.</p>
+</div></body></html>

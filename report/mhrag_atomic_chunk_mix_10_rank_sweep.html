@@ -1,0 +1,28 @@
+<!DOCTYPE html><html lang=en><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width, initial-scale=1">
+<title>Condition E — round-trip rank threshold sweep (margin gate removed)</title>
+<style>
+:root{--bg:#fff;--fg:#1a1d24;--muted:#5b6572;--line:#e4e8ee;--card:#f7f9fc;--good:#0a7d3f;--bad:#c0392b;--flat:#8a94a2;--a:#2563eb;}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1319;--fg:#e6eaf0;--muted:#9aa5b3;--line:#242b36;--card:#161c25;--good:#38d17a;--bad:#ff6b5e;--flat:#7a8494;--a:#6ea0ff;}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 20px 70px}h1{font-size:23px;margin:0 0 6px}
+.lede{color:var(--muted)}table{border-collapse:collapse;width:100%;font-size:13px;margin:16px 0}
+th,td{border:1px solid var(--line);padding:7px 8px;text-align:center}th{background:var(--card)}td.nm,th:first-child{text-align:left}
+tr.base{background:var(--card);font-weight:600}
+.d{display:block;font-size:10.5px}.good{color:var(--good)}.bad{color:var(--bad)}.flat{color:var(--flat)}
+.legend{font-size:12.5px;color:var(--muted)}
+.verdict{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--a);border-radius:10px;padding:14px 16px;margin:16px 0}
+</style></head><body><div class=wrap>
+<h1>Condition E — accept by round-trip parent rank ≤ {1, 5, 10}</h1>
+<p class=lede>Strict positive-margin gate removed (it collapsed to rank-1). A question is accepted when its
+parent chunk round-trips within the given rank; then near-dup + coverage-aware selection as before.
+n=69 eligible queries · Δ vs Condition A in parentheses · <b>*</b> = paired p&lt;0.05.</p>
+<div class=verdict><b>Takeaway:</b> loosening the round-trip threshold adds question vectors and chunk
+coverage but does <b>not</b> close the gap to the chunk baseline — Evidence Recall stays below A at
+every threshold, and looser thresholds add noise (more false-positive matches) rather than recall.</div>
+<div style="overflow-x:auto"><table><thead><tr><th>Condition</th><th>Evidence Recall@1</th><th>Evidence Recall@5</th><th>Evidence Recall@10</th><th>Hit@1</th><th>Hit@5</th><th>Hit@10</th><th>MRR@1</th><th>MRR@5</th><th>MRR@10</th><th>vectors</th><th>notes</th></tr></thead>
+<tbody><tr class='base'><td class='nm'>A · original chunks</td><td>0.197</td><td>0.489</td><td>0.673</td><td>0.507</td><td>0.971</td><td>1.000</td><td>0.507</td><td>0.688</td><td>0.693</td><td>96</td><td>1× · frr 2.0</td></tr><tr class=''><td class='nm'>E · parent rank ≤ 1</td><td>0.204<span class='d good'>(+0.007)</span></td><td>0.475<span class='d bad'>(-0.014)</span></td><td>0.667<span class='d bad'>(-0.006)</span></td><td>0.493<span class='d bad'>(-0.014)</span></td><td>0.870<span class='d bad'>(-0.101*)</span></td><td>0.957<span class='d bad'>(-0.043)</span></td><td>0.493<span class='d bad'>(-0.014)</span></td><td>0.639<span class='d bad'>(-0.049)</span></td><td>0.651<span class='d bad'>(-0.041)</span></td><td>676</td><td>536a/140cl · 95/96 chunks · frr 2.318</td></tr><tr class=''><td class='nm'>E · parent rank ≤ 5</td><td>0.208<span class='d good'>(+0.011)</span></td><td>0.514<span class='d good'>(+0.025)</span></td><td>0.617<span class='d bad'>(-0.056)</span></td><td>0.522<span class='d good'>(+0.015)</span></td><td>0.942<span class='d bad'>(-0.029)</span></td><td>0.986<span class='d bad'>(-0.014)</span></td><td>0.522<span class='d good'>(+0.015)</span></td><td>0.688<span class='d flat'>(+0.000)</span></td><td>0.693<span class='d good'>(+0.001)</span></td><td>919</td><td>730a/189cl · 96/96 chunks · frr 2.088</td></tr><tr class=''><td class='nm'>E · parent rank ≤ 10</td><td>0.197<span class='d flat'>(+0.000)</span></td><td>0.484<span class='d bad'>(-0.005)</span></td><td>0.616<span class='d bad'>(-0.057)</span></td><td>0.493<span class='d bad'>(-0.014)</span></td><td>0.913<span class='d bad'>(-0.058)</span></td><td>0.986<span class='d bad'>(-0.014)</span></td><td>0.493<span class='d bad'>(-0.014)</span></td><td>0.663<span class='d bad'>(-0.025)</span></td><td>0.672<span class='d bad'>(-0.020)</span></td><td>944</td><td>750a/194cl · 96/96 chunks · frr 2.235</td></tr></tbody></table></div>
+<p class=legend>frr = mean first-relevant rank (lower is better). "a/cl" = accepted atomic / chunk-level questions.
+A closed-collection, 10-article pilot — not the full MultiHop-RAG benchmark. Main report:
+<a href="mhrag_atomic_chunk_mix_10_results.html">mhrag_atomic_chunk_mix_10_results.html</a></p>
+</div></body></html>

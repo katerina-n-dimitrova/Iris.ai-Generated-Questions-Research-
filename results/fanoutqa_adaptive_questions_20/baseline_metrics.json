@@ -1,0 +1,35 @@
+{
+  "protocol": {
+    "dataset": "JinChao1022/fanoutqa-retrieval",
+    "articles": 20,
+    "chunks": 791,
+    "eligible_queries": 5,
+    "source_queries": 310,
+    "mean_gold_documents_per_query": 5.6,
+    "chunk_size": 1024,
+    "chunk_overlap": 128,
+    "selection": "seed-42 query-first complete-gold-document union",
+    "selection_seed": 42,
+    "generation_model": "gpt-5.4-mini",
+    "embedding": "Iris dim-384",
+    "rrf_k": 60
+  },
+  "condition": {
+    "condition": "Baseline",
+    "question_rule": "No generated questions",
+    "quality": {
+      "generated_questions": 0,
+      "questions_per_chunk_min": 0,
+      "questions_per_chunk_mean": 0.0,
+      "questions_per_chunk_max": 0
+    },
+    "stored_vectors": 791,
+    "metrics": {
+      "evidence_recall@1": 0.18,
+      "evidence_recall@5": 0.37999999999999995,
+      "evidence_recall@10": 0.74,
+      "all_evidence_hit@5": 0.0,
+      "mrr@10": 1.0
+    }
+  }
+}

@@ -1,0 +1,70 @@
+# =====================================================================
+# MultiHop-RAG — 10-article, dense-VECTOR-ONLY pilot
+# Condition A: original-chunk vectors
+# Condition E: POOLED atomic-fact + chunk-level synthetic-question vectors
+#              (mapped back to parent chunk via max cosine).  ChromaDB (local).
+#
+# NO BM25 / keyword / sparse / hybrid / rerank. Dense cosine only.
+# Credentials come only from .env (OPENAI_API_KEY, HF_EMBEDDING_MODEL).
+# Separate namespace/paths from the 15-article mhrag_vectoronly experiment.
+# =====================================================================
+
+random_seed: 42
+
+dataset:
+  name: "yixuantt/MultiHopRAG"
+  article_id_field: "url"
+  article_count: 10
+  include_null_questions: false
+  require_complete_source_coverage: true
+
+chunking:
+  chunk_size_tokens: 256
+  chunk_overlap_tokens: 50
+  minimum_chunk_tokens: 80
+  tokenizer: "cl100k_base"
+
+question_generation:
+  mode: "atomic_plus_chunk_level"
+  primary_questions_per_atom: 1
+  allow_second_atomic_question: true
+  default_chunk_level_questions: 2
+  maximum_chunk_level_questions: 3
+  maximum_total_questions_per_chunk: 10
+  maximum_retries: 3
+  cache_results: true
+
+question_filtering:
+  require_supporting_span: true
+  parent_retrieval_top_k: 3          # round-trip: parent chunk must rank <= this
+  require_positive_confusion_margin: true
+  min_confusion_margin: 0.0          # margin = sim(parent) - max sim(non-parent)
+  near_duplicate_threshold: 0.93     # cosine >= this within a chunk => near-dup
+  remove_near_duplicates: true
+  coverage_aware_selection: true
+
+retrieval:
+  top_k_values: [1, 3, 4, 5, 10]
+  rank_depth: 10
+  similarity_metric: "cosine"
+  parent_chunk_score_method: "max_question_similarity"
+  candidate_multiplier: 10           # >=10x so >=10 unique parents survive dedup
+
+answer_generation:
+  top_k: 5
+  enabled: true
+
+evaluation:
+  bootstrap_resamples: 1000
+
+chromadb:
+  mode: "local"
+  namespace: "mhrag_atomic_chunk_mix_10"
+  baseline_collection: "mhrag_acm10_baseline_chunks"
+  mixed_question_collection: "mhrag_acm10_mixed_questions"
+
+models:
+  embedding_model: "env:HF_EMBEDDING_MODEL"          # Octen/Octen-Embedding-0.6B
+  question_generation_model: "env:OPENAI_CHAT_MODEL"
+  answer_generation_model: "env:OPENAI_CHAT_MODEL"
+  generation_temperature: 0.3

@@ -1,0 +1,89 @@
+{
+  "experiment": "Generated-question length ablation",
+  "protocol": {
+    "generator": "gpt-5.4-mini",
+    "temperature": 0.3,
+    "seed": 42,
+    "embedding": "Iris dim384",
+    "test_queries": 17,
+    "retrieval": "0.5/0.5 dense chunk-question fusion + BM25 RRF"
+  },
+  "reference": {
+    "condition": "Article-AdaptiveFacts-LargeChunk-BM25",
+    "metrics": {
+      "evidence_recall@1": 0.31862745098039214,
+      "evidence_recall@5": 0.9068627450980392,
+      "evidence_recall@10": 0.9411764705882352,
+      "all_evidence_hit@5": 0.7058823529411765,
+      "mrr@10": 0.892156862745098
+    }
+  },
+  "conditions": [
+    {
+      "condition": "AdaptiveFacts-ShortQ-LargeChunk-BM25",
+      "word_range": [
+        6,
+        10
+      ],
+      "generated_questions": 239,
+      "stored_vectors": 283,
+      "observed_words": {
+        "min": 6,
+        "mean": 8.305439330543933,
+        "median": 8.0,
+        "max": 10
+      },
+      "metrics": {
+        "evidence_recall@1": 0.3382352941176471,
+        "evidence_recall@5": 0.926470588235294,
+        "evidence_recall@10": 0.9607843137254901,
+        "all_evidence_hit@5": 0.7647058823529411,
+        "mrr@10": 0.9215686274509803
+      }
+    },
+    {
+      "condition": "AdaptiveFacts-MediumQ-LargeChunk-BM25",
+      "word_range": [
+        11,
+        16
+      ],
+      "generated_questions": 239,
+      "stored_vectors": 283,
+      "observed_words": {
+        "min": 11,
+        "mean": 12.832635983263598,
+        "median": 13.0,
+        "max": 16
+      },
+      "metrics": {
+        "evidence_recall@1": 0.31862745098039214,
+        "evidence_recall@5": 0.9068627450980392,
+        "evidence_recall@10": 0.9411764705882352,
+        "all_evidence_hit@5": 0.7058823529411765,
+        "mrr@10": 0.9019607843137254
+      }
+    },
+    {
+      "condition": "AdaptiveFacts-LongQ-LargeChunk-BM25",
+      "word_range": [
+        17,
+        24
+      ],
+      "generated_questions": 239,
+      "stored_vectors": 283,
+      "observed_words": {
+        "min": 17,
+        "mean": 18.656903765690377,
+        "median": 18.0,
+        "max": 24
+      },
+      "metrics": {
+        "evidence_recall@1": 0.3382352941176471,
+        "evidence_recall@5": 0.9068627450980392,
+        "evidence_recall@10": 0.9411764705882352,
+        "all_evidence_hit@5": 0.7058823529411765,
+        "mrr@10": 0.9215686274509803
+      }
+    }
+  ]
+}

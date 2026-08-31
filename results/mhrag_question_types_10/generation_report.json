@@ -1,0 +1,17 @@
+{
+  "model": "gpt-5.4-mini",
+  "chunks": 96,
+  "requested_per_type_per_chunk": 6,
+  "requested_total": 4032,
+  "raw_counts": {
+    "atomic": 576,
+    "relation": 575,
+    "causal": 573,
+    "temporal": 569,
+    "comparison": 565,
+    "compositional": 575,
+    "broad": 485
+  },
+  "failed_chunks": 0,
+  "seconds": 0.0
+}

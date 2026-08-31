@@ -44,8 +44,9 @@ def _take(dataset_iterable, n: int) -> List[Dict[str, Any]]:
 
 def download_one(name: str, max_samples: int) -> None:
     spec = config.DATASETS[name]
-    print(f"\n[{name}] {spec.hf_id}"
-          + (f" :: {spec.hf_config}" if spec.hf_config else ""))
+    print(
+        f"\n[{name}] {spec.hf_id}" + (f" :: {spec.hf_config}" if spec.hf_config else "")
+    )
     out_dir = spec.raw_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -53,6 +54,7 @@ def download_one(name: str, max_samples: int) -> None:
     # database + an English test split via raw URLs.
     if name == "formulareasoning":
         import urllib.request
+
         base = "https://raw.githubusercontent.com/nju-websoft/FormulaReasoning/main"
         for rel, dest in [
             ("formulas.json", "formulas.json"),
@@ -112,15 +114,25 @@ def download_one(name: str, max_samples: int) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--datasets", nargs="*", default=config.ALL_DATASETS,
-                    choices=config.ALL_DATASETS,
-                    help="Which datasets to download (default: all).")
-    ap.add_argument("--max-samples", type=int, default=config.MAX_DATASET_SAMPLES,
-                    help="Cap rows per split (default from .env).")
+    ap.add_argument(
+        "--datasets",
+        nargs="*",
+        default=config.ALL_DATASETS,
+        choices=config.ALL_DATASETS,
+        help="Which datasets to download (default: all).",
+    )
+    ap.add_argument(
+        "--max-samples",
+        type=int,
+        default=config.MAX_DATASET_SAMPLES,
+        help="Cap rows per split (default from .env).",
+    )
     args = ap.parse_args()
 
-    print(f"Downloading {len(args.datasets)} dataset(s), "
-          f"max {args.max_samples} samples each.")
+    print(
+        f"Downloading {len(args.datasets)} dataset(s), "
+        f"max {args.max_samples} samples each."
+    )
     for name in tqdm(args.datasets, desc="datasets"):
         try:
             download_one(name, args.max_samples)

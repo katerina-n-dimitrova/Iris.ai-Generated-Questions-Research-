@@ -1,0 +1,149 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[embeddings] backend=huggingface model=Octen/Octen-Embedding-0.6B
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 5730.23it/s]
+/Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/src/embeddings.py:59: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  self.dim = int(self.model.get_sentence_embedding_dimension())
+
+=== PeerQA chunk-size experiment | papers=15 ===
+
+[size 200] 945 chunks, 65 queries
+  [gen] 25/940 (cache 50)
+  [gen] 50/940 (cache 75)
+  [gen] 75/940 (cache 100)
+  [gen] 100/940 (cache 125)
+  [gen] 125/940 (cache 150)
+  [gen] 150/940 (cache 175)
+  [gen] 175/940 (cache 200)
+  [gen] 200/940 (cache 225)
+  [gen] 225/940 (cache 250)
+  [gen] 250/940 (cache 275)
+  [gen] 275/940 (cache 300)
+  [gen] 300/940 (cache 325)
+  [gen] 325/940 (cache 350)
+  [gen] 350/940 (cache 375)
+  [gen] 375/940 (cache 400)
+  [gen] 400/940 (cache 425)
+  [gen] 425/940 (cache 450)
+  [gen] 450/940 (cache 475)
+  [gen] 475/940 (cache 500)
+  [gen] 500/940 (cache 525)
+  [gen] 525/940 (cache 550)
+  [gen] 550/940 (cache 575)
+  [gen] 575/940 (cache 600)
+  [gen] 600/940 (cache 625)
+  [gen] 625/940 (cache 650)
+  [gen] 650/940 (cache 675)
+  [gen] 675/940 (cache 700)
+  [gen] 700/940 (cache 725)
+  [gen] 725/940 (cache 750)
+  [gen] 750/940 (cache 775)
+  [gen] 775/940 (cache 800)
+  [gen] 800/940 (cache 825)
+  [gen] 825/940 (cache 850)
+  [gen] 850/940 (cache 875)
+  [gen] 875/940 (cache 900)
+  [gen] 900/940 (cache 925)
+  [gen] 925/940 (cache 950)
+  [gen] 940/940 (cache 965)
+  baseline      nDCG@10=0.482 Hit@5=0.600
+  q5            nDCG@10=0.450 Hit@5=0.523 #emb=4716
+  q10           nDCG@10=0.484 Hit@5=0.631 #emb=9296
+  q13           nDCG@10=0.479 Hit@5=0.615 #emb=11760
+  q15           nDCG@10=0.470 Hit@5=0.600 #emb=13344
+
+[size 400] 470 chunks, 65 queries
+  [gen] 25/465 (cache 990)
+  [gen] 50/465 (cache 1015)
+  [gen] 75/465 (cache 1040)
+  [gen] 100/465 (cache 1065)
+  [gen] 125/465 (cache 1090)
+  [gen] 150/465 (cache 1115)
+  [gen] 175/465 (cache 1140)
+  [gen] 200/465 (cache 1165)
+  [gen] 225/465 (cache 1190)
+  [gen] 250/465 (cache 1215)
+  [gen] 275/465 (cache 1240)
+  [gen] 300/465 (cache 1265)
+  [gen] 325/465 (cache 1290)
+  [gen] 350/465 (cache 1315)
+  [gen] 375/465 (cache 1340)
+  [gen] 400/465 (cache 1365)
+  [gen] 425/465 (cache 1390)
+  [gen] 450/465 (cache 1415)
+  [gen] 465/465 (cache 1430)
+  baseline      nDCG@10=0.522 Hit@5=0.631
+  q5            nDCG@10=0.377 Hit@5=0.523 #emb=2336
+  q10           nDCG@10=0.430 Hit@5=0.554 #emb=4651
+  q13           nDCG@10=0.511 Hit@5=0.646 #emb=6033
+  q15           nDCG@10=0.535 Hit@5=0.677 #emb=6906
+
+[size 600] 309 chunks, 65 queries
+  [gen] 25/304 (cache 1455)
+  [gen] 50/304 (cache 1480)
+  [gen] 75/304 (cache 1505)
+  [gen] 100/304 (cache 1530)
+  [gen] 125/304 (cache 1555)
+  [gen] 150/304 (cache 1580)
+  [gen] 175/304 (cache 1605)
+  [gen] 200/304 (cache 1630)
+  [gen] 225/304 (cache 1655)
+  [gen] 250/304 (cache 1680)
+  [gen] 275/304 (cache 1705)
+  [gen] 300/304 (cache 1730)
+  [gen] 304/304 (cache 1734)
+  baseline      nDCG@10=0.571 Hit@5=0.677
+  q5            nDCG@10=0.467 Hit@5=0.569 #emb=1533
+  q10           nDCG@10=0.536 Hit@5=0.677 #emb=3051
+  q13           nDCG@10=0.553 Hit@5=0.661 #emb=3951
+  q15           nDCG@10=0.550 Hit@5=0.661 #emb=4514
+
+[size 800] 234 chunks, 65 queries
+  [gen] 25/229 (cache 1759)
+  [gen] 50/229 (cache 1784)
+  [gen] 75/229 (cache 1809)
+  [gen] 100/229 (cache 1834)
+  [gen] 125/229 (cache 1859)
+  [gen] 150/229 (cache 1884)
+  [gen] 175/229 (cache 1909)
+  [gen] 200/229 (cache 1934)
+  [gen] 225/229 (cache 1959)
+  [gen] 229/229 (cache 1963)
+  baseline      nDCG@10=0.605 Hit@5=0.769
+  q5            nDCG@10=0.425 Hit@5=0.523 #emb=1167
+  q10           nDCG@10=0.540 Hit@5=0.708 #emb=2327
+  q13           nDCG@10=0.558 Hit@5=0.769 #emb=3015
+  q15           nDCG@10=0.560 Hit@5=0.754 #emb=3456
+
+[variable chunking] building section-aware variable-size chunks
+  597 chunks, 65 queries, tokens={'min': 1, 'max': 801, 'mean': 336.6, 'median': 227}
+  [gen] 25/592 (cache 1988)
+  [gen] 50/592 (cache 2013)
+  [gen] 75/592 (cache 2038)
+  [gen] 100/592 (cache 2063)
+  [gen] 125/592 (cache 2088)
+  [gen] 150/592 (cache 2113)
+  [gen] 175/592 (cache 2138)
+  [gen] 200/592 (cache 2163)
+  [gen] 225/592 (cache 2188)
+  [gen] 250/592 (cache 2213)
+  [gen] 275/592 (cache 2238)
+  [gen] 300/592 (cache 2263)
+  [gen] 325/592 (cache 2288)
+  [gen] 350/592 (cache 2313)
+  [gen] 375/592 (cache 2338)
+  [gen] 400/592 (cache 2363)
+  [gen] 425/592 (cache 2388)
+  [gen] 450/592 (cache 2413)
+  [gen] 475/592 (cache 2438)
+  [gen] 500/592 (cache 2463)
+  [gen] 525/592 (cache 2488)
+  [gen] 550/592 (cache 2513)
+  [gen] 575/592 (cache 2538)
+  [gen] 592/592 (cache 2555)
+  variable_baseline      nDCG@10=0.467 Hit@5=0.615 #emb=597
+  variable_fixed_q10     nDCG@10=0.501 Hit@5=0.600 #emb=5795
+  variable_adaptive_length nDCG@10=0.537 Hit@5=0.708 #emb=3725
+  variable_adaptive_density nDCG@10=0.509 Hit@5=0.646 #emb=5611
+  variable_fused(chunk+density_q) nDCG@10=0.551 Hit@5=0.661 #emb=6208
+
+Saved -> results/peerqa/chunksize_results.json

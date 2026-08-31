@@ -1,0 +1,171 @@
+{
+  "protocol": {
+    "articles": 340,
+    "chunks": 963,
+    "eligible_queries": 2255,
+    "unresolved_queries": 0,
+    "alignment_methods": {
+      "canonical_chunk_id": 5581
+    },
+    "chunk_size": 1024,
+    "chunk_overlap": 128,
+    "selection_seed": 20260817,
+    "null_queries_excluded": 301,
+    "evaluation_question_generator": "gpt-5.4-mini",
+    "enrichment_generators": [
+      "gpt-5.4-mini",
+      "gpt-4.1-mini-2025-04-14"
+    ],
+    "controlled_variables": [
+      "evaluation queries",
+      "gold evidence",
+      "chunks",
+      "prompts",
+      "question allocation",
+      "Iris embeddings",
+      "BM25",
+      "RRF k=60"
+    ]
+  },
+  "conditions": [
+    {
+      "condition": "Baseline",
+      "question_rule": "No generated questions",
+      "quality": {
+        "generated_questions": 0,
+        "questions_per_chunk_min": 0,
+        "questions_per_chunk_mean": 0,
+        "questions_per_chunk_max": 0
+      },
+      "stored_vectors": 963,
+      "metrics": {
+        "evidence_recall@1": 0.10262379896526237,
+        "evidence_recall@5": 0.3107169253510717,
+        "evidence_recall@10": 0.46186252771618624,
+        "all_evidence_hit@5": 0.07849223946784922,
+        "mrr@10": 0.39207193890120723
+      },
+      "generator_model": ""
+    },
+    {
+      "condition": "Adaptive generated questions 5–20 — gpt-5.4-mini",
+      "question_rule": "clamp(5, 20, round(facts * 0.5))",
+      "quality": {
+        "generated_questions": 9575,
+        "questions_per_chunk_min": 5,
+        "questions_per_chunk_mean": 9.94288681204569,
+        "questions_per_chunk_max": 20
+      },
+      "stored_vectors": 10538,
+      "metrics": {
+        "evidence_recall@1": 0.15964523281596452,
+        "evidence_recall@5": 0.38920916481892087,
+        "evidence_recall@10": 0.5118625277161862,
+        "all_evidence_hit@5": 0.13259423503325943,
+        "mrr@10": 0.5128606623728574
+      },
+      "generator_model": "gpt-5.4-mini"
+    },
+    {
+      "condition": "Adaptive generated questions unbounded — gpt-5.4-mini",
+      "question_rule": "round(facts * 0.5), no bounds",
+      "quality": {
+        "generated_questions": 9435,
+        "questions_per_chunk_min": 0,
+        "questions_per_chunk_mean": 9.797507788161994,
+        "questions_per_chunk_max": 24
+      },
+      "stored_vectors": 10398,
+      "metrics": {
+        "evidence_recall@1": 0.16219512195121952,
+        "evidence_recall@5": 0.3876940133037694,
+        "evidence_recall@10": 0.5079453067257944,
+        "all_evidence_hit@5": 0.129490022172949,
+        "mrr@10": 0.5156326329497061
+      },
+      "generator_model": "gpt-5.4-mini"
+    },
+    {
+      "condition": "Adaptive chunk + whole-article questions 5–20 — gpt-5.4-mini",
+      "question_rule": "chunk and document: clamp(5, 20, round(facts * 0.5))",
+      "quality": {
+        "generated_questions": 16127,
+        "chunk_questions": 9575,
+        "article_questions": 6552,
+        "questions_per_chunk_min": 5,
+        "questions_per_chunk_max": 20,
+        "questions_per_article_min": 10,
+        "questions_per_article_max": 20
+      },
+      "stored_vectors": 17090,
+      "metrics": {
+        "evidence_recall@1": 0.17560975609756097,
+        "evidence_recall@5": 0.406430155210643,
+        "evidence_recall@10": 0.5259423503325943,
+        "all_evidence_hit@5": 0.14057649667405764,
+        "mrr@10": 0.5467998803364656
+      },
+      "generator_model": "gpt-5.4-mini"
+    },
+    {
+      "condition": "Adaptive generated questions 5–20 — gpt-4.1-mini-2025-04-14",
+      "question_rule": "clamp(5, 20, round(facts * 0.5))",
+      "quality": {
+        "generated_questions": 5652,
+        "questions_per_chunk_min": 5,
+        "questions_per_chunk_mean": 5.869158878504673,
+        "questions_per_chunk_max": 12
+      },
+      "stored_vectors": 6615,
+      "metrics": {
+        "evidence_recall@1": 0.15454545454545454,
+        "evidence_recall@5": 0.38159645232815964,
+        "evidence_recall@10": 0.5045824094604582,
+        "all_evidence_hit@5": 0.12771618625277162,
+        "mrr@10": 0.5025393305881111
+      },
+      "generator_model": "gpt-4.1-mini-2025-04-14"
+    },
+    {
+      "condition": "Adaptive generated questions unbounded — gpt-4.1-mini-2025-04-14",
+      "question_rule": "round(facts * 0.5), no bounds",
+      "quality": {
+        "generated_questions": 5076,
+        "questions_per_chunk_min": 0,
+        "questions_per_chunk_mean": 5.271028037383178,
+        "questions_per_chunk_max": 12
+      },
+      "stored_vectors": 6039,
+      "metrics": {
+        "evidence_recall@1": 0.15591278640059128,
+        "evidence_recall@5": 0.3734294161123429,
+        "evidence_recall@10": 0.4989652623798966,
+        "all_evidence_hit@5": 0.12106430155210643,
+        "mrr@10": 0.5005240558899096
+      },
+      "generator_model": "gpt-4.1-mini-2025-04-14"
+    },
+    {
+      "condition": "Adaptive chunk + whole-article questions 5–20 — gpt-4.1-mini-2025-04-14",
+      "question_rule": "chunk and document: clamp(5, 20, round(facts * 0.5))",
+      "quality": {
+        "generated_questions": 10474,
+        "chunk_questions": 5652,
+        "article_questions": 4822,
+        "questions_per_chunk_min": 5,
+        "questions_per_chunk_max": 12,
+        "questions_per_article_min": 6,
+        "questions_per_article_max": 20
+      },
+      "stored_vectors": 11437,
+      "metrics": {
+        "evidence_recall@1": 0.17483370288248337,
+        "evidence_recall@5": 0.4066888396156689,
+        "evidence_recall@10": 0.5185883222468589,
+        "all_evidence_hit@5": 0.1458980044345898,
+        "mrr@10": 0.5372655122655122
+      },
+      "generator_model": "gpt-4.1-mini-2025-04-14"
+    }
+  ]
+}

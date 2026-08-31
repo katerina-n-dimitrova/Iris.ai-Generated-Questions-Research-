@@ -28,8 +28,15 @@ import config
 
 RETRIEVAL_SCORES = config.RETRIEVAL_METRICS_DIR / "retrieval_scores.csv"
 SCORE_FIELDS = [
-    "dataset", "condition", "num_queries",
-    "Recall@5", "Recall@10", "Precision@5", "MRR", "nDCG@10", "Hit@5",
+    "dataset",
+    "condition",
+    "num_queries",
+    "Recall@5",
+    "Recall@10",
+    "Precision@5",
+    "MRR",
+    "nDCG@10",
+    "Hit@5",
 ]
 
 
@@ -93,8 +100,10 @@ def evaluate_file(path) -> Dict | None:
         print(f"  {path.name}: no queries with gold labels; skipped")
         return None
 
-    agg = {m: 0.0 for m in
-           ("Recall@5", "Recall@10", "Precision@5", "MRR", "nDCG@10", "Hit@5")}
+    agg = {
+        m: 0.0
+        for m in ("Recall@5", "Recall@10", "Precision@5", "MRR", "nDCG@10", "Hit@5")
+    }
     for r in rows:
         ranked = _ranked_source_ids(r["retrieved"])
         gold = {str(g) for g in r["gold_source_ids"]}
@@ -106,25 +115,37 @@ def evaluate_file(path) -> Dict | None:
         agg["Hit@5"] += _hit_at_k(ranked, gold, 5)
 
     n = len(rows)
-    out = {"dataset": rows[0]["dataset"], "condition": rows[0]["condition"],
-           "num_queries": n}
+    out = {
+        "dataset": rows[0]["dataset"],
+        "condition": rows[0]["condition"],
+        "num_queries": n,
+    }
     out.update({m: round(v / n, 4) for m, v in agg.items()})
     return out
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--datasets", nargs="*", default=config.ALL_DATASETS,
-                    choices=config.ALL_DATASETS)
-    ap.add_argument("--conditions", nargs="*", default=list(config.CONDITIONS),
-                    choices=config.CONDITIONS)
+    ap.add_argument(
+        "--datasets",
+        nargs="*",
+        default=config.ALL_DATASETS,
+        choices=config.ALL_DATASETS,
+    )
+    ap.add_argument(
+        "--conditions",
+        nargs="*",
+        default=list(config.CONDITIONS),
+        choices=config.CONDITIONS,
+    )
     args = ap.parse_args()
 
     results: List[Dict] = []
     for dataset in args.datasets:
         for condition in args.conditions:
-            path = (config.RETRIEVAL_METRICS_DIR
-                    / f"retrieved_{dataset}_{condition}.jsonl")
+            path = (
+                config.RETRIEVAL_METRICS_DIR / f"retrieved_{dataset}_{condition}.jsonl"
+            )
             if not path.exists():
                 continue
             r = evaluate_file(path)
@@ -136,17 +157,22 @@ def main() -> None:
         return
 
     groups = {(r["dataset"], r["condition"]) for r in results}
-    common.upsert_csv(RETRIEVAL_SCORES, SCORE_FIELDS, results,
-                      ("dataset", "condition"), groups)
+    common.upsert_csv(
+        RETRIEVAL_SCORES, SCORE_FIELDS, results, ("dataset", "condition"), groups
+    )
 
     # pretty print
-    print(f"\n{'dataset':<20}{'cond':<10}{'R@5':>8}{'R@10':>8}"
-          f"{'P@5':>8}{'MRR':>8}{'nDCG@10':>10}{'Hit@5':>8}")
+    print(
+        f"\n{'dataset':<20}{'cond':<10}{'R@5':>8}{'R@10':>8}"
+        f"{'P@5':>8}{'MRR':>8}{'nDCG@10':>10}{'Hit@5':>8}"
+    )
     print("-" * 80)
     for r in results:
-        print(f"{r['dataset']:<20}{r['condition']:<10}"
-              f"{r['Recall@5']:>8}{r['Recall@10']:>8}{r['Precision@5']:>8}"
-              f"{r['MRR']:>8}{r['nDCG@10']:>10}{r['Hit@5']:>8}")
+        print(
+            f"{r['dataset']:<20}{r['condition']:<10}"
+            f"{r['Recall@5']:>8}{r['Recall@10']:>8}{r['Precision@5']:>8}"
+            f"{r['MRR']:>8}{r['nDCG@10']:>10}{r['Hit@5']:>8}"
+        )
     print(f"\nSaved -> {RETRIEVAL_SCORES.relative_to(config.PROJECT_ROOT)}")
 
 

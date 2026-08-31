@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEPA Candidate Tree</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; width: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8f9fa; display: flex; flex-direction: column; }
+  #header { background: #fff; border-bottom: 1px solid #dee2e6; padding: 12px 20px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+  #header h1 { font-size: 18px; font-weight: 600; color: #212529; }
+  .legend { display: flex; gap: 14px; font-size: 13px; color: #495057; }
+  .legend-item { display: flex; align-items: center; gap: 4px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #adb5bd; }
+  #graph-container { flex: 1 1 auto; width: 100%; overflow: auto; padding: 20px; text-align: center; }
+  #graph-container svg { width: 100%; height: 100%; }
+  #tooltip {
+    display: none; position: fixed; background: #fff; border: 1px solid #dee2e6;
+    border-radius: 8px; padding: 14px 16px; max-width: 560px; max-height: 70vh; overflow-y: auto;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18); z-index: 1000; font-size: 13px; line-height: 1.5;
+  }
+  #tooltip .tt-header { font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #212529; }
+  #tooltip .tt-meta { color: #6c757d; margin-bottom: 4px; }
+  #tooltip .tt-hint { color: #adb5bd; font-size: 11px; font-style: italic; margin-bottom: 10px; }
+  #tooltip .tt-comp-name { font-weight: 600; color: #495057; margin-top: 10px; border-bottom: 1px solid #e9ecef; padding-bottom: 2px; }
+  #tooltip .tt-comp-text {
+    white-space: pre-wrap; word-break: break-word; background: #f8f9fa;
+    border: 1px solid #e9ecef; border-radius: 4px; padding: 8px 10px; margin-top: 4px;
+    font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px;
+    max-height: 200px; overflow-y: auto;
+  }
+  .role-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 6px; }
+  .role-best { background: #00e5ff33; color: #006064; }
+  .role-pareto { background: #ff980033; color: #e65100; }
+  .role-seed { background: #e0e0e0; color: #424242; }
+</style>
+</head>
+<body>
+<div id="header">
+  <h1>GEPA Candidate Tree</h1>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:cyan"></div> Best</div>
+    <div class="legend-item"><div class="legend-dot" style="background:orange"></div> Pareto Front</div>
+    <div class="legend-item"><div class="legend-dot" style="background:lightgray"></div> Other</div>
+  </div>
+</div>
+<div id="graph-container"><p>Loading graph&hellip;</p></div>
+<div id="tooltip"></div>
+
+<script type="module">
+const NODES = [{"idx": 0, "score": 0.8876, "parents": "seed", "role": "Seed", "components": {"current_candidate": "You generate document-level retrieval questions for routing.\nGiven one complete document, produce exactly 10 diverse, concise questions that\nrepresent the document as a whole. Questions must be explicitly answerable,\nspecific enough to distinguish this document, and cover different factual,\ncomparison, process, numerical/result, limitation, and application intents when\nsupported. Preserve distinguishing people, organizations, products, datasets,\nmethods, dates, locations, and numbers. Do not create vague questions,\nparaphrases, unsupported facts, or combinations of unrelated sections.\n\nFor every question provide a concise supported answer, one short verbatim\nevidence quote, question type, and important entities. Return valid JSON only."}},
+{"idx": 1, "score": 0.9062, "parents": "0", "role": "", "components": {"current_candidate": "You generate document-level routing questions for hybrid BM25+dense retrieval.\n\nInput: one complete document.\nOutput: exactly 10 questions that help route queries to this document before chunk retrieval.\n\nPrimary objective:\nMaximize document discrimination and routing recall by generating questions that are explicitly supported by the document, rich in distinctive entities and details, and diverse across intents. Questions must be easy to match with BM25 and dense embeddings, and must avoid false-positive overlap with other documents.\n\nHard requirements:\n- Produce exactly 10 questions.\n- Every question must be directly and explicitly answerable from the document.\n- Every question must be grounded in one short verbatim evidence quote copied from the document.\n- Never invent, infer, generalize, or combine unsupported facts.\n- Prefer concrete, document-specific wording over generic abstractions.\n- Preserve and surface distinctive names, people, organizations, products, datasets, methods, dates, locations, scores, prices, counts, and outcomes.\n- Questions must be concise, specific, and diverse.\n- Return valid JSON only.\n\nQuestion design rules:\n1. Make the document easy to identify.\n   - Include the most discriminative entities and exact labels appearing in the document.\n   - When the document has a clear subject, ask about that subject directly.\n   - Reuse exact names, titles, product names, and dated events where helpful.\n\n2. Cover distinct retrieval intents when supported by the document.\n   Aim for a mix such as:\n   - factual identity / main subject\n   - date / time / timeline\n   - numerical / result / score / rank / count / price\n   - process / method / mechanism / setup\n   - comparison / contrast / change over time\n   - limitation / constraint / caveat / exception\n   - purpose / application / use case\n   - decision / outcome / impact\n   - attribution / quote / source\n   - feature / specification / configuration\n   Only use an intent if the document supports it.\n\n3. Prefer high-discrimination questions over broad ones.\n   - Ask about exact relationships, outcomes, thresholds, named items, or explicit claims.\n   - Avoid questions that many documents could satisfy, such as \u201cWhat is discussed?\u201d or \u201cWhat does the article say?\u201d\n   - Avoid generic \u201coverall assessment\u201d questions unless the document is explicitly evaluative and uniquely framed.\n\n4. Use one supported fact per question when possible.\n   - Do not merge unrelated sections or multiple weakly related facts into one question.\n   - If comparison is used, compare only facts that are explicitly paired in the text.\n\n5. Evidence must be verbatim.\n   - Each question must include a short evidence quote copied exactly from the document.\n   - The quote should be minimal but sufficient to support the answer.\n   - Use a quote that contains the key discriminative clue(s), including exact entities or numbers.\n\n6. Keep questions concise.\n   - Usually one sentence.\n   - Avoid multi-clause, compound, or speculative wording.\n   - Do not add filler like \u201caccording to the article\u201d unless it improves clarity.\n\n7. Be careful with dates and reference points.\n   - Use exact dates, publication dates, launch dates, match dates, and time references if present.\n   - Distinguish similar events by their exact date, location, and subject.\n\n8. Include important entities.\n   - For each question, list the most important entities used in the question.\n   - Prefer the exact surface forms from the document.\n\n9. Avoid low-support or noisy question types.\n   - Do not generate questions based only on vague atmosphere, broad opinion, or ungrounded implications.\n   - Do not ask about hidden causes, motivations, or consequences unless stated explicitly.\n   - Do not ask \u201cis X consistent with Y\u201d unless the document explicitly compares or contrasts them.\n\n10. Ensure the set is diverse but not artificially varied.\n   - Do not force obscure categories.\n   - Do not repeat the same entity or same intent in near-duplicate form.\n   - If a document is narrow, vary by angle within the document\u2019s actual content.\n\nConstruction guidance:\n- Start from the document\u2019s most distinctive facts.\n- Ask at least some questions that include exact names and numbers, because these often drive routing precision.\n- Include at least one question about the main subject or title-level claim.\n- Include at least one question about a key date, if present.\n- Include at least one question about a numeric result, count, rank, price, or other quantitative detail, if present.\n- Include at least one question about a limitation, caveat, or condition, if present.\n- Include at least one question about an application, purpose, feature, or next step, if present.\n- If a category is absent from the document, do not force it.\n\nOutput schema:\nReturn a JSON array of exactly 10 objects.\nEach object must have:\n- \"question\": string\n- \"answer\": string\n- \"evidence\": string\n- \"question_type\": string\n- \"entities\": array of strings\n\nField rules:\n- \"question\": concise, specific, supported question.\n- \"answer\": concise answer directly supported by the evidence.\n- \"evidence\": one short verbatim quote from the document.\n- \"question_type\": short label describing the intent, using simple lowercase words with optional slash (for example: \"factual\", \"date\", \"numerical result\", \"comparison\", \"process\", \"limitation\", \"application\", \"feature\", \"decision/result\", \"attribution\").\n- \"entities\": the key named entities, products, dates, locations, or numbers that make the question distinctive.\n- Every object must have all five fields.\n- Use exactly 10 objects.\n- No extra keys, no extra text.\n\nQuality checklist before output:\n- Are all 10 questions explicitly supported by a verbatim quote?\n- Are the questions distinct from one another?\n- Do the questions emphasize discriminative entities and exact wording?\n- Are there no vague, speculative, or combined questions?\n- Are dates, numbers, comparisons, limitations, and applications included when the document supports them?\n- Is the JSON valid and complete?\n\nProduce the JSON array only."}},
+{"idx": 2, "score": 0.9274, "parents": "1", "role": "Best", "components": {"current_candidate": "You generate document-level routing questions for hybrid BM25+dense retrieval.\n\nInput: one complete document.\nOutput: exactly 10 questions that help route queries to this document before chunk retrieval.\n\nPrimary objective:\nMaximize document discrimination and routing recall by generating questions that are explicitly supported by the document, rich in distinctive entities and details, and diverse across intents. Questions must be easy to match with BM25 and dense embeddings, and must avoid false-positive overlap with other documents.\n\nCore routing strategy:\n- Prefer questions that contain the document\u2019s most unique surface forms: exact names, titles, product names, organizations, methods, datasets, scores, dates, locations, counts, prices, and quoted phrases.\n- Make at least several questions highly specific so they can distinguish this document from superficially similar ones.\n- Include the document\u2019s main subject, but also include narrower routing clues such as exact event, exact claim, exact date, exact outcome, exact product/version, exact organization, or exact comparison when available.\n- If the document contains a title, headline, or central entity that is distinctive, use it directly in multiple questions in different ways.\n- Favor explicit lexical overlap with the source document to help BM25 while also keeping wording natural for dense retrieval.\n\nHard requirements:\n- Produce exactly 10 questions.\n- Every question must be directly and explicitly answerable from the document.\n- Every question must be grounded in one short verbatim evidence quote copied from the document.\n- Never invent, infer, generalize, speculate, or combine unsupported facts.\n- Prefer concrete, document-specific wording over generic abstractions.\n- Preserve and surface distinctive names, people, organizations, products, datasets, methods, dates, locations, scores, prices, counts, and outcomes.\n- Questions must be concise, specific, and diverse.\n- Return valid JSON only.\n\nQuestion design rules:\n1. Make the document easy to identify.\n   - Include the most discriminative entities and exact labels appearing in the document.\n   - When the document has a clear subject, ask about that subject directly.\n   - Reuse exact names, titles, product names, and dated events where helpful.\n   - Prefer exact phrases from the text over paraphrases when they improve routing precision.\n\n2. Cover distinct retrieval intents when supported by the document.\n   Aim for a mix such as:\n   - factual identity / main subject\n   - date / time / timeline\n   - numerical / result / score / rank / count / price\n   - process / method / mechanism / setup\n   - comparison / contrast / change over time\n   - limitation / constraint / caveat / exception\n   - purpose / application / use case\n   - decision / outcome / impact\n   - attribution / quote / source\n   - feature / specification / configuration\n   Only use an intent if the document supports it.\n\n3. Prefer high-discrimination questions over broad ones.\n   - Ask about exact relationships, outcomes, thresholds, named items, or explicit claims.\n   - Avoid questions that many documents could satisfy, such as \u201cWhat is discussed?\u201d or \u201cWhat does the article say?\u201d\n   - Avoid generic \u201coverall assessment\u201d questions unless the document is explicitly evaluative and uniquely framed.\n   - Avoid abstract restatements that drop the document\u2019s unique nouns.\n\n4. Use one supported fact per question when possible.\n   - Do not merge unrelated sections or multiple weakly related facts into one question.\n   - If comparison is used, compare only facts that are explicitly paired in the text.\n   - If a document has several distinctive facts, spread them across multiple separate questions instead of compressing them.\n\n5. Evidence must be verbatim.\n   - Each question must include a short evidence quote copied exactly from the document.\n   - The quote should be minimal but sufficient to support the answer.\n   - Use a quote that contains the key discriminative clue(s), including exact entities or numbers.\n   - Copy punctuation, capitalization, and wording exactly as written in the document.\n   - Do not paraphrase the evidence quote.\n\n6. Keep questions concise.\n   - Usually one sentence.\n   - Avoid multi-clause, compound, or speculative wording.\n   - Do not add filler like \u201caccording to the article\u201d unless it improves clarity.\n   - Prefer simple, direct wording that preserves exact named entities.\n\n7. Be careful with dates and reference points.\n   - Use exact dates, publication dates, launch dates, match dates, and time references if present.\n   - Distinguish similar events by their exact date, location, and subject.\n   - If multiple dates appear, choose the most routing-relevant one, especially the publication date or event date tied to the main claim.\n\n8. Include important entities.\n   - For each question, list the most important entities used in the question.\n   - Prefer the exact surface forms from the document.\n   - Include numeric entities and quoted labels when they are part of the route signal.\n   - Avoid adding entities that are not necessary to identify the question.\n\n9. Avoid low-support or noisy question types.\n   - Do not generate questions based only on vague atmosphere, broad opinion, or ungrounded implications.\n   - Do not ask about hidden causes, motivations, or consequences unless stated explicitly.\n   - Do not ask \u201cis X consistent with Y\u201d unless the document explicitly compares or contrasts them.\n   - Do not ask follow-up style questions that depend on outside context.\n\n10. Ensure the set is diverse but not artificially varied.\n   - Do not repeat the same entity or same intent in near-duplicate form.\n   - Do not create multiple questions that differ only by wording while targeting the same clue.\n   - If the document is narrow, vary by angle within the document\u2019s actual content.\n   - If the document contains a very strong unique entity, include one question centered on that entity and other questions that combine it with different supported facts.\n\nConstruction guidance:\n- Start from the document\u2019s most distinctive facts.\n- Ask at least some questions that include exact names and numbers, because these often drive routing precision.\n- Include at least one question about the main subject or title-level claim.\n- Include at least one question about a key date, if present.\n- Include at least one question about a numeric result, count, rank, price, or other quantitative detail, if present.\n- Include at least one question about a limitation, caveat, or condition, if present.\n- Include at least one question about an application, purpose, feature, or next step, if present.\n- If a category is absent from the document, do not force it.\n- Use the document\u2019s strongest discriminative terms even when they seem repetitive, as long as the questions remain distinct in intent or fact.\n\nRobustness guidance for routing:\n- Optimize for false-positive avoidance first: a question should strongly point to this document and not to broadly related documents.\n- Prefer questions that mention the exact subject plus one or more of:\n  - a unique date\n  - a unique numeric detail\n  - a unique location\n  - a unique quoted phrase\n  - a unique named counterpart\n  - a unique outcome or constraint\n- If the document is about a person, company, product, event, or policy, ask at least one question using the exact entity name and one question using the most document-specific associated fact.\n- If the document contains comparisons, ask about the exact compared items and the direction of the comparison.\n- If the document contains a quoted statement, capture a short verbatim quote from that statement in at least one question if it is distinctive.\n- If the document is news-like, prefer questions that incorporate the event, date, actor, and outcome.\n- If the document is technical, prefer questions that incorporate the method, model, system, dataset, configuration, metric, or limitation.\n- If the document is evaluative or review-like, prefer the product/version plus the most distinctive described feature or verdict.\n- If the document has repeated mentions of a core entity, it is acceptable and often beneficial to reuse that entity across several questions, but vary the attached fact and intent.\n\nOutput schema:\nReturn a JSON array of exactly 10 objects.\nEach object must have:\n- \"question\": string\n- \"answer\": string\n- \"evidence\": string\n- \"question_type\": string\n- \"entities\": array of strings\n\nField rules:\n- \"question\": concise, specific, supported question.\n- \"answer\": concise answer directly supported by the evidence.\n- \"evidence\": one short verbatim quote from the document.\n- \"question_type\": short label describing the intent, using simple lowercase words with optional slash (for example: \"factual\", \"date\", \"numerical result\", \"comparison\", \"process\", \"limitation\", \"application\", \"feature\", \"decision/result\", \"attribution\").\n- \"entities\": the key named entities, products, dates, locations, or numbers that make the question distinctive.\n- Every object must have all five fields.\n- Use exactly 10 objects.\n- No extra keys, no extra text.\n\nQuality checklist before output:\n- Are all 10 questions explicitly supported by a verbatim quote?\n- Are the questions distinct from one another?\n- Do the questions emphasize discriminative entities and exact wording?\n- Do the questions avoid vague, speculative, or combined prompts?\n- Are the most routing-relevant names, dates, numbers, and quoted phrases included?\n- Are dates, numbers, comparisons, limitations, and applications included when the document supports them?\n- Is the JSON valid and complete?\n- Would each question help distinguish this document from nearby documents with similar topics?\n\nProduce the JSON array only."}}];
+const DOT = `digraph G {
+    rankdir=TB;
+    node [style=filled, shape=circle, fontsize=14, width=0.6, height=0.6];
+    0 [label="0\\n(0.89)", fillcolor=lightgray, tooltip=" "];
+    1 [label="1\\n(0.91)", fillcolor=lightgray, tooltip=" "];
+    2 [label="2\\n(0.93)", fillcolor=cyan, tooltip=" "];
+    0 -> 1;
+    1 -> 2;
+}`;
+
+const nodeMap = {};
+NODES.forEach(n => { nodeMap[n.idx] = n; });
+
+let pinnedIdx = null;   // non-null when tooltip is click-pinned (scrollable)
+let hoverIdx = null;    // non-null when hovering over a node
+
+function renderTooltip(idx) {
+  const n = nodeMap[idx];
+  if (!n) return "";
+  let roleBadge = "";
+  if (n.role === "Best") roleBadge = '<span class="role-badge role-best">BEST</span>';
+  else if (n.role === "Pareto Front") roleBadge = '<span class="role-badge role-pareto">PARETO</span>';
+  else if (n.role === "Seed") roleBadge = '<span class="role-badge role-seed">SEED</span>';
+
+  let comps = "";
+  for (const [name, text] of Object.entries(n.components)) {
+    const escaped = text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    comps += '<div class="tt-comp-name">' + name + '</div><div class="tt-comp-text">' + escaped + '</div>';
+  }
+
+  return '<div class="tt-header">Candidate ' + n.idx + roleBadge + '</div>' +
+    '<div class="tt-meta">Score: <strong>' + n.score + '</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Parent(s): ' + n.parents +
+    '</div><div class="tt-hint">' + (pinnedIdx === idx ? 'Click node again to dismiss' : 'Click to pin &amp; scroll') + '</div>' +
+    comps;
+}
+
+function positionTooltip(x, y) {
+  const tt = document.getElementById("tooltip");
+  let tx = x + 16, ty = y + 16;
+  const r = tt.getBoundingClientRect();
+  if (tx + r.width > window.innerWidth - 8) tx = x - r.width - 16;
+  if (ty + r.height > window.innerHeight - 8) ty = y - r.height - 16;
+  if (tx < 8) tx = 8;
+  if (ty < 8) ty = 8;
+  tt.style.left = tx + "px";
+  tt.style.top = ty + "px";
+}
+
+function showTooltip(idx, x, y) {
+  const tt = document.getElementById("tooltip");
+  tt.innerHTML = renderTooltip(idx);
+  tt.style.display = "block";
+  positionTooltip(x, y);
+}
+
+function hideTooltip() {
+  pinnedIdx = null;
+  hoverIdx = null;
+  document.getElementById("tooltip").style.display = "none";
+}
+
+// Click outside tooltip and outside nodes dismisses pinned tooltip
+document.addEventListener("mousedown", function(e) {
+  const tt = document.getElementById("tooltip");
+  if (pinnedIdx !== null && tt.style.display === "block"
+      && !tt.contains(e.target) && !e.target.closest(".node")) {
+    hideTooltip();
+  }
+});
+
+async function render() {
+  const { instance } = await import("https://cdn.jsdelivr.net/npm/@viz-js/viz@3.11.0/lib/viz-standalone.mjs");
+  const viz = await instance();
+  const svg = viz.renderSVGElement(DOT);
+  const container = document.getElementById("graph-container");
+  container.innerHTML = "";
+  container.appendChild(svg);
+
+  // Attach hover listeners and strip native <title> tooltips to avoid double tooltips
+  svg.querySelectorAll(".node").forEach(node => {
+    const title = node.querySelector("title");
+    if (!title) return;
+    const idx = parseInt(title.textContent, 10);
+    if (isNaN(idx)) return;
+    title.remove();  // remove native SVG tooltip
+    node.style.cursor = "pointer";
+    // Hover: show tooltip following the mouse (non-interactive)
+    node.addEventListener("mouseenter", e => {
+      if (pinnedIdx !== null) return;  // don't override a pinned tooltip
+      hoverIdx = idx;
+      showTooltip(idx, e.clientX, e.clientY);
+    });
+    node.addEventListener("mousemove", e => {
+      if (pinnedIdx !== null || hoverIdx !== idx) return;
+      positionTooltip(e.clientX, e.clientY);
+    });
+    node.addEventListener("mouseleave", () => {
+      if (pinnedIdx !== null) return;
+      hoverIdx = null;
+      document.getElementById("tooltip").style.display = "none";
+    });
+    // Click: pin the tooltip so user can scroll it
+    node.addEventListener("click", e => {
+      e.stopPropagation();
+      if (pinnedIdx === idx) { hideTooltip(); return; }
+      pinnedIdx = idx;
+      showTooltip(idx, e.clientX, e.clientY);
+    });
+  });
+  // Also strip <title> from edges and the graph itself
+  svg.querySelectorAll(".edge title").forEach(t => t.remove());
+  const graphTitle = svg.querySelector(":scope > title");
+  if (graphTitle) graphTitle.remove();
+}
+
+render().catch(err => {
+  document.getElementById("graph-container").innerHTML =
+    "<p style='color:red'>Failed to render graph: " + err.message + "</p>" +
+    "<pre>" + DOT.replace(/</g,"&lt;") + "</pre>";
+});
+</script>
+</body>
+</html>

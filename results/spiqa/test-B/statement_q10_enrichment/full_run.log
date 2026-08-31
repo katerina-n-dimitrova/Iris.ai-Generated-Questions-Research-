@@ -1,0 +1,93 @@
+=== statement-level q10 experiment | split=test-B ===
+chunks=3326 queries=228
+Generating statement questions for 3184 chunks...
+  [stmt-gen] 50/3184 (cache 192)
+  [stmt-gen] 100/3184 (cache 242)
+  [stmt-gen] 150/3184 (cache 292)
+  [stmt-gen] 200/3184 (cache 342)
+  [stmt-gen] 250/3184 (cache 392)
+  [stmt-gen] 300/3184 (cache 442)
+  [stmt-gen] 350/3184 (cache 492)
+  [stmt-gen] 400/3184 (cache 542)
+  [stmt-gen] 450/3184 (cache 592)
+  [stmt-gen] 500/3184 (cache 642)
+  [stmt-gen] 550/3184 (cache 692)
+  [stmt-gen] 600/3184 (cache 742)
+  [stmt-gen] 650/3184 (cache 792)
+  [stmt-gen] 700/3184 (cache 842)
+  [stmt-gen] 750/3184 (cache 892)
+  [stmt-gen] 800/3184 (cache 942)
+  [stmt-gen] 850/3184 (cache 992)
+  [stmt-gen] 900/3184 (cache 1042)
+  [stmt-gen] 950/3184 (cache 1092)
+  [stmt-gen] 1000/3184 (cache 1142)
+  [stmt-gen] 1050/3184 (cache 1192)
+  [stmt-gen] 1100/3184 (cache 1242)
+  [stmt-gen] 1150/3184 (cache 1292)
+  [stmt-gen] 1200/3184 (cache 1342)
+  [stmt-gen] 1250/3184 (cache 1392)
+  [stmt-gen] 1300/3184 (cache 1442)
+  [stmt-gen] 1350/3184 (cache 1492)
+  [stmt-gen] 1400/3184 (cache 1542)
+  [stmt-gen] 1450/3184 (cache 1592)
+  [stmt-gen] 1500/3184 (cache 1642)
+  [stmt-gen] 1550/3184 (cache 1692)
+  [stmt-gen] 1600/3184 (cache 1742)
+  [stmt-gen] 1650/3184 (cache 1792)
+  [stmt-gen] 1700/3184 (cache 1842)
+  [stmt-gen] 1750/3184 (cache 1892)
+  [stmt-gen] 1800/3184 (cache 1942)
+  [stmt-gen] 1850/3184 (cache 1992)
+  [stmt-gen] 1900/3184 (cache 2042)
+  [stmt-gen] 1950/3184 (cache 2092)
+  [stmt-gen] 2000/3184 (cache 2142)
+  [stmt-gen] 2050/3184 (cache 2192)
+  [stmt-gen] 2100/3184 (cache 2242)
+  [stmt-gen] 2150/3184 (cache 2292)
+  [stmt-gen] 2200/3184 (cache 2342)
+  [stmt-gen] 2250/3184 (cache 2392)
+  [stmt-gen] 2300/3184 (cache 2442)
+  [stmt-gen] 2350/3184 (cache 2492)
+  [stmt-gen] 2400/3184 (cache 2542)
+  [stmt-gen] 2450/3184 (cache 2592)
+  [stmt-gen] 2500/3184 (cache 2642)
+  [stmt-gen] 2550/3184 (cache 2692)
+  [stmt-gen] 2600/3184 (cache 2742)
+  [stmt-gen] 2650/3184 (cache 2792)
+  [stmt-gen] 2700/3184 (cache 2842)
+  [stmt-gen] 2750/3184 (cache 2892)
+  [stmt-gen] 2800/3184 (cache 2942)
+  [stmt-gen] 2850/3184 (cache 2992)
+  [stmt-gen] 2900/3184 (cache 3042)
+  [stmt-gen] 2950/3184 (cache 3092)
+  [stmt-gen] 3000/3184 (cache 3142)
+  [stmt-gen] 3050/3184 (cache 3192)
+  [stmt-gen] 3100/3184 (cache 3242)
+  [stmt-gen] 3150/3184 (cache 3292)
+  [stmt-gen] 3184/3184 (cache 3326)
+gen: {"chunks_newly_generated": 3184, "chunks_cached_now": 3326, "prompt_tokens": 1747315, "completion_tokens": 2092275, "estimated_cost_usd": 1.5175, "wall_seconds": 2055.6}
+[embeddings] backend=huggingface model=Octen/Octen-Embedding-0.6B
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 29091.92it/s]
+/Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/src/embeddings.py:59: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  self.dim = int(self.model.get_sentence_embedding_dimension())
+  embedded 3326 original chunks in 402s
+  embedded 16613 generated questions in 99s
+round-trip filter: kept 9293/16613 (44.1% filtered)
+  baseline                                 Hit@1=0.408 Hit@5=0.684 Hit@10=0.759 MRR=0.518 nDCG@10=0.564 p95=0.297ms
+  q10_statement_raw_append                 Hit@1=0.456 Hit@5=0.702 Hit@10=0.772 MRR=0.563 nDCG@10=0.591 p95=0.437ms
+  q10_statement_roundtrip_filter_append    Hit@1=0.447 Hit@5=0.689 Hit@10=0.772 MRR=0.557 nDCG@10=0.589 p95=0.466ms
+  q10_statement_score_fusion               Hit@1=0.513 Hit@5=0.706 Hit@10=0.794 MRR=0.603 nDCG@10=0.622 p95=1.237ms
+  q10_statement_filtered_score_fusion      Hit@1=0.474 Hit@5=0.697 Hit@10=0.772 MRR=0.572 nDCG@10=0.599 p95=1.302ms
+  q10_statement_filtered_fusion_rerank     Hit@1=0.439 Hit@5=0.684 Hit@10=0.750 MRR=0.532 nDCG@10=0.568 p95=0.799ms
+| condition | hit@1 | hit@5 | hit@10 | mrr | ndcg@10 | generated_questions | kept_questions | filtered_pct | embeddings | index_mb | storage_x | search_p95_ms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| baseline | 0.4079 | 0.6842 | 0.7588 | 0.5185 | 0.5644 | 0 | 0 | 0.0 | 3326 | 23.496 | 1.0 | 0.297 |
+| q10_statement_raw_append | 0.4561 | 0.7018 | 0.7719 | 0.5628 | 0.5907 | 16613 | 16613 | 0.0 | 3326 | 23.527 | 1.0 | 0.437 |
+| q10_statement_roundtrip_filter_append | 0.4474 | 0.6886 | 0.7719 | 0.5573 | 0.5889 | 16613 | 9293 | 44.1 | 3326 | 23.527 | 1.0 | 0.466 |
+| q10_statement_score_fusion | 0.5132 | 0.7061 | 0.7939 | 0.603 | 0.6219 | 16613 | 16613 | 0.0 | 19939 | 99.959 | 4.25 | 1.237 |
+| q10_statement_filtered_score_fusion | 0.4737 | 0.6974 | 0.7719 | 0.5724 | 0.5991 | 16613 | 9293 | 44.1 | 12619 | 63.815 | 2.72 | 1.302 |
+| q10_statement_filtered_fusion_rerank | 0.4386 | 0.6842 | 0.75 | 0.5316 | 0.5681 | 16613 | 9293 | 44.1 | 12619 | 63.815 | 2.72 | 0.799 |
+failure analysis vs 'q10_statement_score_fusion': +13/-5/=210
+
+All outputs under /Users/katerina_dimitrova/Downloads/Iris.ai RAG research/Structured, Unstructured, Tables, Charts Context Enrichment /context-enrichment-rag/results/spiqa/test-B/statement_q10_enrichment
